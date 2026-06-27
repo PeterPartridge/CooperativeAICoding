@@ -6,7 +6,10 @@
 >
 > When you're done, this brief gets handed to Claude using the bridge in **[`claude-only/1-translate-to-claude.md`](claude-only/1-translate-to-claude.md)**, which turns your answers into instructions the AI can follow.
 >
-> **How the folders are laid out:** this project brief lives at the root. Each **solution** (e.g. `frontEnd`, `backend`) gets its own folder, and each **page** is a file inside it — e.g. `frontEnd/page1.md`, `backend/userLogin.md`. To create a page, copy [`_forms/page.md`](_forms/page.md) into the right solution folder. Endpoints and data models for that page go in the same solution folder (copies of [`_forms/endpoint.md`](_forms/endpoint.md) and [`_forms/database-model.md`](_forms/database-model.md)).
+> **How the folders are laid out:** this project brief lives at the root. Each **solution** gets its own folder, with a **spec file** at its root that defines the solution's technology, plus one file per page/endpoint/model. See [`example/`](example/) for a worked Clothing project. Pick the spec form that matches the solution type:
+> - **Website / front-end** → [`_forms/Website-spec.md`](_forms/Website-spec.md) + pages from [`_forms/page.md`](_forms/page.md) (e.g. `ClothingWebsite/userLogin.md`)
+> - **API** → [`_forms/API-spec.md`](_forms/API-spec.md) + resources from [`_forms/endpoint.md`](_forms/endpoint.md) (e.g. `ClothingAPI/Login.md`)
+> - **Database** → [`_forms/Database-spec.md`](_forms/Database-spec.md) + tables from [`_forms/database-model.md`](_forms/database-model.md) (e.g. `ClothingDatabase/UserCredentials.md`)
 
 ---
 
@@ -42,6 +45,8 @@ _Your answer:_
 
 ## Part 2 — How Should We Build the Solution(s) *(Developers answer this)*
 
+> Each **solution** (API, website, database, etc.) gets its own folder with a spec file that defines its specific technology — language, framework, hosting, database engine. The questions here set the **overall** direction; the solution specs fill in the detail.
+
 **6. What platforms would this development need to run on?**
 > e.g. a website, Android, iOS, Windows service, etc.
 
@@ -52,25 +57,26 @@ _Your answer:_
 
 _Your answer:_
 
-**9. Software development rules for the codebase.**
+**8. Software development rules for the codebase.**
 > List rules for how the code will be written in general and add Software development practices to follow and how you define them and the AI must use this definition.
 > e.g. Build this using DRY (Do not repeat yourself) — if you are repeating code three times, put that code into a shared library where it can be accessed.
 > All Frontend code will use CamelCase for page names.
 
 _Your answer:_
 
-**10. Can you list roles or claims that will be used int he application?**
-> e.g. Claims Admin, SuperAdmin, Manager, ?
+**9. List the roles or claims used across the application.**
+> The shared vocabulary every solution authorises against.
+> e.g. Admin, SuperAdmin, Manager.
 
 _Your answer:_
 
-**11. What technology will host this solution?**
-> e.g. a particular hosting service, an app store, your own servers. "Not decided" is not a valid answer.
+**10. What technology will host these solutions?**
+> e.g. a particular hosting service, an app store, your own servers. "Not decided" is not a valid answer. (Each solution spec can refine this.)
 
 _Your answer:_
 
-**11. Databse technology will this solution use?**
-> e.g. a particular hosting service, an app store, your own servers. "Not decided" is not a valid answer.
+**11. What database technology will the solution(s) use?**
+> e.g. PostgreSQL, MySQL, SQL Server, MongoDB. "Not decided" is not a valid answer. (Each Database solution restates its engine in its `Database-spec.md`.)
 
 _Your answer:_
 

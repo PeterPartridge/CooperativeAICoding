@@ -1,24 +1,28 @@
+# Database Solution Spec — <Solution / Folder Name>
+
 > **Who fills this in:** Developers.
 >
-> **When:** whenever a page needs to store data. One of these per model/table. Copy it into the same **solution folder** as the page it belongs to and link it from that page.
+> **When:** once per database solution. This file sits at the root of the database's solution folder and defines the engine and hosting. Each table/model is a separate file in the same folder (copies of [`database-model.md`](database-model.md)).
 >
-> **How:** answer in plain English where you can. Then hand it to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md) along with the page it serves.
-> ** solution** definintion the folder this file is sitting in is the solution it is part of
+> **How:** answer in plain English. Then hand it to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md).
+>
+> **Solution = the folder this file sits in.**
 
+---
 
 **Which database type does it use?**
-> Be specific — this is where we define the database engine for this model.
-> e.g. PostgreSQL, MySQL, SQLite, SQL Server, MongoDB, DynamoDB, Redis, etc.
+> Be specific — this defines the database engine for every model in this solution.
+> e.g. PostgreSQL, MySQL, SQLite, SQL Server, MongoDB, DynamoDB, Redis.
 
 _Your answer:_
 
-**Where will this be deployed?
-> Be specific — this is where we define how this will be hosted?
-> e.g. firebase, Azure SQL Server, Azure CosmoDb , etc.
+**Where will it be deployed / hosted?**
+> e.g. Firebase, Azure SQL, Azure Elastic Pool, Azure Cosmos DB.
 
+_Your answer:_
 
-**What can this solution not deploy?
-> Be specific — this is where we define how this will be hosted?
-> e.g. firebase, Azure SQL Server, Azure CosmoDb , etc.
-> If the project standardises on one database (set in the Project Brief), repeat it here so each model is self-contained.
----
+**What can this solution NOT do / not deploy?**
+> Constraints the AI must respect when building against this database.
+> e.g. "No SQL Agent Jobs on an Elastic Pool."
+
+_Your answer:_

@@ -5,11 +5,10 @@
 > **When:** whenever a page needs to store data. One of these per model/table. Copy it into the same **solution folder** as the page it belongs to and link it from that page.
 >
 > **How:** answer in plain English where you can. Then hand it to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md) along with the page it serves.
+>
+> **Solution = the folder this file sits in. Table / object name = this file's name.** The database engine is set once for the whole solution in [`Database-spec.md`](Database-spec.md).
 
 ---
-
-## Where this lives
-
 
 ## What this model is
 
@@ -24,9 +23,9 @@ _Your answer:_
 
 > One row per piece of data. "Type" can be plain (text, number, date, true/false, money, list) — Developers can map it to the real database type.
 
-| Field name | Type | Required? | Default | Rules / constraints | Description |
+| Field name | Type | Nullable? | Default | Rules / constraints | Description |
 |------------|------|-----------|---------|---------------------|-------------|
-| id         | id / key | yes    | auto    | unique              | The unique identifier |
+| id         | id / key | No     | auto    | unique              | The unique identifier |
 | <...>      | <...> | <...>    | <...>   | <...>               | <...>       |
 
 ---
@@ -35,9 +34,9 @@ _Your answer:_
 
 > How this model connects to others. Leave blank if it stands alone.
 
-| Related model | Relationship | Notes |
-|---------------|--------------|-------|
-| <...>         | one-to-many / many-to-one / many-to-many | <...> |
+| Field | Relationship | Related table | Related field | Constraint name |
+|-------|--------------|---------------|---------------|-----------------|
+| <...> | one-to-many / many-to-one / many-to-many | <...> | <...> | <...> |
 
 ---
 

@@ -1,67 +1,53 @@
-# Endpoint — <Short Name (e.g. "Get customer orders")>
+# Endpoint(s) — <Resource name, e.g. "User maintenance">
 
 > **Who fills this in:** Developers.
 >
-> **When:** for each endpoint a page needs. One of these per endpoint. Copy it into the same **solution folder** as the page it serves (e.g. `backend/userLogin-get.md`) and link it from that page.
+> **When:** for each resource (a group of related operations) an API needs. One file per resource. Lives in the API's solution folder; the API itself is defined in that folder's [`API-spec.md`](API-spec.md).
 >
-> **How:** answer in plain English where you can. Then hand it to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md) along with the page and any data models it touches.
-
----
-
-## Where this lives
-
-**Which solution / service does this endpoint belong to?**
-
-_Your answer:_
-
-**Which page(s) use it?**
-
-_Your answer:_
+> **How:** answer in plain English. Then hand it to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md), along with the page and any data models it touches.
+>
+> **Solution = the folder this file sits in.**
 
 ---
 
 ## What it does
 
-**In one line, what is this endpoint for?**
-> e.g. "Return the list of orders for the logged-in customer."
+**In one line, what is this resource for?**
+> e.g. "Create, log in, and manage users."
 
 _Your answer:_
 
-**Method and path**
-> e.g. `GET /customers/{id}/orders`
+**Overall base path**
+> e.g. `/users`
 
 _Your answer:_
 
 ---
 
-## Who can call it
+## Operations
 
-**Does it require authentication?** _(yes / no)_
+> One row per operation. "Who can call" uses the roles/claims from the Project Brief.
 
-_Your answer:_
-
-**Who is allowed to call it?**
-> e.g. the logged-in customer (their own data only), admins, another service.
-
-_Your answer:_
+| Method | Name | Path | Auth required? | Who can call (roles/claims) |
+|--------|------|------|----------------|------------------------------|
+| POST | LoginUser | /login | No | Everyone |
+| <...> | <...> | <...> | <...> | <...> |
 
 ---
 
 ## Request
 
-**What does the caller send?**
-> Path parts, query options, and/or a body. Say which are required.
+**What does each operation expect in the body?**
+> Show the shape per operation. Mark which fields are required.
 
-| Part | Where (path / query / body) | Type | Required? | Description |
-|------|-----------------------------|------|-----------|-------------|
-| <...> | <...>                      | <...> | <...>    | <...>       |
+_Your answer:_
 
 ---
 
 ## Response
 
-**What does a successful response return?**
-> Describe the shape, and which [data model(s)](../_forms/database-model.md) it comes from.
+**What does each operation return?**
+> Describe the shape, and which data model(s) it comes from (the model files in the Database solution).
 
 _Your answer:_
 
@@ -69,13 +55,8 @@ _Your answer:_
 
 | Code | Meaning |
 |------|---------|
-| 200  | Success |
-| <...> | <...>  |
-
-**What can go wrong, and what does the caller get back?**
-> e.g. "Not logged in → 401", "Order not found → 404".
-
-- <...>
+| 200 | Success |
+| <...> | <...> |
 
 ---
 
@@ -83,4 +64,4 @@ _Your answer:_
 
 - **Which data models does it read or write?** <...>
 - **Any limits** (rate limits, page size, max payload)? <...>
-- **Anything to watch out for** (slow queries, side effects, things that must not happen twice)? <...>
+- **Anything to watch out for** (side effects, things that must not happen twice)? <...>

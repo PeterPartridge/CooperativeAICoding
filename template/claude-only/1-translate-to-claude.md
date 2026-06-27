@@ -35,10 +35,10 @@ The AI defines skills at **two levels**: skills for the **whole project** (fille
 5. Read it back. If anything's wrong, tell Claude in plain English ("the admin shouldn't be able to delete orders") and it will redo that part.
 6. Save the result inside `claude-only/`, **mirroring the human folder layout**:
    - the Project Brief → `claude-only/Project_system.md`
-   - a page like `frontEnd/page1.md` → `claude-only/frontEnd/page1.md`
-   - a page like `backend/userLogin.md` → `claude-only/backend/userLogin.md`
+   - a page like `ClothingWebsite/userLogin.md` → `claude-only/ClothingWebsite/userLogin.md`
+   - a resource like `ClothingAPI/Login.md` → `claude-only/ClothingAPI/Login.md`
 
-   So for every solution folder on the human side, Claude creates a matching solution folder on its side, with one spec file per page.
+   So for every solution folder on the human side, Claude creates a matching solution folder on its side, with one spec file per item.
 
 ---
 

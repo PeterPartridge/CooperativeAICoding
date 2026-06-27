@@ -2,7 +2,7 @@
 
 > **Who fills this in:** Product describes what the page is for; Developers add the building details. One of these per page (a page is one screen or section of the project).
 >
-> **Where it goes:** copy this file into the page's **solution folder**, named after the page — e.g. `frontEnd/page1.md` or `backend/userLogin.md`.
+> **Where it goes:** copy this file into the website **solution folder**, named after the page — e.g. `ClothingWebsite/userLogin.md`.
 >
 > **How:** answer in plain English, same as the Project Brief. Then hand it to Claude using the bridge in **[`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md)**.
 

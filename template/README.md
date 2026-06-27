@@ -8,34 +8,52 @@ This folder is the working layout for a project built with the CooperativeAICodi
 template/
 ├─ Project_brief.md              ← fill in once (the whole project)
 ├─ _forms/                       ← blank master forms — copy these, don't fill them in place
-│  ├─ page.md                    ← one per page
-│  ├─ endpoint.md                ← one per endpoint
+│  ├─ Website-spec.md            ← solution spec: one per website / front-end
+│  ├─ API-spec.md                ← solution spec: one per API
+│  ├─ Database-spec.md           ← solution spec: one per database
+│  ├─ page.md                    ← one per website page
+│  ├─ endpoint.md                ← one per API resource
 │  └─ database-model.md          ← one per data model / table
 │
 ├─ <solution>/                   ← one folder per solution (you create these)
-│  └─ <page>.md                  ← a filled page form, plus its endpoint/model forms
+│  ├─ <Type>-spec.md             ← the solution's spec (Website / API / Database)
+│  └─ <item>.md                  ← its pages / endpoints / models
+│
+├─ example/                      ← a worked Clothing project to copy from
+│  ├─ ClothingWebsite/  (Website-spec.md + userLogin.md)
+│  ├─ ClothingAPI/      (API-spec.md + Login.md)
+│  └─ ClothingDatabase/ (Database-spec.md + UserCredentials.md)
 │
 └─ claude-only/                  ← Claude's side — no human input
    ├─ 1-translate-to-claude.md   ← the bridge: turns a form into a structured spec + skills
    ├─ 2-claude-system.template.md← the shape Claude's specs come back in
-   └─ <solution>/<page>.md       ← Claude mirrors your solution folders here
+   └─ <solution>/<item>.md       ← Claude mirrors your solution folders here
 ```
+
+**Solutions are typed.** Each solution folder holds one **spec file** describing the whole solution, plus its items:
+
+| Solution type | Spec form | Item form | Example |
+|---------------|-----------|-----------|---------|
+| Website / front-end | `Website-spec.md` | `page.md` | `ClothingWebsite/userLogin.md` |
+| API | `API-spec.md` | `endpoint.md` | `ClothingAPI/Login.md` |
+| Database | `Database-spec.md` | `database-model.md` | `ClothingDatabase/UserCredentials.md` |
 
 ## How to use it
 
-1. **Fill in [`Project_brief.md`](Project_brief.md)** — once, for the whole project. List your solutions here (e.g. `frontEnd`, `backend`).
+1. **Fill in [`Project_brief.md`](Project_brief.md)** — once, for the whole project. List your solutions here (e.g. `ClothingWebsite`, `ClothingAPI`, `ClothingDatabase`).
 
-2. **Create a folder per solution.** For each solution, make a folder under `template/` — e.g. `frontEnd/`, `backend/`.
+2. **Create a folder per solution**, and drop in its spec. Copy the matching spec form from [`_forms/`](_forms/) into the folder — `Website-spec.md`, `API-spec.md`, or `Database-spec.md`.
 
-3. **Add a page.** Copy [`_forms/page.md`](_forms/page.md) into the right solution folder and name it after the page:
-   - `frontEnd/page1.md`
-   - `backend/userLogin.md`
+3. **Add the items.** Copy the matching item form into the same folder and name it after the item:
+   - Website page → `page.md` → e.g. `ClothingWebsite/userLogin.md`
+   - API resource → `endpoint.md` → e.g. `ClothingAPI/Login.md`
+   - Database table → `database-model.md` → e.g. `ClothingDatabase/UserCredentials.md`
 
-4. **Add detail.** For each endpoint or data model that page needs, copy [`_forms/endpoint.md`](_forms/endpoint.md) and [`_forms/database-model.md`](_forms/database-model.md) into the same solution folder, and link them from the page.
+4. **Translate.** Hand any filled-in form to Claude using [`claude-only/1-translate-to-claude.md`](claude-only/1-translate-to-claude.md). Claude returns a structured spec **plus the skills it needs**, and saves it in `claude-only/` mirroring your folders — e.g. `ClothingWebsite/userLogin.md` → `claude-only/ClothingWebsite/userLogin.md`.
 
-5. **Translate.** Hand any filled-in form to Claude using [`claude-only/1-translate-to-claude.md`](claude-only/1-translate-to-claude.md). Claude returns a structured spec **plus the skills it needs**, and saves it in `claude-only/` mirroring your folders — e.g. `frontEnd/page1.md` → `claude-only/frontEnd/page1.md`.
+5. **Check and approve.** Read the spec back, fix anything in plain English, then let the AI build — smallest change first, one item at a time.
 
-6. **Check and approve.** Read the spec back, fix anything in plain English, then let the AI build — smallest change first, one page at a time.
+See [`example/`](example/) for a complete worked project you can copy from.
 
 ## Why two sides
 
