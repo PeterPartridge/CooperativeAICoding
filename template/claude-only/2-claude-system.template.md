@@ -61,6 +61,18 @@
 
 ---
 
+## Project Digest *(reused by page translations)*
+
+> A compact, self-contained extract of the constraints that bind every page. Page translations read **this** instead of the whole spec, so the full project document isn't re-sent per page. Keep it under ~12 lines.
+
+- **Platform / tech:** <...>
+- **House rules:** <names only, e.g. DRY, CamelCase page names>
+- **Security model:** <how users log in, how endpoints are protected>
+- **Roles:** <...>
+- **Model & effort tiers:** <cheapest → … ; low/med/high effort → …>
+
+---
+
 ## Project Skills *(defined by the AI)*
 
 > The capabilities the AI needs for the project as a whole. A short list means a tidy scope; a long one is a signal to break the project down.

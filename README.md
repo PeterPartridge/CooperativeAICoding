@@ -100,3 +100,11 @@ The working layout lives in [`template/`](template/). **You** fill in plain-Engl
 - **[`template/claude-only/`](template/claude-only/)** — Claude's side (no human input): the [translate bridge](template/claude-only/1-translate-to-claude.md) and the [spec shape](template/claude-only/2-claude-system.template.md). Claude mirrors your solution folders here, e.g. `frontEnd/page1.md` → `claude-only/frontEnd/page1.md`.
 
 See [`template/README.md`](template/README.md) for the full layout and step-by-step flow.
+
+## Getting started
+
+New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses three Claude Code slash commands:
+
+- **`/translate <brief>`** — turn a filled-in brief into a structured spec + skills.
+- **`/new-item <type> <solution> <name>`** — copy a blank page/endpoint/model form into a solution folder.
+- **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.

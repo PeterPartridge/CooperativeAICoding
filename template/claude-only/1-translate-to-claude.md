@@ -8,11 +8,13 @@
 
 ## What you'll get back
 
-When you run the translation, Claude produces two things:
+When you run the translation, Claude produces three things (the Project Brief gets all three; a Page Brief gets the spec and skills):
 
 1. **A System Spec** — your brief, reorganised into clear labelled sections (who it's for, the rules, the constraints, the design). This is what the AI re-reads every time it builds. The blank shape of it lives in **[`2-claude-system.template.md`](2-claude-system.template.md)** so the output always looks the same.
 
-2. **A Skills List** — the AI's own answer to *"what do I need to be good at to build this?"*
+2. **A Project Digest** — a short (~12-line) constraints block extracted from the spec. Page translations reuse *this* instead of the whole project spec, so you don't re-send the full document for every page. Only produced at the project level.
+
+3. **A Skills List** — the AI's own answer to *"what do I need to be good at to build this?"*
 
 ### What a "skill" means here (in plain words)
 
@@ -52,7 +54,7 @@ Your job is to translate it — do NOT invent features, scope, or technology tha
 isn't in the brief. If something important is missing, list it under "Open
 Questions" instead of guessing.
 
-Produce TWO sections:
+Produce THREE sections:
 
 1. SYSTEM SPEC — reorganise the brief into these labelled headings:
    - Purpose (one line)
@@ -64,7 +66,13 @@ Produce TWO sections:
    - Model & effort selection (which AI model — cheapest / mid-range / most capable — and how much reasoning effort, matched to task difficulty)
    - Open Questions (anything missing or unclear)
 
-2. PROJECT SKILLS — the capabilities you'll need to build this project well.
+2. PROJECT DIGEST — a compact, self-contained extract that page translations
+   reuse instead of re-reading the whole spec. Keep it under ~12 lines, just the
+   constraints that bind every page: platform/tech, the house rules (names only),
+   security model, roles, and the model/effort tiers. This is the ONLY part a
+   page translation needs to see from the project level.
+
+3. PROJECT SKILLS — the capabilities you'll need to build this project well.
    Present as a table: Skill | Why it's needed | How you'll use it | Tools/approach.
    Keep it to the skills the brief actually justifies. If the list grows long,
    note that the project may need breaking into smaller parts.
@@ -84,9 +92,17 @@ Here is the brief:
 ### Prompt B — Translate a Page Brief
 
 ```text
-You are working on a software project that already has a Project System Spec
-(pasted first below). Now translate the Page Brief (pasted second) for one page,
-using the "CooperativeAICoding" framework.
+You are working on a software project that already has a Project System Spec.
+Now translate the Page Brief (pasted below) for one page, using the
+"CooperativeAICoding" framework.
+
+To stay token-efficient, you do NOT need the full project spec — only its
+Project Digest (the short constraints block). Provide it ONE of these ways:
+  - If you can read files, open `claude-only/Project_system.md` and use its
+    Project Digest section. Do not paste it.
+  - Otherwise, paste just the Project Digest block where shown below.
+Only ask for more of the project spec if a page decision genuinely needs detail
+the digest doesn't cover.
 
 Do NOT invent anything not in the briefs. Stay inside the project's constraints,
 house rules, and security. If something important is missing, list it under
@@ -113,8 +129,8 @@ End with a short PLAN: a one-paragraph summary plus bullet points of the changes
 you'd make, and an honest note of anything you expect to leave as technical debt.
 Wait for a person to approve the plan before building.
 
-Here is the project system spec:
-<<< PASTE THE PROJECT SYSTEM SPEC HERE >>>
+Here is the project digest (or say "read from Project_system.md"):
+<<< PASTE THE PROJECT DIGEST BLOCK HERE >>>
 
 Here is the page brief:
 <<< PASTE THE FILLED-IN PAGE BRIEF HERE >>>
