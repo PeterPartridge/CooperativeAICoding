@@ -2,27 +2,26 @@
 
 A framework that gives **Product, Developers, and AI** a single, shared way of working — so that software is built to clear objectives, within agreed technical guardrails, without the AI wandering off and burning tokens rebuilding things that already work.
 
+Development is a team game, and normally this would involve Product working with Developers and Quality Assurance to build a good product, with continuous feedback from Product to Developers, Developers to Product, and QA to Developers and Product — all about capabilities, general product functionality, and look and feel.
+
 ## The Problem
 
-Traditionally, development is a two-way handoff: Product listens to customers, shapes an idea, and passes it to Developers to build (with varying levels of rigour).
+AI allows us to move faster, but this also means communication involves AI putting its own spin on the product, the coding, and how the QA is written. The plan of this framework is to make AI part of the team and stop AI from going its own way with a product.
 
-AI turns this into a **three-way process**:
-
-1. **Product** — the idea and the customer need.
-2. **Developers** — the technology required to achieve it.
-3. **AI** — the code that brings the idea to life using that technology.
-
-Without structure, the AI tends to:
+AI when given vague or general descriptions tends to:
 
 - get lost and add endpoints or features that weren't asked for,
 - spend a lot of tokens creating, then recreating, the same work, and
 - produce large-scale changes at high speed that overwhelm teams and destabilise production.
 
-The goal is to put **guardrails** around this so that code can be built by *any* AI, yet stays uniform and follows one consistent flow.
+The goal is to give AI and all team members a source of truth for the product. Create **guardrails** around this so AI can build a solution that developers can maintain, following the Product flow, and also give AI a place to feed back what it cannot do. This also allows developers to keep to the idea of changing as little production code as possible and to use AI to create more testable code.
 
 ## How It Works
 
-The framework is defined in two layers: a **global** setup that applies to the whole system, and **pages** that are built up iteratively.
+The framework is defined in three areas:
+- The Project brief, which is the why we are doing this, plus general development rules and structure, and gives AI the software engineering practices to employ and how the developers it is working with define these ideas.
+- The solution specification, which is where developers define the reason for each solution, give AI the solution-specific guidance, and set it up to successfully move quickly.
+- The endpoint/page/database model, which allows us to define the purpose of what we are creating and what we need from the page, and is designed to build a page iteratively. AI can do the task and, instead of burning tokens trying to implement something it can't understand, it says "I can implement this" and allows the developers to tell it how to implement it, or go to Product and rethink the feature.
 
 ### Global Setup
 
