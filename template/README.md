@@ -44,7 +44,7 @@ template/
 | API | `API-spec.json` | `endpoint.json` | `ClothingAPI/Login.json` |
 | Database | `Database-spec.json` | `database-model.json` | `ClothingDatabase/UserCredentials.json` |
 
-**How the forms work.** Two shapes, matched to their content, and both carry the same metadata (`form`, a name, and `status: blank | filled | approved`):
+**How the forms work.** Two shapes, matched to their content, and both carry the same metadata (`form`, a name, and `status: blank | filled | approved | built`). Item briefs also declare `depends-on`/`dependsOn` — the briefs that must be built before them (a page depends on its endpoints; an endpoint on its models) — and `/build` refuses to run out of order:
 
 - **Prose briefs are Markdown** (`Project_brief.md`, `page.md`): one `### <id> — <question>` heading per question. Lines starting with `>` are guidance and examples; whatever else you write under the heading is your answer.
 - **Record-style forms are JSON** (endpoints, models, solution specs): question objects with `question` / `guidance` / `example`, where you fill in the `answer` fields — plus `entries` lists for rows like operations and database fields.

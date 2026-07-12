@@ -2,6 +2,7 @@
 form: page-brief
 page: userLogin
 solution: ClothingWebsite
+depends-on: [ClothingAPI/Login.json]
 status: filled
 ---
 

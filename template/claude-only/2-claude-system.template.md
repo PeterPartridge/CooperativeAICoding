@@ -112,6 +112,10 @@
 
 <...>
 
+**Depends on** _(briefs that must be `built` before this one)_
+
+- <...>
+
 **Actions**
 
 | User | Can do |

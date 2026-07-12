@@ -14,7 +14,7 @@ staying token-efficient (no re-sending the whole project spec for every page).
 
 Trigger when the user provides, or points at, a filled-in form from this framework.
 Forms come in two shapes; both carry a `form` key (which kind it is) and a `status`
-key (`blank | filled | approved`):
+key (`blank | filled | approved | built`):
 - **Markdown briefs** (project brief, page briefs) — YAML frontmatter + one `###
   <id> — <question>` heading per question. Under a heading, lines starting with `>`
   are form guidance/examples; everything else is the person's answer. Never treat
@@ -53,7 +53,7 @@ If you can't tell which, ask once. Don't translate a blank master form from
 1. **Get project constraints cheaply.** Read `template/claude-only/Project_system.md` and use *only* its **Project Digest** section. Do not load the whole spec unless a specific page decision needs detail the digest doesn't cover. If `Project_system.md` doesn't exist yet, translate the Project Brief first (procedure A).
 2. Read the page brief.
 3. Produce:
-   - **Page Spec** — Page objective, Model & effort, Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
+   - **Page Spec** — Page objective, Model & effort, Depends on (the briefs listed in `depends-on`/`dependsOn` that must be built first), Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
    - **Page Skills** — table building on the project skills (don't repeat them); flag any skill new for this page.
    - **PLAN** — one-paragraph summary + bullet changes + an honest note of expected technical debt.
 4. Save to the mirrored path: `<solution>/<item>.md|.json` → `template/claude-only/<solution>/<item>.md` (e.g. `ClothingWebsite/userLogin.md` → `template/claude-only/ClothingWebsite/userLogin.md`, `ClothingAPI/Login.json` → `template/claude-only/ClothingAPI/Login.md`).

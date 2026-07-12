@@ -1,6 +1,6 @@
 {
   "purpose": "Named presets a solution spec can adopt instead of hand-writing everything: scaffold presets (file layout, tests, commands) and security baselines (the rules a solution must obey).",
-  "howToUse": "In your solution spec's scaffold block, set boilerplate.answer to a scaffold preset name; in its security block, set baseline.answer to a security baseline name. Scaffold fields you fill in yourself override the preset. Security rules you add are ADDITIONS — they can never weaken the baseline. These are starting points — edit this file or add your own to match how your team really works.",
+  "howToUse": "In your solution spec's scaffold block, set boilerplate.answer to a scaffold preset name; in its security block, set baseline.answer to a security baseline name. Scaffold fields you fill in yourself override the preset. Security rules you add are ADDITIONS — they can never weaken the baseline. Versions are pinned in each preset so scaffolding is deliberate — update them here to move; if a preset doesn't pin something, the AI uses the latest stable release and records the exact version in its report-back. These are starting points — edit this file or add your own to match how your team really works.",
   "securityBaselines": {
     "website-baseline": {
       "solutionType": "website",
@@ -42,6 +42,7 @@
     "react-vite": {
       "solutionType": "website",
       "description": "TypeScript + React on Vite, tested with Vitest + React Testing Library. Works with Tailwind or plain CSS.",
+      "versions": { "node": "22 LTS", "typescript": "5", "react": "19", "vite": "6", "vitest": "3" },
       "fileLayout": [
         "src/pages/ — one file per page, named after the page brief (CamelCase)",
         "src/components/ — shared UI components",
@@ -64,6 +65,7 @@
     "go-azure-functions": {
       "solutionType": "api",
       "description": "Go HTTP handlers hosted on Azure Functions (custom handler), table-driven tests with the standard library.",
+      "versions": { "go": "1.24", "azureFunctionsCoreTools": "4" },
       "fileLayout": [
         "cmd/api/main.go — entry point and router",
         "internal/handlers/ — one file per resource, matching the endpoint briefs",
@@ -86,6 +88,7 @@
     "dotnet-webapi": {
       "solutionType": "api",
       "description": "C# ASP.NET Core Web API tested with xUnit and WebApplicationFactory.",
+      "versions": { "dotnet": "8.0 LTS", "xunit": "2" },
       "fileLayout": [
         "src/<Solution>.Api/Controllers/ — one controller per resource, matching the endpoint briefs",
         "src/<Solution>.Api/Services/ — business logic behind the controllers",
@@ -106,6 +109,7 @@
     "sql-server-database-project": {
       "solutionType": "database",
       "description": "SQL Server database project (DACPAC) — one .sql file per table, deployed with sqlpackage.",
+      "versions": { "sqlServerTarget": "2022", "dotnetSdk": "8.0 (Microsoft.Build.Sql)" },
       "fileLayout": [
         "Tables/ — one CREATE TABLE .sql per database-model brief",
         "StoredProcedures/ — one .sql per procedure, if any",

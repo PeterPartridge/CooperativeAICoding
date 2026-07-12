@@ -131,6 +131,8 @@ Produce TWO sections:
 1. PAGE SPEC — reorganise the page brief into these labelled headings:
    - Page objective (the one unchanging purpose)
    - Model & effort (default model and effort level for this page, from the project's tiers)
+   - Depends on (the briefs the item's depends-on/dependsOn field lists — these
+     must be built before this one)
    - Actions (what each kind of user can do)
    - Information shown / collected
    - Data to store (each item and what it looks like)

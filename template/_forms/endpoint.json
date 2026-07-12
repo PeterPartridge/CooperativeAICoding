@@ -2,6 +2,11 @@
   "form": "endpoint-brief",
   "resourceName": "",
   "status": "blank",
+  "dependsOn": {
+    "guidance": "Briefs that must be built before this one — usually the database models this resource reads or writes.",
+    "example": ["ClothingDatabase/UserCredentials.json"],
+    "entries": []
+  },
   "instructions": {
     "whoFillsThisIn": "Developers.",
     "when": "For each resource (a group of related operations) an API needs. One file per resource. Lives in the API's solution folder; the API itself is defined in that folder's API-spec.json.",
@@ -51,5 +56,10 @@
       "question": "Anything to watch out for (side effects, things that must not happen twice)?",
       "answer": ""
     }
+  },
+  "changesOverTime": {
+    "guidance": "You don't fill this in at the start. Each time you come back to change this resource, add an entry describing what should change. Keep changes small.",
+    "exampleEntry": { "round": 2, "change": "Add a DELETE operation, Admin only." },
+    "rounds": []
   }
 }

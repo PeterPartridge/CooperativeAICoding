@@ -6,7 +6,7 @@
 >
 > **Where it's saved:** `claude-only/Code_map.md` — one file for the whole project, with one section per solution. `/build` updates it in the **Report back** step every time it creates, renames, or removes a method, and reads it in the **Plan** step.
 >
-> **Keeping it honest:** one row per method, one line per description. If a method changes so the row is wrong, the same build that changed it fixes the row. Rows are never left stale — an out-of-date map is worse than none.
+> **Keeping it honest:** one row per method, one line per description. If a method changes so the row is wrong, the same build that changed it fixes the row. Rows are never left stale — an out-of-date map is worse than none. If the project adopts an existing codebase, the map starts empty and grows as builds touch existing methods — add a row for any existing method a build calls or changes, so the map converges on the code that actually matters.
 
 ---
 

@@ -2,7 +2,8 @@
 form: page-brief
 page: ""
 solution: ""
-status: blank            # blank | filled | approved
+depends-on: []           # briefs that must be built first, e.g. [ClothingAPI/Login.json]
+status: blank            # blank | filled | approved | built
 ---
 
 # Page Brief — <Page Name>

@@ -2,6 +2,11 @@
   "form": "database-model",
   "modelName": "",
   "status": "blank",
+  "dependsOn": {
+    "guidance": "Briefs that must be built before this one — usually the tables this model's relationships point at.",
+    "example": ["ClothingDatabase/Customer.json"],
+    "entries": []
+  },
   "instructions": {
     "whoFillsThisIn": "Developers (Product can sanity-check the information being stored).",
     "when": "Whenever a page needs to store data. One of these per model/table. Copy it into the same solution folder as the page it belongs to and link it from that page.",
@@ -43,5 +48,10 @@
       "example": "An order must belong to a customer.",
       "answer": ""
     }
+  },
+  "changesOverTime": {
+    "guidance": "You don't fill this in at the start. Each time you come back to change this model, add an entry describing what should change. Keep changes small.",
+    "exampleEntry": { "round": 2, "change": "Add a lastLogin date field, nullable." },
+    "rounds": []
   }
 }

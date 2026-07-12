@@ -111,9 +111,9 @@ Claude will:
 ## Iterating
 
 Don't rewrite the form. Add a bullet under the **changes-over-time** section of a
-Markdown brief (e.g. "Round 2: add 'remember me'"), or a note in a JSON form's
-relevant field. Then re-run `/translate` on it and `/build` again. Keep each
-change small.
+Markdown brief (e.g. "Round 2: add 'remember me'"), or an entry to the
+**`changesOverTime.rounds`** list of a JSON brief. Then re-run `/translate` on it
+and `/build` again. Keep each change small.
 
 ---
 

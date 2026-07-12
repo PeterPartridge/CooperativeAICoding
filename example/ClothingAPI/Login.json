@@ -2,6 +2,9 @@
   "form": "endpoint-brief",
   "resourceName": "User maintenance",
   "status": "filled",
+  "dependsOn": {
+    "entries": ["ClothingDatabase/UserCredentials.json"]
+  },
   "exampleOf": "../../template/_forms/endpoint.json",
   "exampleNote": "A filled-in example. Lives in the ClothingAPI solution; the API itself is defined in API-spec.json.",
   "whatItDoes": {
@@ -53,5 +56,8 @@
       "question": "Anything to watch out for (side effects, things that must not happen twice)?",
       "answer": ""
     }
+  },
+  "changesOverTime": {
+    "rounds": []
   }
 }
