@@ -25,6 +25,13 @@
 
 <...>
 
+**Solutions & repositories**
+> Where each solution's code lives, so the AI builds in the right repo — including when solutions span multiple repositories.
+
+| Solution | Type | Repository | Local path |
+|----------|------|------------|------------|
+| <...> | website / API / database | <...> | <...> |
+
 **Coding house rules**
 
 | Rule | What it means on this project |
@@ -66,6 +73,7 @@
 > A compact, self-contained extract of the constraints that bind every page. Page translations read **this** instead of the whole spec, so the full project document isn't re-sent per page. Keep it under ~12 lines.
 
 - **Platform / tech:** <...>
+- **Solutions & repos:** <name → repo, local path; one per solution>
 - **House rules:** <names only, e.g. DRY, CamelCase page names>
 - **Security model:** <how users log in, how endpoints are protected>
 - **Roles:** <...>

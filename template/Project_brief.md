@@ -48,6 +48,13 @@ status: blank            # blank | filled | approved
 ### repo-structure — Is this a single repo or multi purpose repo?
 > e.g. one combined codebase, or separate repos for each service/app.
 
+### solutions — List each solution and where its code lives.
+> One bullet per solution, so the AI always builds in the right place — especially
+> when solutions live in separate repositories. Give the repository (URL, or "this
+> repo") and the local folder path where it's checked out relative to this project.
+> - Name: … — type: website / API / database — repo: … — local path: …
+> - e.g. Name: ClothingAPI — type: API — repo: github.com/you/clothing-api — local path: ../clothing-api
+
 ### dev-rules — Software development rules for the codebase.
 > List rules for how the code will be written in general, plus software development practices to follow and how you define them — the AI must use your definition.
 > e.g. Build this using DRY (Do not repeat yourself) — if you are repeating code three times, put that code into a shared library where it can be accessed.

@@ -1,0 +1,90 @@
+{
+  "purpose": "Named scaffold presets a solution spec can adopt instead of hand-writing its file layout, tests, and commands.",
+  "howToUse": "In your solution spec's scaffold block, set boilerplate.answer to one of the names below. Any scaffold field you also fill in yourself overrides the boilerplate's version of it. These are starting points — edit this file or add your own presets to match how your team really works.",
+  "boilerplates": {
+    "react-vite": {
+      "solutionType": "website",
+      "description": "TypeScript + React on Vite, tested with Vitest + React Testing Library. Works with Tailwind or plain CSS.",
+      "fileLayout": [
+        "src/pages/ — one file per page, named after the page brief (CamelCase)",
+        "src/components/ — shared UI components",
+        "src/lib/ — shared helpers (apiClient, auth)",
+        "src/pages/__tests__/ and src/lib/__tests__/ — tests beside what they test",
+        "public/ — static assets",
+        "index.html, vite.config.ts, tsconfig.json — project config"
+      ],
+      "testing": {
+        "framework": "Vitest + React Testing Library",
+        "kinds": "Unit tests for lib helpers and components; per page, one test for each check in the page brief's tests answer."
+      },
+      "commands": {
+        "install": "npm install",
+        "run": "npm run dev",
+        "build": "npm run build",
+        "test": "npm test"
+      }
+    },
+    "go-azure-functions": {
+      "solutionType": "api",
+      "description": "Go HTTP handlers hosted on Azure Functions (custom handler), table-driven tests with the standard library.",
+      "fileLayout": [
+        "cmd/api/main.go — entry point and router",
+        "internal/handlers/ — one file per resource, matching the endpoint briefs",
+        "internal/auth/ — JWT validation and role checks",
+        "internal/models/ — request/response structs",
+        "internal/handlers/*_test.go — table-driven tests beside each handler",
+        "host.json, local.settings.json — Azure Functions config"
+      ],
+      "testing": {
+        "framework": "Go standard testing package",
+        "kinds": "Table-driven tests per handler: happy path, auth required, wrong role — one case per operation in the endpoint brief."
+      },
+      "commands": {
+        "install": "go mod tidy",
+        "run": "func start",
+        "build": "go build ./...",
+        "test": "go test ./..."
+      }
+    },
+    "dotnet-webapi": {
+      "solutionType": "api",
+      "description": "C# ASP.NET Core Web API tested with xUnit and WebApplicationFactory.",
+      "fileLayout": [
+        "src/<Solution>.Api/Controllers/ — one controller per resource, matching the endpoint briefs",
+        "src/<Solution>.Api/Services/ — business logic behind the controllers",
+        "src/<Solution>.Api/Models/ — request/response and data models",
+        "tests/<Solution>.Tests/ — xUnit tests mirroring the src layout"
+      ],
+      "testing": {
+        "framework": "xUnit + WebApplicationFactory",
+        "kinds": "Integration test per endpoint operation (status codes, auth, roles) plus unit tests for services."
+      },
+      "commands": {
+        "install": "dotnet restore",
+        "run": "dotnet run --project src",
+        "build": "dotnet build",
+        "test": "dotnet test"
+      }
+    },
+    "sql-server-database-project": {
+      "solutionType": "database",
+      "description": "SQL Server database project (DACPAC) — one .sql file per table, deployed with sqlpackage.",
+      "fileLayout": [
+        "Tables/ — one CREATE TABLE .sql per database-model brief",
+        "StoredProcedures/ — one .sql per procedure, if any",
+        "Scripts/ — post-deployment seeds and reference data",
+        "<Solution>.sqlproj — the database project file"
+      ],
+      "testing": {
+        "framework": "tSQLt (or plain verification scripts if tSQLt is unavailable)",
+        "kinds": "Per model: uniqueness, nullability, defaults, and relationship constraints from the database-model brief."
+      },
+      "commands": {
+        "install": "",
+        "build": "dotnet build",
+        "deploy": "sqlpackage /Action:Publish",
+        "test": "run the tSQLt test classes"
+      }
+    }
+  }
+}

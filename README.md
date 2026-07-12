@@ -63,9 +63,9 @@ Each page is defined **once** by Product, then built up **iteratively** by Devel
 
 For each page (and each iteration), the AI follows a defined loop:
 
-1. **Plan** — the AI generates a plan from the questions above, with a summary at the top and bullet-point changes describing how each use case will be implemented.
+1. **Plan** — the AI generates a plan from the questions above, with a summary at the top and bullet-point changes describing how each use case will be implemented. It checks its **code map** first and reuses existing methods rather than rebuilding them.
 2. **Review & execute** — the developer reviews and updates the plan, then executes it.
-3. **Report back** — once complete, the AI updates the plan document with what it did, how each use case was implemented, and what test scenarios it created.
+3. **Report back** — once complete, the AI updates the plan document with what it did, how each use case was implemented, and what test scenarios it created. It also updates the **code map** (`claude-only/Code_map.md`): one row per method it created or changed — what it does in one line, and which other files and methods it uses.
 4. **Declare debt** — the AI lists any technical debt it created or anything it failed to implement.
 
 > The AI should **not** spend ages trying to fix or reimagine something. It builds the page simply and clearly records where it fell short and what debt it introduced.

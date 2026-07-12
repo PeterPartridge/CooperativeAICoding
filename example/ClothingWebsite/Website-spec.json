@@ -42,6 +42,28 @@
       "answer": "Azure Application Insights."
     }
   },
+  "scaffold": {
+    "boilerplate": {
+      "question": "Start from a named boilerplate?",
+      "answer": "react-vite"
+    },
+    "fileLayout": {
+      "question": "What is the folder and file layout of this solution's repo?",
+      "answer": []
+    },
+    "testing": {
+      "question": "What test framework should be used, and what kinds of tests?",
+      "answer": ""
+    },
+    "commands": {
+      "question": "The commands the AI should use to work with this repo.",
+      "install": "",
+      "run": "",
+      "build": "",
+      "test": ""
+    },
+    "note": "Everything comes from the react-vite boilerplate in _forms/boilerplates.json — no overrides."
+  },
   "notes": {
     "mustNotDo": {
       "question": "Anything this solution must NOT do?",

@@ -38,6 +38,11 @@ A website (desktop + mobile browsers).
 ### repo-structure — Is this a single repo or multi purpose repo?
 Multi — separate solutions for the website, API, and database.
 
+### solutions — List each solution and where its code lives.
+- Name: ClothingWebsite — type: website — repo: github.com/example/clothing-website — local path: ../clothing-website
+- Name: ClothingAPI — type: API — repo: github.com/example/clothing-api — local path: ../clothing-api
+- Name: ClothingDatabase — type: database — repo: github.com/example/clothing-database — local path: ../clothing-database
+
 ### dev-rules — Software development rules for the codebase.
 DRY — if code is repeated three times, move it to a shared library. Front-end page names use CamelCase.
 

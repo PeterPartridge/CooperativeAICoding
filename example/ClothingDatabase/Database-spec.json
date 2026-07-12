@@ -17,5 +17,27 @@
       "question": "What can this solution NOT do / not deploy?",
       "answer": "SQL Agent Jobs (not supported on an Elastic Pool)."
     }
+  },
+  "scaffold": {
+    "boilerplate": {
+      "question": "Start from a named boilerplate?",
+      "answer": "sql-server-database-project"
+    },
+    "fileLayout": {
+      "question": "What is the folder and file layout of this solution's repo?",
+      "answer": []
+    },
+    "testing": {
+      "question": "What test framework should be used, and what kinds of tests?",
+      "answer": ""
+    },
+    "commands": {
+      "question": "The commands the AI should use to work with this repo.",
+      "install": "",
+      "build": "",
+      "deploy": "",
+      "test": ""
+    },
+    "note": "Everything comes from the sql-server-database-project boilerplate — no overrides."
   }
 }

@@ -26,5 +26,30 @@
       "example": "No SQL Agent Jobs on an Elastic Pool.",
       "answer": ""
     }
+  },
+  "scaffold": {
+    "guidance": "How this solution's repo is laid out and driven, so the AI can create the skeleton on the first build and verify its work on every build. Pick a boilerplate from _forms/boilerplates.json by name, or fill the fields in yourself — anything you fill in overrides the boilerplate's version of it.",
+    "boilerplate": {
+      "question": "Start from a named boilerplate?",
+      "example": "sql-server-database-project",
+      "answer": ""
+    },
+    "fileLayout": {
+      "question": "What is the folder and file layout of this solution's repo?",
+      "guidance": "One entry per folder or key file, with what belongs in it.",
+      "answer": []
+    },
+    "testing": {
+      "question": "What test framework should be used, and what kinds of tests?",
+      "example": "tSQLt; uniqueness, nullability, and relationship checks per database-model brief.",
+      "answer": ""
+    },
+    "commands": {
+      "question": "The commands the AI should use to work with this repo.",
+      "install": "",
+      "build": "",
+      "deploy": "",
+      "test": ""
+    }
   }
 }

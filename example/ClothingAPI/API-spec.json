@@ -55,6 +55,28 @@
       { "code": 200, "meaning": "Success" }
     ]
   },
+  "scaffold": {
+    "boilerplate": {
+      "question": "Start from a named boilerplate?",
+      "answer": "go-azure-functions"
+    },
+    "fileLayout": {
+      "question": "What is the folder and file layout of this solution's repo?",
+      "answer": []
+    },
+    "testing": {
+      "question": "What test framework should be used, and what kinds of tests?",
+      "answer": "Go standard testing, plus every handler test must cover the 'wrong role' case — roles are the whole security model here."
+    },
+    "commands": {
+      "question": "The commands the AI should use to work with this repo.",
+      "install": "",
+      "run": "",
+      "build": "",
+      "test": ""
+    },
+    "note": "Based on the go-azure-functions boilerplate; the testing answer above overrides the boilerplate's testing entry."
+  },
   "notes": {
     "mustNotDo": {
       "question": "Anything this solution must NOT do / cannot deploy?",

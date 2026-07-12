@@ -63,6 +63,8 @@ Produce THREE sections:
    - Purpose (one line)
    - Users (who, and what each wants)
    - Platforms & technology constraints
+   - Solutions & repositories (each solution, its type, its repo, and its local
+     path — so building happens in the right repo when solutions span several)
    - Coding house rules (with the project-specific meaning of each)
    - Access & security (who can do what, how people log in)
    - Look & feel / design references
@@ -71,9 +73,10 @@ Produce THREE sections:
 
 2. PROJECT DIGEST — a compact, self-contained extract that page translations
    reuse instead of re-reading the whole spec. Keep it under ~12 lines, just the
-   constraints that bind every page: platform/tech, the house rules (names only),
-   security model, roles, and the model/effort tiers. This is the ONLY part a
-   page translation needs to see from the project level.
+   constraints that bind every page: platform/tech, each solution's repo and
+   local path, the house rules (names only), security model, roles, and the
+   model/effort tiers. This is the ONLY part a page translation needs to see
+   from the project level.
 
 3. PROJECT SKILLS — the capabilities you'll need to build this project well.
    Present as a table: Skill | Why it's needed | How you'll use it | Tools/approach.

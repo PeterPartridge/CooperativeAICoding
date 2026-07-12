@@ -31,7 +31,8 @@ generates lands in `template/claude-only/`, mirroring your folders.
    and answer each question in plain English under its heading (the `>` lines are
    guidance and examples). Set `status: filled` at the top when you're done. This
    is the whole-project "why," the tech direction, the house rules, security, and
-   your model/effort tiers.
+   your model/effort tiers — plus **where each solution's code lives** (repo and
+   local path), so Claude can build across multiple repositories.
 
 2. **Translate it.** Run:
 
@@ -92,9 +93,16 @@ Once a spec is approved:
 ```
 
 Claude will:
-1. **Plan** — summary + bullet changes, and wait for your go-ahead.
+0. **Scaffold** (first build in a solution only) — create the repo skeleton from
+   the solution spec's `scaffold` block: a named boilerplate from
+   `template/_forms/boilerplates.json`, or the layout/tests/commands the
+   developers wrote, as its own approved plan.
+1. **Plan** — summary + bullet changes, reusing methods already listed in its
+   code map instead of rebuilding them, and wait for your go-ahead.
 2. **Execute** — smallest change first, treating existing code as production.
-3. **Report back** — record what it did and the tests it created, in the spec.
+3. **Report back** — record what it did and the tests it created in the spec, and
+   update `claude-only/Code_map.md`: every method it created or changed, one line
+   on what it does, and which other files/methods it uses.
 4. **Declare debt** — list anything unfinished or any technical debt, instead of
    thrashing on it.
 

@@ -43,8 +43,8 @@ If you can't tell which, ask once. Don't translate a blank master form from
 
 1. Read the brief. Read [`template/claude-only/2-claude-system.template.md`](../../../template/claude-only/2-claude-system.template.md) for the exact output shape.
 2. Produce, in this order:
-   - **System Spec** — the labelled headings from the template (Purpose, Users, Platforms & tech constraints, Coding house rules, Access & security, Look & feel, Model & effort selection, Open Questions).
-   - **Project Digest** — a compact ≤12-line constraints block (platform/tech, house-rule names, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.
+   - **System Spec** — the labelled headings from the template (Purpose, Users, Platforms & tech constraints, Solutions & repositories, Coding house rules, Access & security, Look & feel, Model & effort selection, Open Questions). Solutions & repositories is the table of where each solution's code lives (repo + local path) from the brief's `solutions` answer — if the brief didn't give locations, that's an Open Question.
+   - **Project Digest** — a compact ≤12-line constraints block (platform/tech, solutions & repo locations, house-rule names, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.
    - **Project Skills** — table: `Skill | Why it's needed | How you'll use it | Tools/approach`. Keep it to what the brief justifies; if it grows long, flag that the project may need splitting.
 3. Save to `template/claude-only/Project_system.md`.
 
