@@ -70,6 +70,16 @@ status: blank            # blank | filled | approved
 ### database-technology — What database technology will the solution(s) use?
 > e.g. PostgreSQL, MySQL, SQL Server, MongoDB. "Not decided" is not a valid answer. (Each Database solution restates its engine in its `Database-spec.json`.)
 
+### environments — What environments will this project have, and which may the AI deploy to?
+> e.g. "dev (AI may deploy), production (people deploy after review)." Each solution spec can refine this.
+
+### infrastructure-policy — Who creates infrastructure, and with what tool? Where do secrets live?
+> The AI only ever creates infrastructure as its own approved plan — never as a side
+> effect of building a page. And **secret values are never written into code or
+> committed config** — say where they live so the AI can reference them by name.
+> e.g. "The AI writes Bicep in each solution's infra/ folder; the pipeline deploys it.
+> Secrets live in Azure Key Vault and GitHub Actions secrets."
+
 ---
 
 ## Part 3 — Look & Feel *(Product answers this)*

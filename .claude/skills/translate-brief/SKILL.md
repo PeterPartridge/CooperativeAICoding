@@ -35,7 +35,7 @@ If you can't tell which, ask once. Don't translate a blank master form from
 
 - **Do not invent** features, scope, technology, or security that isn't in the brief. Gaps go under **Open Questions**, never guesses.
 - **Stay inside** the project's platform, house rules, roles, and security.
-- Restate the **Working Agreement** at the end (smallest change, treat existing code as production, log technical debt instead of retrying endlessly, a person approves before building, score each change by token cost).
+- Restate the **Working Agreement** at the end (smallest change, treat existing code as production, log technical debt instead of retrying endlessly, a person approves before building, score each change by token cost, never put secret values in code or config, infrastructure/pipelines are their own approved plans).
 
 ## Procedure
 
@@ -43,8 +43,8 @@ If you can't tell which, ask once. Don't translate a blank master form from
 
 1. Read the brief. Read [`template/claude-only/2-claude-system.template.md`](../../../template/claude-only/2-claude-system.template.md) for the exact output shape.
 2. Produce, in this order:
-   - **System Spec** — the labelled headings from the template (Purpose, Users, Platforms & tech constraints, Solutions & repositories, Coding house rules, Access & security, Look & feel, Model & effort selection, Open Questions). Solutions & repositories is the table of where each solution's code lives (repo + local path) from the brief's `solutions` answer — if the brief didn't give locations, that's an Open Question.
-   - **Project Digest** — a compact ≤12-line constraints block (platform/tech, solutions & repo locations, house-rule names, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.
+   - **System Spec** — the labelled headings from the template (Purpose, Users, Platforms & tech constraints, Solutions & repositories, Infrastructure & environments, Coding house rules, Access & security, Look & feel, Model & effort selection, Open Questions). Solutions & repositories is the table of where each solution's code lives (repo + local path) from the brief's `solutions` answer; Infrastructure & environments comes from the `environments` and `infrastructure-policy` answers (who provisions, tool, deploy permissions, where secrets live — never values). Missing locations or policy → Open Questions.
+   - **Project Digest** — a compact ≤12-line constraints block (platform/tech, solutions & repo locations, infra policy & environments, house-rule names, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.
    - **Project Skills** — table: `Skill | Why it's needed | How you'll use it | Tools/approach`. Keep it to what the brief justifies; if it grows long, flag that the project may need splitting.
 3. Save to `template/claude-only/Project_system.md`.
 

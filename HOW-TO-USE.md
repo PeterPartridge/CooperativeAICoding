@@ -124,6 +124,7 @@ change small.
 | `/translate <brief>` | Turn a filled-in brief (project or item) into a structured spec + skills under `claude-only/`. |
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |
+| `/pipeline <solution>` | Create the solution's CI/CD pipeline and missing infrastructure from its spec's `infrastructure` block. Secrets are referenced by name only — never written into code. |
 
 `/translate` and `/build` also trigger automatically when you hand Claude a brief
 or ask it to build an approved spec — the commands just give you explicit control.
@@ -136,3 +137,5 @@ or ask it to build an approved spec — the commands just give you explicit cont
 - Treat anything already built as **working in production**; don't break it.
 - If Claude can't finish something, it **says so and writes it down** — no endless retrying.
 - **A person reviews and approves** every plan before anything is built.
+- **Secret values never go into code** — settings are referenced by name; values live in secret stores you control.
+- **Infrastructure and pipelines are their own approved plans** — never a side effect of building a feature.

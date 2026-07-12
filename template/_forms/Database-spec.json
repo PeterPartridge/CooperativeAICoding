@@ -51,5 +51,48 @@
       "deploy": "",
       "test": ""
     }
+  },
+  "security": {
+    "guidance": "The security rules this solution must obey on every build. Pick a named baseline from _forms/boilerplates.json (securityBaselines) and add any extra rules — extra rules are additions and can never weaken the baseline. The AI treats every rule here like a test: a build that breaks one is not done.",
+    "baseline": {
+      "question": "Start from a named security baseline?",
+      "example": "database-baseline",
+      "answer": ""
+    },
+    "rules": {
+      "question": "Any extra security rules for this solution?",
+      "guidance": "One entry per rule, in plain English.",
+      "entries": []
+    }
+  },
+  "infrastructure": {
+    "guidance": "What this solution runs on, so the AI can create missing infrastructure and a pipeline deliberately — always as its own approved plan, never as a side effect of building a model. SECRETS ARE NEVER WRITTEN INTO CODE OR COMMITTED CONFIG: list every setting by name and where its value lives; the AI only ever references them by name.",
+    "resources": {
+      "question": "What infrastructure resources does this solution need?",
+      "guidance": "One entry per resource. Mark whether it already exists or the AI should create it.",
+      "exampleEntry": { "name": "clothing-sql", "type": "Azure SQL Database", "existsAlready": false, "notes": "" },
+      "entries": []
+    },
+    "provisioning": {
+      "question": "How is infrastructure created, and by whom?",
+      "example": "Bicep files in infra/, deployed by the pipeline — or 'a person creates resources in the portal; the AI never provisions'.",
+      "answer": ""
+    },
+    "environments": {
+      "question": "What environments exist, and which may the AI deploy to?",
+      "example": "dev (AI may deploy), production (people deploy after review).",
+      "answer": ""
+    },
+    "settings": {
+      "question": "What named settings and secrets does deployment need?",
+      "guidance": "Names and where each value lives — NEVER the values themselves, e.g. a deployment identity as a GitHub Actions secret or federated credential.",
+      "exampleEntry": { "name": "AZURE_SQL_DEPLOY_CREDENTIAL", "whatItIs": "Identity the pipeline deploys with", "secret": true, "where": "GitHub Actions secret (federated credential preferred)" },
+      "entries": []
+    },
+    "pipeline": {
+      "question": "What CI/CD pipeline should this solution have?",
+      "example": "GitHub Actions: on PR → build the database project; on merge to main → deploy the DACPAC to dev.",
+      "answer": ""
+    }
   }
 }

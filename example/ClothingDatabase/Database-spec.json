@@ -39,5 +39,42 @@
       "test": ""
     },
     "note": "Everything comes from the sql-server-database-project boilerplate — no overrides."
+  },
+  "security": {
+    "baseline": {
+      "question": "Start from a named security baseline?",
+      "answer": "database-baseline"
+    },
+    "rules": {
+      "question": "Any extra security rules for this solution?",
+      "entries": []
+    }
+  },
+  "infrastructure": {
+    "resources": {
+      "question": "What infrastructure resources does this solution need?",
+      "entries": [
+        { "name": "clothing-pool", "type": "Azure SQL Elastic Pool", "existsAlready": true, "notes": "Created by a person" },
+        { "name": "clothing-db", "type": "Azure SQL Database (in the pool)", "existsAlready": false, "notes": "" }
+      ]
+    },
+    "provisioning": {
+      "question": "How is infrastructure created, and by whom?",
+      "answer": "The elastic pool is managed by a person. The database itself is created by Bicep in infra/, deployed by the pipeline."
+    },
+    "environments": {
+      "question": "What environments exist, and which may the AI deploy to?",
+      "answer": "dev (AI may deploy), production (people deploy after review)."
+    },
+    "settings": {
+      "question": "What named settings and secrets does deployment need?",
+      "entries": [
+        { "name": "AZURE_SQL_DEPLOY_CREDENTIAL", "whatItIs": "Identity the pipeline deploys the DACPAC with", "secret": true, "where": "GitHub federated credential — no stored password" }
+      ]
+    },
+    "pipeline": {
+      "question": "What CI/CD pipeline should this solution have?",
+      "answer": "GitHub Actions: on PR → build the database project; on merge to main → deploy the DACPAC to dev."
+    }
   }
 }

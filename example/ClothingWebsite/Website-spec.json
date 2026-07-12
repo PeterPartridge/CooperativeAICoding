@@ -64,6 +64,44 @@
     },
     "note": "Everything comes from the react-vite boilerplate in _forms/boilerplates.json — no overrides."
   },
+  "security": {
+    "baseline": {
+      "question": "Start from a named security baseline?",
+      "answer": "website-baseline"
+    },
+    "rules": {
+      "question": "Any extra security rules for this solution?",
+      "entries": [
+        "The typed password exists only in the login form's memory — never in logs, storage, or URLs (from the userLogin page brief)."
+      ]
+    }
+  },
+  "infrastructure": {
+    "resources": {
+      "question": "What infrastructure resources does this solution need?",
+      "entries": [
+        { "name": "clothing-web", "type": "Azure Static Web App", "existsAlready": false, "notes": "" }
+      ]
+    },
+    "provisioning": {
+      "question": "How is infrastructure created, and by whom?",
+      "answer": "Bicep files in infra/, deployed by the pipeline."
+    },
+    "environments": {
+      "question": "What environments exist, and which may the AI deploy to?",
+      "answer": "dev (AI may deploy), production (people deploy after review)."
+    },
+    "settings": {
+      "question": "What named settings and secrets does this solution need at runtime?",
+      "entries": [
+        { "name": "API_BASE_URL", "whatItIs": "Base URL of ClothingAPI", "secret": false, "where": "Static Web App application settings" }
+      ]
+    },
+    "pipeline": {
+      "question": "What CI/CD pipeline should this solution have?",
+      "answer": "GitHub Actions: on PR → install, build, test; on merge to main → deploy to dev."
+    }
+  },
   "notes": {
     "mustNotDo": {
       "question": "Anything this solution must NOT do?",

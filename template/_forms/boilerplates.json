@@ -1,6 +1,43 @@
 {
-  "purpose": "Named scaffold presets a solution spec can adopt instead of hand-writing its file layout, tests, and commands.",
-  "howToUse": "In your solution spec's scaffold block, set boilerplate.answer to one of the names below. Any scaffold field you also fill in yourself overrides the boilerplate's version of it. These are starting points — edit this file or add your own presets to match how your team really works.",
+  "purpose": "Named presets a solution spec can adopt instead of hand-writing everything: scaffold presets (file layout, tests, commands) and security baselines (the rules a solution must obey).",
+  "howToUse": "In your solution spec's scaffold block, set boilerplate.answer to a scaffold preset name; in its security block, set baseline.answer to a security baseline name. Scaffold fields you fill in yourself override the preset. Security rules you add are ADDITIONS — they can never weaken the baseline. These are starting points — edit this file or add your own to match how your team really works.",
+  "securityBaselines": {
+    "website-baseline": {
+      "solutionType": "website",
+      "rules": [
+        "HTTPS only — the site is served over HTTPS and never links to or loads plain-HTTP content.",
+        "No secrets in code or in the browser bundle — anything shipped to the browser is public; the front end may only hold non-secret settings (like the API's URL) referenced by name.",
+        "Never log, display, or store credentials or tokens in plain text (including console logs and error reports).",
+        "All user input is treated as untrusted — rely on the framework's escaping; never build HTML from raw input.",
+        "Auth tokens are sent only to this project's own API, over HTTPS, and never appear in URLs.",
+        "Dependencies are installed from the lockfile; new dependencies are named in the plan for approval."
+      ]
+    },
+    "api-baseline": {
+      "solutionType": "api",
+      "rules": [
+        "HTTPS only — plain-HTTP requests are rejected or redirected, never served.",
+        "No secrets in code, config, or logs — settings are referenced by name from the infrastructure settings list.",
+        "Every endpoint requires authentication unless the endpoint brief explicitly says it is public.",
+        "Every operation enforces the roles/claims its endpoint brief declares — deny by default.",
+        "All input is validated before use; requests that fail validation get a 4xx, not a crash.",
+        "Error responses are generic — no stack traces, no internal details, and no hint whether a username or password was the wrong half of a login.",
+        "CORS is restricted to the project's own front-end origins — never a wildcard with credentials.",
+        "Dependencies are installed from the lockfile; new dependencies are named in the plan for approval."
+      ]
+    },
+    "database-baseline": {
+      "solutionType": "database",
+      "rules": [
+        "Connections are encrypted in transit (TLS); unencrypted connections are refused.",
+        "Data is encrypted at rest where the engine supports it.",
+        "No credentials in code — applications connect using named settings from their infrastructure settings list.",
+        "Least privilege — application accounts can read/write their own data only; they are never database admins.",
+        "All access from application code uses parameterised queries — never SQL built from strings.",
+        "Fields marked sensitive in a database-model brief are stored hashed or encrypted, exactly as the brief says."
+      ]
+    }
+  },
   "boilerplates": {
     "react-vite": {
       "solutionType": "website",

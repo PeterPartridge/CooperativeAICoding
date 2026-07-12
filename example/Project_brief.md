@@ -55,6 +55,12 @@ Azure (Static Web Apps, Function App, SQL).
 ### database-technology — What database technology will the solution(s) use?
 SQL Server.
 
+### environments — What environments will this project have, and which may the AI deploy to?
+dev (AI may deploy), production (people deploy after review).
+
+### infrastructure-policy — Who creates infrastructure, and with what tool? Where do secrets live?
+The AI writes Bicep in each solution's infra/ folder; the pipeline deploys it. The Key Vault and the SQL elastic pool are managed by a person. Secrets live in Azure Key Vault and GitHub Actions secrets — never in code.
+
 ---
 
 ## Part 3 — Look & Feel *(Product answers this)*

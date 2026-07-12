@@ -11,8 +11,9 @@ template/
 │  ├─ Website-spec.json          ← solution spec: one per website / front-end
 │  ├─ API-spec.json              ← solution spec: one per API
 │  ├─ Database-spec.json         ← solution spec: one per database
-│  ├─ boilerplates.json          ← named scaffold presets (layout + tests + commands)
-│  │                               a solution spec can adopt by name
+│  ├─ boilerplates.json          ← named presets a solution spec adopts by name:
+│  │                               scaffolds (layout + tests + commands) and
+│  │                               security baselines (HTTPS-only, no secrets in code, …)
 │  ├─ page.md                    ← one per website page
 │  ├─ endpoint.json              ← one per API resource
 │  └─ database-model.json        ← one per data model / table
@@ -52,7 +53,7 @@ template/
 
 1. **Fill in [`Project_brief.md`](Project_brief.md)** — once, for the whole project. List your solutions here (e.g. `ClothingWebsite`, `ClothingAPI`, `ClothingDatabase`), each with its repository and local path — solutions can live in separate repos, and this is how the AI knows where to build each one.
 
-2. **Create a folder per solution**, and drop in its spec. Copy the matching spec form from [`_forms/`](_forms/) into the folder — `Website-spec.json`, `API-spec.json`, or `Database-spec.json`. In its `scaffold` block, either name a preset from [`boilerplates.json`](_forms/boilerplates.json) or write your own file layout, test setup, and commands — this is what the AI uses to create the repo skeleton on the first build and to verify every build after.
+2. **Create a folder per solution**, and drop in its spec. Copy the matching spec form from [`_forms/`](_forms/) into the folder — `Website-spec.json`, `API-spec.json`, or `Database-spec.json`. In its `scaffold` block, either name a preset from [`boilerplates.json`](_forms/boilerplates.json) or write your own file layout, test setup, and commands — this is what the AI uses to create the repo skeleton on the first build and to verify every build after. In its `security` block, name a security baseline (HTTPS-only, no secrets in code, deny-by-default auth, …) and add any extra rules — additions only; they can never weaken the baseline.
 
 3. **Add the items.** Copy the matching item form into the same folder and name it after the item:
    - Website page → `page.md` → e.g. `ClothingWebsite/userLogin.md`

@@ -108,3 +108,4 @@ New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish
 - **`/translate <brief>`** — turn a filled-in brief into a structured spec + skills.
 - **`/new-item <type> <solution> <name>`** — copy a blank page/endpoint/model form into a solution folder.
 - **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.
+- **`/pipeline <solution>`** — create the solution's CI/CD pipeline and missing infrastructure from its spec, as its own approved plan. Secret values are never written into code — they're referenced by name from stores you control.

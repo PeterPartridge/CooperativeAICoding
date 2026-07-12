@@ -94,6 +94,49 @@
       "test": ""
     }
   },
+  "security": {
+    "guidance": "The security rules this solution must obey on every build. Pick a named baseline from _forms/boilerplates.json (securityBaselines) and add any extra rules — extra rules are additions and can never weaken the baseline. The AI treats every rule here like a test: a build that breaks one is not done.",
+    "baseline": {
+      "question": "Start from a named security baseline?",
+      "example": "api-baseline",
+      "answer": ""
+    },
+    "rules": {
+      "question": "Any extra security rules for this solution?",
+      "guidance": "One entry per rule, in plain English.",
+      "entries": []
+    }
+  },
+  "infrastructure": {
+    "guidance": "What this solution runs on, so the AI can create missing infrastructure and a pipeline deliberately — always as its own approved plan, never as a side effect of building an endpoint. SECRETS ARE NEVER WRITTEN INTO CODE OR COMMITTED CONFIG: list every setting by name and where its value lives; the AI only ever references them by name.",
+    "resources": {
+      "question": "What infrastructure resources does this solution need?",
+      "guidance": "One entry per resource. Mark whether it already exists or the AI should create it.",
+      "exampleEntry": { "name": "clothing-api", "type": "Azure Function App", "existsAlready": false, "notes": "" },
+      "entries": []
+    },
+    "provisioning": {
+      "question": "How is infrastructure created, and by whom?",
+      "example": "Bicep files in infra/, deployed by the pipeline — or 'a person creates resources in the portal; the AI never provisions'.",
+      "answer": ""
+    },
+    "environments": {
+      "question": "What environments exist, and which may the AI deploy to?",
+      "example": "dev (AI may deploy), production (people deploy after review).",
+      "answer": ""
+    },
+    "settings": {
+      "question": "What named settings and secrets does this solution need at runtime?",
+      "guidance": "Names and where each value lives — NEVER the values themselves. 'where' is a secret store or the host's settings, e.g. GitHub Actions secret, Azure Key Vault, Function App application settings.",
+      "exampleEntry": { "name": "SQL_CONNECTION_STRING", "whatItIs": "Connection to the database solution", "secret": true, "where": "Azure Key Vault, referenced from Function App settings" },
+      "entries": []
+    },
+    "pipeline": {
+      "question": "What CI/CD pipeline should this solution have?",
+      "example": "GitHub Actions: on PR → install, build, test; on merge to main → deploy to dev.",
+      "answer": ""
+    }
+  },
   "notes": {
     "mustNotDo": {
       "question": "Anything this solution must NOT do / cannot deploy?",

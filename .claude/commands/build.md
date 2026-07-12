@@ -12,6 +12,15 @@ Honor the Working Agreement at all times:
 - Treat all existing code as **working in production**; do not break it. Assume it works even if it looks broken.
 - Pick the **model & effort** the spec specifies for this item.
 - If you cannot finish something, **stop and record it as technical debt** rather than retrying endlessly.
+- **Never write a secret value into code, config, or logs** — reference settings by
+  name from the solution spec's `infrastructure.settings` list.
+- **Obey the solution spec's `security` block** — resolve its named baseline from
+  `template/_forms/boilerplates.json` (securityBaselines) plus its extra rules, and
+  treat each rule like a test: a build that breaks one is not done. Say in the plan
+  if a change touches anything a rule covers.
+- If the change needs **new infrastructure or pipeline work**, stop — that is its own
+  approved plan via `/pipeline` (the `create-pipeline` skill), never a side effect
+  of building this item.
 
 Workflow:
 0. **Scaffold (first build in a solution only)** — if the solution's repo has no

@@ -77,6 +77,48 @@
     },
     "note": "Based on the go-azure-functions boilerplate; the testing answer above overrides the boilerplate's testing entry."
   },
+  "security": {
+    "baseline": {
+      "question": "Start from a named security baseline?",
+      "answer": "api-baseline"
+    },
+    "rules": {
+      "question": "Any extra security rules for this solution?",
+      "entries": [
+        "Passwords are only ever compared against the hashed value in UserCredentials — the API never stores or logs a plain-text password."
+      ]
+    }
+  },
+  "infrastructure": {
+    "resources": {
+      "question": "What infrastructure resources does this solution need?",
+      "entries": [
+        { "name": "clothing-api", "type": "Azure Function App", "existsAlready": false, "notes": "" },
+        { "name": "clothing-insights", "type": "Azure Application Insights", "existsAlready": false, "notes": "Shared with ClothingWebsite for error logging" },
+        { "name": "clothing-vault", "type": "Azure Key Vault", "existsAlready": true, "notes": "Created by a person; holds all secrets" }
+      ]
+    },
+    "provisioning": {
+      "question": "How is infrastructure created, and by whom?",
+      "answer": "Bicep files in infra/, deployed by the pipeline. The Key Vault is managed by a person, not the AI."
+    },
+    "environments": {
+      "question": "What environments exist, and which may the AI deploy to?",
+      "answer": "dev (AI may deploy), production (people deploy after review)."
+    },
+    "settings": {
+      "question": "What named settings and secrets does this solution need at runtime?",
+      "entries": [
+        { "name": "SQL_CONNECTION_STRING", "whatItIs": "Connection to ClothingDatabase", "secret": true, "where": "Azure Key Vault, referenced from Function App settings" },
+        { "name": "JWT_SIGNING_KEY", "whatItIs": "Key used to sign and validate JWTs", "secret": true, "where": "Azure Key Vault, referenced from Function App settings" },
+        { "name": "APPLICATIONINSIGHTS_CONNECTION_STRING", "whatItIs": "Where errors and telemetry are logged", "secret": false, "where": "Function App application settings" }
+      ]
+    },
+    "pipeline": {
+      "question": "What CI/CD pipeline should this solution have?",
+      "answer": "GitHub Actions: on PR → go mod tidy, go build ./..., go test ./...; on merge to main → deploy to dev."
+    }
+  },
   "notes": {
     "mustNotDo": {
       "question": "Anything this solution must NOT do / cannot deploy?",

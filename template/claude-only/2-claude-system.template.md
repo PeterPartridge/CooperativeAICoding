@@ -32,6 +32,11 @@
 |----------|------|------------|------------|
 | <...> | website / API / database | <...> | <...> |
 
+**Infrastructure & environments**
+> Who provisions, with what tool, which environments the AI may deploy to — and where secrets live. Secret **values** never appear in code, committed config, or this spec; everything is referenced by name.
+
+<...>
+
 **Coding house rules**
 
 | Rule | What it means on this project |
@@ -74,6 +79,7 @@
 
 - **Platform / tech:** <...>
 - **Solutions & repos:** <name → repo, local path; one per solution>
+- **Infra & environments:** <who provisions + tool; envs the AI may deploy to; where secrets live — never values>
 - **House rules:** <names only, e.g. DRY, CamelCase page names>
 - **Security model:** <how users log in, how endpoints are protected>
 - **Roles:** <...>
@@ -149,3 +155,5 @@
 - Record **technical debt** instead of retrying endlessly.
 - A **person reviews and approves** every plan before anything is built.
 - **Score each change** by how token-intensive it's likely to be.
+- **Never put secret values in code, config, or logs** — reference them by name from their stores.
+- **Infrastructure and pipelines are their own approved plans** — never a side effect of building a feature.
