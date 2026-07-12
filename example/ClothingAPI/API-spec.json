@@ -1,0 +1,68 @@
+{
+  "form": "api-spec",
+  "solutionName": "ClothingAPI",
+  "status": "filled",
+  "exampleOf": "../../template/_forms/API-spec.json",
+  "exampleNote": "A filled-in example. The solution is the folder this file sits in (ClothingAPI).",
+  "theApi": {
+    "purpose": {
+      "question": "What is the purpose of this API?",
+      "answer": "The single API for all requests from the clothing website."
+    },
+    "hosting": {
+      "question": "Where will it be hosted?",
+      "answer": "Azure Function App."
+    },
+    "language": {
+      "question": "What language will it use?",
+      "answer": "Go."
+    },
+    "frameworks": {
+      "question": "What frameworks should it use?",
+      "answer": ""
+    }
+  },
+  "authentication": {
+    "type": {
+      "question": "What type of authentication does it use?",
+      "answer": "JWT."
+    },
+    "claimsOrRoles": {
+      "question": "Does it authorise callers by Claims or Roles?",
+      "answer": "Roles."
+    }
+  },
+  "conventions": {
+    "basePath": {
+      "question": "What is the main URL path?",
+      "answer": "/api/"
+    },
+    "versionedFolders": {
+      "question": "Are endpoints organised into version-specific folders?",
+      "answer": "No."
+    },
+    "errorLogging": {
+      "question": "How do we log errors and issues?",
+      "answer": "Azure Application Insights."
+    },
+    "documentation": {
+      "question": "How is the API documented for external users online?",
+      "answer": ""
+    }
+  },
+  "standardResponses": {
+    "entries": [
+      { "code": 200, "meaning": "Success" }
+    ]
+  },
+  "notes": {
+    "mustNotDo": {
+      "question": "Anything this solution must NOT do / cannot deploy?",
+      "answer": ""
+    },
+    "limits": {
+      "question": "Any limits (rate limits, payload size)?",
+      "answer": ""
+    }
+  }
+}

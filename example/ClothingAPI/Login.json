@@ -1,0 +1,57 @@
+{
+  "form": "endpoint-brief",
+  "resourceName": "User maintenance",
+  "status": "filled",
+  "exampleOf": "../../template/_forms/endpoint.json",
+  "exampleNote": "A filled-in example. Lives in the ClothingAPI solution; the API itself is defined in API-spec.json.",
+  "whatItDoes": {
+    "purpose": {
+      "question": "In one line, what is this resource for?",
+      "answer": "Create, log in, and manage users."
+    },
+    "basePath": {
+      "question": "Overall base path",
+      "answer": "/users"
+    }
+  },
+  "operations": {
+    "entries": [
+      { "method": "POST", "name": "LoginUser", "path": "/login", "authRequired": false, "whoCanCall": "Everyone" },
+      { "method": "POST", "name": "LogoutUser", "path": "/logout", "authRequired": true, "whoCanCall": "All roles" },
+      { "method": "POST", "name": "ResetPassword", "path": "/resetPassword", "authRequired": true, "whoCanCall": "All roles" },
+      { "method": "POST", "name": "CreateUser", "path": "/", "authRequired": true, "whoCanCall": "Admin" },
+      { "method": "PATCH", "name": "UpdateUser", "path": "/", "authRequired": true, "whoCanCall": "Admin" }
+    ]
+  },
+  "request": {
+    "question": "What does each operation expect in the body?",
+    "perOperation": {
+      "LoginUser": {
+        "username": "(required) text",
+        "password": "(required) text"
+      }
+    },
+    "note": "Other operations: to be defined."
+  },
+  "response": {
+    "question": "What does each operation return?",
+    "answer": "Response bodies: to be defined — reads/writes the UserCredentials model in the ClothingDatabase solution.",
+    "statusCodes": [
+      { "code": 200, "meaning": "Success" }
+    ]
+  },
+  "notes": {
+    "dataModels": {
+      "question": "Which data models does it read or write?",
+      "answer": "UserCredentials (ClothingDatabase)."
+    },
+    "limits": {
+      "question": "Any limits (rate limits, page size, max payload)?",
+      "answer": ""
+    },
+    "watchOutFor": {
+      "question": "Anything to watch out for (side effects, things that must not happen twice)?",
+      "answer": ""
+    }
+  }
+}

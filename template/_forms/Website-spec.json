@@ -1,0 +1,61 @@
+{
+  "form": "website-spec",
+  "solutionName": "",
+  "status": "blank",
+  "instructions": {
+    "whoFillsThisIn": "Product (look & feel) + Developers (tech).",
+    "when": "Once per website / front-end solution. This file sits at the root of the website's solution folder. Each page is a separate file in the same folder (copies of _forms/page.md).",
+    "how": "Answer in plain English. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md.",
+    "note": "Solution = the folder this file sits in."
+  },
+  "theWebsite": {
+    "purpose": {
+      "question": "What is the purpose of this website / front-end?",
+      "answer": ""
+    },
+    "languageAndFramework": {
+      "question": "What language and framework will it use?",
+      "example": "TypeScript + React, Vue, Blazor.",
+      "answer": ""
+    },
+    "hosting": {
+      "question": "Where will it be hosted?",
+      "example": "Azure Static Web Apps, Vercel, Netlify.",
+      "answer": ""
+    }
+  },
+  "lookAndFeel": {
+    "overall": {
+      "question": "What is the overall look and feel?",
+      "guidance": "Link a design system or describe it.",
+      "answer": ""
+    },
+    "styling": {
+      "question": "What styling approach or component library?",
+      "example": "Tailwind, Material UI, Bootstrap.",
+      "answer": ""
+    }
+  },
+  "behaviour": {
+    "apis": {
+      "question": "Which API(s) does it talk to?",
+      "guidance": "Name the API solution(s) it calls.",
+      "answer": ""
+    },
+    "authentication": {
+      "question": "How does it authenticate users?",
+      "example": "JWT stored where; which roles/claims gate which pages.",
+      "answer": ""
+    },
+    "errorLogging": {
+      "question": "How do we log front-end errors?",
+      "answer": ""
+    }
+  },
+  "notes": {
+    "mustNotDo": {
+      "question": "Anything this solution must NOT do?",
+      "answer": ""
+    }
+  }
+}

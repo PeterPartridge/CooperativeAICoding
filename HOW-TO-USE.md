@@ -12,20 +12,26 @@ layout, see [`template/README.md`](template/README.md). This file is just *how t
 ## The loop in one picture
 
 ```
-Fill a plain-English form   →   Translate to a spec   →   Review & approve   →   Build   →   Iterate
+Fill a form                 →   Translate to a spec   →   Review & approve   →   Build   →   Iterate
    (you, in template/)          (/translate)              (you)                 (/build)    (add a change round)
 ```
 
-You only ever write plain English. Everything Claude generates lands in
-`template/claude-only/`, mirroring your folders.
+Forms come in two shapes, matched to their content. Prose briefs (the project
+brief and page briefs) are **Markdown**: write your plain-English answer under
+each question heading — lines starting with `>` are guidance, everything else is
+yours. Record-style forms (endpoints, database models, solution specs) are
+**JSON**: fill in the `answer` fields and entry lists. Everything Claude
+generates lands in `template/claude-only/`, mirroring your folders.
 
 ---
 
 ## First-time setup (once per project)
 
 1. **Fill in the project brief.** Open [`template/Project_brief.md`](template/Project_brief.md)
-   and answer the questions in plain English. This is the whole-project "why,"
-   the tech direction, the house rules, security, and your model/effort tiers.
+   and answer each question in plain English under its heading (the `>` lines are
+   guidance and examples). Set `status: filled` at the top when you're done. This
+   is the whole-project "why," the tech direction, the house rules, security, and
+   your model/effort tiers.
 
 2. **Translate it.** Run:
 
@@ -53,12 +59,15 @@ file inside it.
    /new-item page ClothingWebsite userLogin
    ```
 
-   This copies the right blank form to `template/ClothingWebsite/userLogin.md`.
-   (Types: `page`, `endpoint`, `model`. A brand-new solution folder also needs its
-   spec — `Website-spec.md` / `API-spec.md` / `Database-spec.md`; the command reminds you.)
+   This copies the right blank form to `template/ClothingWebsite/userLogin.md`
+   (pages are Markdown; endpoints and models are JSON, e.g.
+   `template/ClothingAPI/Login.json`). A brand-new solution folder also needs its
+   spec — `Website-spec.json` / `API-spec.json` / `Database-spec.json`; the command reminds you.
 
-2. **Fill it in.** Answer the form in plain English — what the page is for, who uses
-   it, what it shows/stores, how you'll know it works, and its default model/effort.
+2. **Fill it in.** Answer in plain English — under the question headings in a
+   Markdown form, or in the `answer` fields of a JSON one: what the page is for,
+   who uses it, what it shows/stores, how you'll know it works, and its default
+   model/effort.
 
 3. **Translate it.**
 
@@ -93,9 +102,10 @@ Claude will:
 
 ## Iterating
 
-Don't rewrite the form. Add a short note under **Part 4 — Changes Over Time** in the
-item's plain-English file (e.g. "Round 2: add 'remember me'"). Then re-run
-`/translate` on it and `/build` again. Keep each change small.
+Don't rewrite the form. Add a bullet under the **changes-over-time** section of a
+Markdown brief (e.g. "Round 2: add 'remember me'"), or a note in a JSON form's
+relevant field. Then re-run `/translate` on it and `/build` again. Keep each
+change small.
 
 ---
 

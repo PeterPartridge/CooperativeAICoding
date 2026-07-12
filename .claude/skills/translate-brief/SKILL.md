@@ -1,6 +1,6 @@
 ---
 name: translate-brief
-description: Translate a filled-in CooperativeAICoding plain-English brief (Project_brief.md or a page/endpoint/database-model form) into a structured Claude System Spec, a reusable Project Digest, and a Skills List, then save it under template/claude-only/ mirroring the human folder layout. Use whenever the user hands over or points at a filled-in CooperativeAICoding form and wants it turned into instructions Claude can build from.
+description: Translate a filled-in CooperativeAICoding brief (Markdown Project_brief.md or page brief, or a JSON endpoint/database-model/solution-spec form) into a structured Claude System Spec, a reusable Project Digest, and a Skills List, then save it under template/claude-only/ mirroring the human folder layout. Use whenever the user hands over or points at a filled-in CooperativeAICoding form and wants it turned into instructions Claude can build from.
 ---
 
 # Translate a CooperativeAICoding brief
@@ -12,11 +12,24 @@ staying token-efficient (no re-sending the whole project spec for every page).
 
 ## When to use
 
-Trigger when the user provides, or points at, a filled-in form from this framework:
-- A **Project Brief** (`template/Project_brief.md` or a copy of it) → run the *project* translation.
-- A **Page / endpoint / database-model brief** (e.g. `ClothingWebsite/userLogin.md`) → run the *page* translation.
+Trigger when the user provides, or points at, a filled-in form from this framework.
+Forms come in two shapes; both carry a `form` key (which kind it is) and a `status`
+key (`blank | filled | approved`):
+- **Markdown briefs** (project brief, page briefs) — YAML frontmatter + one `###
+  <id> — <question>` heading per question. Under a heading, lines starting with `>`
+  are form guidance/examples; everything else is the person's answer. Never treat
+  guidance as an answer.
+- **JSON forms** (endpoint, database-model, and the three solution specs) — question
+  objects with `question` / `guidance` / `example` fields plus the person's
+  plain-English `answer` (or `entries` lists). Same rule: only `answer`/`entries`
+  content is the person's input.
 
-If you can't tell which, ask once. Don't translate a blank master form from `template/_forms/`.
+Routing:
+- A **Project Brief** (`template/Project_brief.md` or a copy, `form: project-brief`) → run the *project* translation.
+- A **Page / endpoint / database-model brief** (e.g. `ClothingWebsite/userLogin.md`, `ClothingAPI/Login.json`) → run the *page* translation.
+
+If you can't tell which, ask once. Don't translate a blank master form from
+`template/_forms/` (`status: blank`, or all answers empty).
 
 ## Hard rules (do not break these)
 
@@ -43,7 +56,7 @@ If you can't tell which, ask once. Don't translate a blank master form from `tem
    - **Page Spec** — Page objective, Model & effort, Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
    - **Page Skills** — table building on the project skills (don't repeat them); flag any skill new for this page.
    - **PLAN** — one-paragraph summary + bullet changes + an honest note of expected technical debt.
-4. Save to the mirrored path: `<solution>/<item>.md` → `template/claude-only/<solution>/<item>.md` (e.g. `ClothingWebsite/userLogin.md` → `template/claude-only/ClothingWebsite/userLogin.md`).
+4. Save to the mirrored path: `<solution>/<item>.md|.json` → `template/claude-only/<solution>/<item>.md` (e.g. `ClothingWebsite/userLogin.md` → `template/claude-only/ClothingWebsite/userLogin.md`, `ClothingAPI/Login.json` → `template/claude-only/ClothingAPI/Login.md`).
 
 ## After translating
 

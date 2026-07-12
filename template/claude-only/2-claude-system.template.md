@@ -2,7 +2,7 @@
 
 > **What this is:** the structured version of your brief that the AI re-reads every time it builds. You don't write this from scratch — Claude produces it from your plain brief using [`1-translate-to-claude.md`](1-translate-to-claude.md). This file just shows the shape it should come back in, so every project looks the same.
 >
-> **Where it's saved:** Claude mirrors the human folder layout. The project-level spec is saved as `Project_system.md` here in `claude-only/`; each page spec is saved at `claude-only/<solution>/<page>.md` to match the human `<solution>/<page>.md`.
+> **Where it's saved:** Claude mirrors the human folder layout. The project-level spec is saved as `Project_system.md` here in `claude-only/`; each page spec is saved at `claude-only/<solution>/<page>.md` to match the human `<solution>/<page>.json`.
 >
 > Read it back against your brief to make sure nothing was changed or invented.
 

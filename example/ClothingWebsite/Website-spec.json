@@ -1,0 +1,51 @@
+{
+  "form": "website-spec",
+  "solutionName": "ClothingWebsite",
+  "status": "filled",
+  "exampleOf": "../../template/_forms/Website-spec.json",
+  "exampleNote": "A filled-in example. The solution is the folder this file sits in (ClothingWebsite).",
+  "theWebsite": {
+    "purpose": {
+      "question": "What is the purpose of this website / front-end?",
+      "answer": "The storefront customers use to browse and buy clothes, and to manage their account."
+    },
+    "languageAndFramework": {
+      "question": "What language and framework will it use?",
+      "answer": "TypeScript + React."
+    },
+    "hosting": {
+      "question": "Where will it be hosted?",
+      "answer": "Azure Static Web Apps."
+    }
+  },
+  "lookAndFeel": {
+    "overall": {
+      "question": "What is the overall look and feel?",
+      "answer": "Clean and friendly, lots of white space, large product imagery."
+    },
+    "styling": {
+      "question": "What styling approach or component library?",
+      "answer": "Tailwind CSS."
+    }
+  },
+  "behaviour": {
+    "apis": {
+      "question": "Which API(s) does it talk to?",
+      "answer": "ClothingAPI (/api/)."
+    },
+    "authentication": {
+      "question": "How does it authenticate users?",
+      "answer": "JWT returned by ClothingAPI /users/login, stored client-side. Admin-only pages are gated by the Admin role."
+    },
+    "errorLogging": {
+      "question": "How do we log front-end errors?",
+      "answer": "Azure Application Insights."
+    }
+  },
+  "notes": {
+    "mustNotDo": {
+      "question": "Anything this solution must NOT do?",
+      "answer": "It must not talk to the database directly — all data goes through ClothingAPI."
+    }
+  }
+}

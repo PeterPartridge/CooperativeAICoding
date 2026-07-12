@@ -6,7 +6,8 @@ argument-hint: [path to the filled-in brief, e.g. template/Project_brief.md or t
 Run the `translate-brief` skill on the brief at: $ARGUMENTS
 
 If no path was given, ask which filled-in brief to translate (or list the
-candidate files under `template/` that look filled in).
+candidate briefs under `template/` — Markdown or JSON — whose `status` is
+`filled`, or that otherwise look filled in).
 
 Follow the skill exactly:
 - Project Brief → produce System Spec + Project Digest + Project Skills, save to `template/claude-only/Project_system.md`.

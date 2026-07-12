@@ -1,0 +1,30 @@
+{
+  "form": "database-spec",
+  "solutionName": "",
+  "status": "blank",
+  "instructions": {
+    "whoFillsThisIn": "Developers.",
+    "when": "Once per database solution. This file sits at the root of the database's solution folder and defines the engine and hosting. Each table/model is a separate file in the same folder (copies of _forms/database-model.json).",
+    "how": "Answer in plain English. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md.",
+    "note": "Solution = the folder this file sits in."
+  },
+  "questions": {
+    "databaseType": {
+      "question": "Which database type does it use?",
+      "guidance": "Be specific — this defines the database engine for every model in this solution.",
+      "example": "PostgreSQL, MySQL, SQLite, SQL Server, MongoDB, DynamoDB, Redis.",
+      "answer": ""
+    },
+    "hosting": {
+      "question": "Where will it be deployed / hosted?",
+      "example": "Firebase, Azure SQL, Azure Elastic Pool, Azure Cosmos DB.",
+      "answer": ""
+    },
+    "cannotDo": {
+      "question": "What can this solution NOT do / not deploy?",
+      "guidance": "Constraints the AI must respect when building against this database.",
+      "example": "No SQL Agent Jobs on an Elastic Pool.",
+      "answer": ""
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Translate Your Brief Into Something Claude Can Build From
 
-> **Why this step exists.** People write best in plain, flowing language. AI models like **Claude Opus** and **Claude Sonnet** follow instructions most reliably when those same facts are laid out in a clear, labelled structure — a "system spec." This step is the bridge: you paste your plain brief into Claude, and Claude rewrites it into that structure **and works out the skills it will need.** You stay in plain English; Claude does the translating.
+> **Why this step exists.** People write best in plain language, and the forms keep it that way — prose briefs are Markdown where you answer under question headings, and record-style forms are JSON where you fill in `answer` fields. AI models like **Claude Opus** and **Claude Sonnet** follow instructions most reliably when those same facts are laid out in a clear, labelled structure — a "system spec." This step is the bridge: you hand your filled-in brief to Claude, and Claude rewrites it into that structure **and works out the skills it will need.** You stay in plain English; Claude does the translating.
 >
 > You do **not** need to understand the structure yourself. You just check that the result matches what you meant.
 
@@ -32,13 +32,13 @@ The AI defines skills at **two levels**: skills for the **whole project** (fille
 
 1. Open Claude (Opus or Sonnet).
 2. Copy **one** of the prompts below.
-3. Paste your filled-in brief where it says `<<< PASTE … >>>`.
+3. Paste the contents of your filled-in brief where it says `<<< PASTE … >>>`.
 4. Send it. Claude returns the System Spec and Skills List.
 5. Read it back. If anything's wrong, tell Claude in plain English ("the admin shouldn't be able to delete orders") and it will redo that part.
 6. Save the result inside `claude-only/`, **mirroring the human folder layout**:
    - the Project Brief → `claude-only/Project_system.md`
    - a page like `ClothingWebsite/userLogin.md` → `claude-only/ClothingWebsite/userLogin.md`
-   - a resource like `ClothingAPI/Login.md` → `claude-only/ClothingAPI/Login.md`
+   - a resource like `ClothingAPI/Login.json` → `claude-only/ClothingAPI/Login.md`
 
    So for every solution folder on the human side, Claude creates a matching solution folder on its side, with one spec file per item.
 
@@ -49,10 +49,13 @@ The AI defines skills at **two levels**: skills for the **whole project** (fille
 ```text
 You are setting up a software project using the "CooperativeAICoding" framework.
 
-Below is a Project Brief written in plain English by Product and Developers.
-Your job is to translate it — do NOT invent features, scope, or technology that
-isn't in the brief. If something important is missing, list it under "Open
-Questions" instead of guessing.
+Below is a Project Brief filled in by Product and Developers — a Markdown form
+with one "### <id> — <question>" heading per question. Under each heading, lines
+starting with ">" are the form's own guidance and examples; everything else is
+the person's plain-English answer. Translate the answers only — do NOT invent
+features, scope, or technology that isn't in the brief, and never treat guidance
+or example text as an answer. List unanswered questions under "Open Questions"
+instead of guessing.
 
 Produce THREE sections:
 
@@ -93,8 +96,14 @@ Here is the brief:
 
 ```text
 You are working on a software project that already has a Project System Spec.
-Now translate the Page Brief (pasted below) for one page, using the
-"CooperativeAICoding" framework.
+Now translate the brief (pasted below) for one item, using the
+"CooperativeAICoding" framework. The brief is either a Markdown form (page
+briefs: one "### <id> — <question>" heading per question, where ">" lines are
+form guidance and everything else is the person's answer) or a JSON form
+(endpoints, database models: question objects with the person's plain-English
+"answer", plus "entries" lists). Translate the answers only; never treat
+guidance or example text as an answer, and list unanswered questions under
+"Open Questions".
 
 To stay token-efficient, you do NOT need the full project spec — only its
 Project Digest (the short constraints block). Provide it ONE of these ways:

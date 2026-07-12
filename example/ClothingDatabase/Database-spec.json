@@ -1,0 +1,21 @@
+{
+  "form": "database-spec",
+  "solutionName": "ClothingDatabase",
+  "status": "filled",
+  "exampleOf": "../../template/_forms/Database-spec.json",
+  "exampleNote": "A filled-in example. The solution is the folder this file sits in (ClothingDatabase).",
+  "questions": {
+    "databaseType": {
+      "question": "Which database type does it use?",
+      "answer": "SQL Server."
+    },
+    "hosting": {
+      "question": "Where will it be deployed / hosted?",
+      "answer": "Azure Elastic Pool."
+    },
+    "cannotDo": {
+      "question": "What can this solution NOT do / not deploy?",
+      "answer": "SQL Agent Jobs (not supported on an Elastic Pool)."
+    }
+  }
+}

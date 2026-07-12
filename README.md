@@ -92,10 +92,10 @@ After the first build, each further iteration defines **what needs to change**:
 
 ## Templates
 
-The working layout lives in [`template/`](template/). **You** fill in plain-English forms; **Claude** translates them into structured specs — working out the **skills** it needs — and mirrors your folders on its side.
+The working layout lives in [`template/`](template/). **You** fill in the forms — prose briefs (the project brief and page briefs) are **Markdown** you answer under question headings; record-style forms (endpoints, database models, solution specs) are **JSON** with `answer` fields and entry lists. Either way you write plain English; **Claude** translates them into structured specs — working out the **skills** it needs — and mirrors your folders on its side.
 
 - **[`template/Project_brief.md`](template/Project_brief.md)** — plain questions about the whole project. Filled in once.
-- **[`template/_forms/`](template/_forms/)** — blank master forms to copy: [`page.md`](template/_forms/page.md), [`endpoint.md`](template/_forms/endpoint.md), [`database-model.md`](template/_forms/database-model.md).
+- **[`template/_forms/`](template/_forms/)** — blank master forms to copy: [`page.md`](template/_forms/page.md), [`endpoint.json`](template/_forms/endpoint.json), [`database-model.json`](template/_forms/database-model.json).
 - **`template/<solution>/`** — one folder per solution (e.g. `frontEnd/`, `backend/`); each page is a file inside it, like `frontEnd/page1.md` or `backend/userLogin.md`.
 - **[`template/claude-only/`](template/claude-only/)** — Claude's side (no human input): the [translate bridge](template/claude-only/1-translate-to-claude.md) and the [spec shape](template/claude-only/2-claude-system.template.md). Claude mirrors your solution folders here, e.g. `frontEnd/page1.md` → `claude-only/frontEnd/page1.md`.
 

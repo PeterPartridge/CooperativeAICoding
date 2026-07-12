@@ -1,0 +1,47 @@
+{
+  "form": "database-model",
+  "modelName": "",
+  "status": "blank",
+  "instructions": {
+    "whoFillsThisIn": "Developers (Product can sanity-check the information being stored).",
+    "when": "Whenever a page needs to store data. One of these per model/table. Copy it into the same solution folder as the page it belongs to and link it from that page.",
+    "how": "Answer in plain English where you can. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md along with the page it serves.",
+    "note": "Solution = the folder this file sits in. Table / object name = this file's name. The database engine is set once for the whole solution in Database-spec.json."
+  },
+  "whatThisModelIs": {
+    "question": "What does this model represent, in one line?",
+    "example": "A customer's order.",
+    "answer": ""
+  },
+  "fields": {
+    "guidance": "One entry per piece of data. \"type\" can be plain (text, number, date, true/false, money, list) — Developers can map it to the real database type.",
+    "entries": [
+      { "fieldName": "id", "type": "id / key", "nullable": false, "default": "auto", "rules": "unique", "description": "The unique identifier" }
+    ]
+  },
+  "relationships": {
+    "guidance": "How this model connects to others. Leave entries empty if it stands alone.",
+    "exampleEntry": { "field": "", "relationship": "one-to-many / many-to-one / many-to-many", "relatedTable": "", "relatedField": "", "constraintName": "" },
+    "entries": []
+  },
+  "lookupsAndPerformance": {
+    "question": "Which fields do we search or filter on a lot?",
+    "guidance": "These usually need an index so the page stays fast. One entry per field.",
+    "answer": []
+  },
+  "lifecycleAndRules": {
+    "retention": {
+      "question": "How long do we keep this data / when is it deleted?",
+      "answer": ""
+    },
+    "sensitiveFields": {
+      "question": "Any sensitive fields (personal data, payment info) that need extra protection?",
+      "answer": ""
+    },
+    "invariants": {
+      "question": "Anything that must always be true?",
+      "example": "An order must belong to a customer.",
+      "answer": ""
+    }
+  }
+}

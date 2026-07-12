@@ -1,0 +1,55 @@
+{
+  "form": "endpoint-brief",
+  "resourceName": "",
+  "status": "blank",
+  "instructions": {
+    "whoFillsThisIn": "Developers.",
+    "when": "For each resource (a group of related operations) an API needs. One file per resource. Lives in the API's solution folder; the API itself is defined in that folder's API-spec.json.",
+    "how": "Answer in plain English. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md, along with the page and any data models it touches.",
+    "note": "Solution = the folder this file sits in."
+  },
+  "whatItDoes": {
+    "purpose": {
+      "question": "In one line, what is this resource for?",
+      "example": "Create, log in, and manage users.",
+      "answer": ""
+    },
+    "basePath": {
+      "question": "Overall base path",
+      "example": "/users",
+      "answer": ""
+    }
+  },
+  "operations": {
+    "guidance": "One entry per operation. \"whoCanCall\" uses the roles/claims from the Project Brief.",
+    "exampleEntry": { "method": "POST", "name": "LoginUser", "path": "/login", "authRequired": false, "whoCanCall": "Everyone" },
+    "entries": []
+  },
+  "request": {
+    "question": "What does each operation expect in the body?",
+    "guidance": "Show the shape per operation, keyed by operation name. Mark which fields are required.",
+    "perOperation": {}
+  },
+  "response": {
+    "question": "What does each operation return?",
+    "guidance": "Describe the shape, and which data model(s) it comes from (the model files in the Database solution).",
+    "answer": "",
+    "statusCodes": [
+      { "code": 200, "meaning": "Success" }
+    ]
+  },
+  "notes": {
+    "dataModels": {
+      "question": "Which data models does it read or write?",
+      "answer": ""
+    },
+    "limits": {
+      "question": "Any limits (rate limits, page size, max payload)?",
+      "answer": ""
+    },
+    "watchOutFor": {
+      "question": "Anything to watch out for (side effects, things that must not happen twice)?",
+      "answer": ""
+    }
+  }
+}

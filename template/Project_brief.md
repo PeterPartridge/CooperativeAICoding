@@ -1,45 +1,40 @@
+---
+form: project-brief
+project: ""
+status: blank            # blank | filled | approved
+---
+
 # Project Brief — <Project Name>
 
 > **Who fills this in:** the people who own the idea (Product) and the people who will build it (Developers), together.
 >
-> **How:** just answer the questions below in plain English. Write like you're explaining it to a new colleague — you don't need any technical wording. Leave a question blank if you genuinely don't know yet, but try.
+> **How:** answer each question in plain English directly under its heading. Lines starting with `>` are guidance for you — anything else you write under a heading is your answer. Write like you're explaining it to a new colleague; no technical wording needed. Leave a question unanswered if you genuinely don't know yet, but try. When you're done, set `status: filled` at the top.
 >
-> When you're done, this brief gets handed to Claude using the bridge in **[`claude-only/1-translate-to-claude.md`](claude-only/1-translate-to-claude.md)**, which turns your answers into instructions the AI can follow.
+> Then the brief gets handed to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](claude-only/1-translate-to-claude.md), which turns your answers into instructions the AI can follow.
 >
-> **How the folders are laid out:** this project brief lives at the root. Each **solution** gets its own folder, with a **spec file** at its root that defines the solution's technology, plus one file per page/endpoint/model. See [`example/`](example/) for a worked Clothing project. Pick the spec form that matches the solution type:
-> - **Website / front-end** → [`_forms/Website-spec.md`](_forms/Website-spec.md) + pages from [`_forms/page.md`](_forms/page.md) (e.g. `ClothingWebsite/userLogin.md`)
-> - **API** → [`_forms/API-spec.md`](_forms/API-spec.md) + resources from [`_forms/endpoint.md`](_forms/endpoint.md) (e.g. `ClothingAPI/Login.md`)
-> - **Database** → [`_forms/Database-spec.md`](_forms/Database-spec.md) + tables from [`_forms/database-model.md`](_forms/database-model.md) (e.g. `ClothingDatabase/UserCredentials.md`)
+> **How the folders are laid out:** this project brief lives at the root. Each **solution** gets its own folder, with a spec file at its root that defines the solution's technology, plus one file per page/endpoint/model. See [`example/`](example/) for a worked Clothing project. Prose briefs are Markdown; record-style forms are JSON:
+> - **Website / front-end** → [`_forms/Website-spec.json`](_forms/Website-spec.json) + pages from [`_forms/page.md`](_forms/page.md) (e.g. `ClothingWebsite/userLogin.md`)
+> - **API** → [`_forms/API-spec.json`](_forms/API-spec.json) + resources from [`_forms/endpoint.json`](_forms/endpoint.json) (e.g. `ClothingAPI/Login.json`)
+> - **Database** → [`_forms/Database-spec.json`](_forms/Database-spec.json) + tables from [`_forms/database-model.json`](_forms/database-model.json) (e.g. `ClothingDatabase/UserCredentials.json`)
 
 ---
 
 ## Part 1 — The Idea *(Product answers this)*
 
-**1. In one or two sentences, what is the purpose of this software?**
+### purpose — In one or two sentences, what is the purpose of this software?
 > Example: "An app that lets dog walkers book and get paid for walks."
 
-_Your answer:_
+### problem — What problem does it solve, and for whom?
 
-**2. What problem does it solve, and for whom?**
-> What problem are we solving?
-
-_Your answer:_
-
-**3. Who will use this software?**
+### users — Who will use this software?
 > List the kinds of people. For each, say what they're trying to get done.
+> - Person/group: … — they want to: …
 
-- Person/group: … — they want to: …
-- Person/group: … — they want to: …
-
-**4. Are there any apps or websites you like?**
+### apps-you-like — Are there any apps or websites you like?
 > Links or names are fine.
 
-_Your answer:_
-
-**5. Are there any apps or websites you want to avoid copying?**
+### apps-to-avoid — Are there any apps or websites you want to avoid copying?
 > Links or names are fine.
-
-_Your answer:_
 
 ---
 
@@ -47,47 +42,33 @@ _Your answer:_
 
 > Each **solution** (API, website, database, etc.) gets its own folder with a spec file that defines its specific technology — language, framework, hosting, database engine. The questions here set the **overall** direction; the solution specs fill in the detail.
 
-**6. What platforms would this development need to run on?**
+### platforms — What platforms would this development need to run on?
 > e.g. a website, Android, iOS, Windows service, etc.
 
-_Your answer:_
-
-**7. Is this a single repo or multi purpose repo?**
+### repo-structure — Is this a single repo or multi purpose repo?
 > e.g. one combined codebase, or separate repos for each service/app.
 
-_Your answer:_
-
-**8. Software development rules for the codebase.**
-> List rules for how the code will be written in general and add Software development practices to follow and how you define them and the AI must use this definition.
+### dev-rules — Software development rules for the codebase.
+> List rules for how the code will be written in general, plus software development practices to follow and how you define them — the AI must use your definition.
 > e.g. Build this using DRY (Do not repeat yourself) — if you are repeating code three times, put that code into a shared library where it can be accessed.
-> All Frontend code will use CamelCase for page names.
+> All frontend code will use CamelCase for page names.
 
-_Your answer:_
-
-**9. List the roles or claims used across the application.**
+### roles — List the roles or claims used across the application.
 > The shared vocabulary every solution authorises against.
 > e.g. Admin, SuperAdmin, Manager.
 
-_Your answer:_
-
-**10. What technology will host these solutions?**
+### hosting — What technology will host these solutions?
 > e.g. a particular hosting service, an app store, your own servers. "Not decided" is not a valid answer. (Each solution spec can refine this.)
 
-_Your answer:_
-
-**11. What database technology will the solution(s) use?**
-> e.g. PostgreSQL, MySQL, SQL Server, MongoDB. "Not decided" is not a valid answer. (Each Database solution restates its engine in its `Database-spec.md`.)
-
-_Your answer:_
+### database-technology — What database technology will the solution(s) use?
+> e.g. PostgreSQL, MySQL, SQL Server, MongoDB. "Not decided" is not a valid answer. (Each Database solution restates its engine in its `Database-spec.json`.)
 
 ---
 
 ## Part 3 — Look & Feel *(Product answers this)*
 
-**12. Do you have any designs, sketches, screenshots, or examples?**
+### designs — Do you have any designs, sketches, screenshots, or examples?
 > Paste links, attach images, or just describe the feeling you want (e.g. "clean and friendly, lots of white space").
-
-_Your answer:_
 
 ---
 
@@ -95,36 +76,26 @@ _Your answer:_
 
 > AI models trade cost against capability. Cheaper, faster models are great for simple, well-defined work; more powerful, pricier models are worth it for complex or high-risk work. Tell the AI when to reach for each, so it doesn't overspend on easy tasks or under-power hard ones.
 
-**13. When should we use the cheapest, fastest model?**
-> simple, repetitive, or low-risk tasks.
+### cheapest-model — When should we use the cheapest, fastest model?
+> Simple, repetitive, or low-risk tasks.
 
-_Your answer:_
-
-**14. When should we use the mid-range model?**
+### mid-range-model — When should we use the mid-range model?
 > Building medium and advanced complexity tasks.
 
-_Your answer:_
-
-**15. When should we use the most capable (and most expensive) model?**
+### most-capable-model — When should we use the most capable (and most expensive) model?
 > Best for complex, ambiguous, or high-stakes bugs and features.
 
-_Your answer:_
-
-**16. How hard should the model think (effort level) for different kinds of work?**
+### effort-levels — How hard should the model think (effort level) for different kinds of work?
 > Separate from *which* model, you can dial how much effort it spends reasoning before it acts. Higher effort = more careful, slower, more tokens; lower effort = faster and cheaper. Say when to use each.
 > - **Low effort:** simple, well-defined tasks where the answer is obvious.
 > - **Medium effort:** everyday building and changes.
 > - **High effort:** tricky logic, architecture decisions, or anything risky.
 
-_Your answer:_
-
 ---
 
 ## Part 5 — Anything Else
 
-**17. Is there anything important we haven't asked about?**
-
-_Your answer:_
+### anything-else — Is there anything important we haven't asked about?
 
 ---
 

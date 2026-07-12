@@ -1,0 +1,82 @@
+{
+  "form": "api-spec",
+  "solutionName": "",
+  "status": "blank",
+  "instructions": {
+    "whoFillsThisIn": "Developers.",
+    "when": "Once per API solution. This file sits at the root of the API's solution folder and defines how the whole API is built. Each endpoint/resource is a separate file in the same folder (copies of _forms/endpoint.json).",
+    "how": "Answer in plain English. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md.",
+    "note": "Solution = the folder this file sits in."
+  },
+  "theApi": {
+    "purpose": {
+      "question": "What is the purpose of this API?",
+      "example": "The single API for all requests from the clothing website.",
+      "answer": ""
+    },
+    "hosting": {
+      "question": "Where will it be hosted?",
+      "example": "Azure Function App, AWS Lambda, a container.",
+      "answer": ""
+    },
+    "language": {
+      "question": "What language will it use?",
+      "example": "Go, C#, TypeScript.",
+      "answer": ""
+    },
+    "frameworks": {
+      "question": "What frameworks should it use?",
+      "answer": ""
+    }
+  },
+  "authentication": {
+    "type": {
+      "question": "What type of authentication does it use?",
+      "example": "JWT, API keys, OAuth.",
+      "answer": ""
+    },
+    "claimsOrRoles": {
+      "question": "Does it authorise callers by Claims or Roles?",
+      "guidance": "The roles/claims vocabulary itself is listed in the Project Brief.",
+      "answer": ""
+    }
+  },
+  "conventions": {
+    "basePath": {
+      "question": "What is the main URL path?",
+      "example": "/api/",
+      "answer": ""
+    },
+    "versionedFolders": {
+      "question": "Are endpoints organised into version-specific folders?",
+      "example": "/api/v1/… — yes / no.",
+      "answer": ""
+    },
+    "errorLogging": {
+      "question": "How do we log errors and issues?",
+      "example": "Azure Application Insights.",
+      "answer": ""
+    },
+    "documentation": {
+      "question": "How is the API documented for external users online?",
+      "example": "OpenAPI / Swagger.",
+      "answer": ""
+    }
+  },
+  "standardResponses": {
+    "guidance": "One entry per status code the whole API uses consistently.",
+    "entries": [
+      { "code": 200, "meaning": "Success" }
+    ]
+  },
+  "notes": {
+    "mustNotDo": {
+      "question": "Anything this solution must NOT do / cannot deploy?",
+      "answer": ""
+    },
+    "limits": {
+      "question": "Any limits (rate limits, payload size)?",
+      "answer": ""
+    }
+  }
+}
