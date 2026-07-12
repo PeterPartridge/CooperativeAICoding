@@ -12,10 +12,11 @@ status: blank            # blank | filled | approved
 >
 > Then the brief gets handed to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](claude-only/1-translate-to-claude.md), which turns your answers into instructions the AI can follow.
 >
-> **How the folders are laid out:** this project brief lives at the root. Each **solution** gets its own folder, with a spec file at its root that defines the solution's technology, plus one file per page/endpoint/model. See [`example/`](example/) for a worked Clothing project. Prose briefs are Markdown; record-style forms are JSON:
-> - **Website / front-end** → [`_forms/Website-spec.json`](_forms/Website-spec.json) + pages from [`_forms/page.md`](_forms/page.md) (e.g. `ClothingWebsite/userLogin.md`)
-> - **API** → [`_forms/API-spec.json`](_forms/API-spec.json) + resources from [`_forms/endpoint.json`](_forms/endpoint.json) (e.g. `ClothingAPI/Login.json`)
-> - **Database** → [`_forms/Database-spec.json`](_forms/Database-spec.json) + tables from [`_forms/database-model.json`](_forms/database-model.json) (e.g. `ClothingDatabase/UserCredentials.json`)
+> **How the folders are laid out:** this project brief lives at the root. Each **solution** gets its own folder, with a spec file at its root that defines the solution's technology, plus one file per page/endpoint/model. See [`example/`](example/) for a worked Clothing project. Every solution folder's spec is a copy of the same [`_forms/application-spec.json`](_forms/application-spec.json) — set its `solutionType` to `website`, `api`, `database`, or `application`:
+> - **Website / front-end** → `application-spec.json` (`solutionType: website`) + pages from [`_forms/page.md`](_forms/page.md) (e.g. `ClothingWebsite/userLogin.md`)
+> - **API** → `application-spec.json` (`solutionType: api`) + resources from [`_forms/endpoint.json`](_forms/endpoint.json) (e.g. `ClothingAPI/Login.json`)
+> - **Database** → `application-spec.json` (`solutionType: database`) + tables from [`_forms/database-model.json`](_forms/database-model.json) (e.g. `ClothingDatabase/UserCredentials.json`)
+> - **Standalone application (CLI/TUI/desktop)** → `application-spec.json` (`solutionType: application`) + screens from `page.md` (e.g. `CoperativeAI/mainScreen.md`)
 
 ---
 
@@ -68,7 +69,7 @@ status: blank            # blank | filled | approved
 > e.g. a particular hosting service, an app store, your own servers. "Not decided" is not a valid answer. (Each solution spec can refine this.)
 
 ### database-technology — What database technology will the solution(s) use?
-> e.g. PostgreSQL, MySQL, SQL Server, MongoDB. "Not decided" is not a valid answer. (Each Database solution restates its engine in its `Database-spec.json`.)
+> e.g. PostgreSQL, MySQL, SQL Server, MongoDB. "Not decided" is not a valid answer. (Each Database solution restates its engine in its `application-spec.json`.)
 
 ### environments — What environments will this project have, and which may the AI deploy to?
 > e.g. "dev (AI may deploy), production (people deploy after review)." Each solution spec can refine this.

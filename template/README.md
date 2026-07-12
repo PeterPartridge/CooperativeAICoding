@@ -8,24 +8,23 @@ This folder is the working layout for a project built with the CooperativeAICodi
 template/
 ├─ Project_brief.md              ← fill in once (the whole project)
 ├─ _forms/                       ← blank master forms — copy these, don't fill them in place
-│  ├─ Website-spec.json          ← solution spec: one per website / front-end
-│  ├─ API-spec.json              ← solution spec: one per API
-│  ├─ Database-spec.json         ← solution spec: one per database
+│  ├─ application-spec.json      ← ONE solution spec for every type — set
+│  │                               solutionType: website | api | database | application
 │  ├─ boilerplates.json          ← named presets a solution spec adopts by name:
 │  │                               scaffolds (layout + tests + commands) and
 │  │                               security baselines (HTTPS-only, no secrets in code, …)
-│  ├─ page.md                    ← one per website page
+│  ├─ page.md                    ← one per website/application screen
 │  ├─ endpoint.json              ← one per API resource
 │  └─ database-model.json        ← one per data model / table
 │
 ├─ <solution>/                   ← one folder per solution (you create these)
-│  ├─ <Type>-spec.json           ← the solution's spec (Website / API / Database)
+│  ├─ application-spec.json      ← the solution's spec, whatever its solutionType
 │  └─ <item>.md|.json            ← its pages (Markdown) / endpoints / models (JSON)
 │
 ├─ example/                      ← a worked Clothing project to copy from
-│  ├─ ClothingWebsite/  (Website-spec.json + userLogin.md)
-│  ├─ ClothingAPI/      (API-spec.json + Login.json)
-│  └─ ClothingDatabase/ (Database-spec.json + UserCredentials.json)
+│  ├─ ClothingWebsite/  (application-spec.json, solutionType website + userLogin.md)
+│  ├─ ClothingAPI/      (application-spec.json, solutionType api + Login.json)
+│  └─ ClothingDatabase/ (application-spec.json, solutionType database + UserCredentials.json)
 │
 └─ claude-only/                  ← Claude's side — no human input
    ├─ 1-translate-to-claude.md   ← the bridge: turns a form into a structured spec + skills
@@ -36,13 +35,16 @@ template/
    └─ <solution>/<item>.md       ← Claude mirrors your solution folders here
 ```
 
-**Solutions are typed.** Each solution folder holds one **spec file** describing the whole solution, plus its items:
+**Solutions are typed, but the spec form is one file.** Each solution folder holds one `application-spec.json` describing the whole solution, plus its items. Set `solutionType` to pick which questions apply:
 
-| Solution type | Spec form | Item form | Example |
-|---------------|-----------|-----------|---------|
-| Website / front-end | `Website-spec.json` | `page.md` | `ClothingWebsite/userLogin.md` |
-| API | `API-spec.json` | `endpoint.json` | `ClothingAPI/Login.json` |
-| Database | `Database-spec.json` | `database-model.json` | `ClothingDatabase/UserCredentials.json` |
+| Solution type (`solutionType`) | Item form | Example |
+|---------------------------------|-----------|---------|
+| `website` — front-end | `page.md` | `ClothingWebsite/userLogin.md` |
+| `api` | `endpoint.json` | `ClothingAPI/Login.json` |
+| `database` | `database-model.json` | `ClothingDatabase/UserCredentials.json` |
+| `application` — CLI / TUI / desktop | `page.md` (one per screen, panel, or command group) | `CoperativeAI/mainScreen.md` |
+
+The spec's `core`, `accessAndInterface`, and `conventions` blocks hold every type's questions together; each field's `guidance` says which `solutionType`(s) it applies to — leave the rest blank. The `scaffold`, `security`, and `infrastructure` blocks are identical for every type and pull from the same [`boilerplates.json`](_forms/boilerplates.json) presets.
 
 **How the forms work.** Two shapes, matched to their content, and both carry the same metadata (`form`, a name, and `status: blank | filled | approved | built`). Item briefs also declare `depends-on`/`dependsOn` — the briefs that must be built before them (a page depends on its endpoints; an endpoint on its models) — and `/build` refuses to run out of order:
 
@@ -53,7 +55,7 @@ template/
 
 1. **Fill in [`Project_brief.md`](Project_brief.md)** — once, for the whole project. List your solutions here (e.g. `ClothingWebsite`, `ClothingAPI`, `ClothingDatabase`), each with its repository and local path — solutions can live in separate repos, and this is how the AI knows where to build each one.
 
-2. **Create a folder per solution**, and drop in its spec. Copy the matching spec form from [`_forms/`](_forms/) into the folder — `Website-spec.json`, `API-spec.json`, or `Database-spec.json`. In its `scaffold` block, either name a preset from [`boilerplates.json`](_forms/boilerplates.json) or write your own file layout, test setup, and commands — this is what the AI uses to create the repo skeleton on the first build and to verify every build after. In its `security` block, name a security baseline (HTTPS-only, no secrets in code, deny-by-default auth, …) and add any extra rules — additions only; they can never weaken the baseline.
+2. **Create a folder per solution**, and drop in its spec. Copy [`_forms/application-spec.json`](_forms/application-spec.json) into the folder and set `solutionType` to `website`, `api`, `database`, or `application`. In its `scaffold` block, either name a preset from [`boilerplates.json`](_forms/boilerplates.json) or write your own file layout, test setup, and commands — this is what the AI uses to create the repo skeleton on the first build and to verify every build after. In its `security` block, name a security baseline (HTTPS-only, no secrets in code, deny-by-default auth, …) and add any extra rules — additions only; they can never weaken the baseline.
 
 3. **Add the items.** Copy the matching item form into the same folder and name it after the item:
    - Website page → `page.md` → e.g. `ClothingWebsite/userLogin.md`

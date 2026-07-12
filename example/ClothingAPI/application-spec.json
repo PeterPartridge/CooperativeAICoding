@@ -1,16 +1,17 @@
 {
-  "form": "api-spec",
+  "form": "application-spec",
   "solutionName": "ClothingAPI",
+  "solutionType": "api",
   "status": "filled",
-  "exampleOf": "../../template/_forms/API-spec.json",
+  "exampleOf": "../../template/_forms/application-spec.json",
   "exampleNote": "A filled-in example. The solution is the folder this file sits in (ClothingAPI).",
-  "theApi": {
+  "core": {
     "purpose": {
-      "question": "What is the purpose of this API?",
+      "question": "What is the purpose of this solution?",
       "answer": "The single API for all requests from the clothing website."
     },
     "hosting": {
-      "question": "Where will it be hosted?",
+      "question": "Where will it be hosted, deployed, or distributed?",
       "answer": "Azure Function App."
     },
     "language": {
@@ -18,17 +19,17 @@
       "answer": "Go."
     },
     "frameworks": {
-      "question": "What frameworks should it use?",
+      "question": "What frameworks, libraries, or UI toolkit should it use?",
       "answer": ""
     }
   },
-  "authentication": {
-    "type": {
-      "question": "What type of authentication does it use?",
+  "accessAndInterface": {
+    "authType": {
+      "question": "How does this solution authenticate or authorise callers/users?",
       "answer": "JWT."
     },
-    "claimsOrRoles": {
-      "question": "Does it authorise callers by Claims or Roles?",
+    "rolesOrClaims": {
+      "question": "Does it authorise by Claims or Roles?",
       "answer": "Roles."
     }
   },
@@ -46,7 +47,7 @@
       "answer": "Azure Application Insights."
     },
     "documentation": {
-      "question": "How is the API documented for external users online?",
+      "question": "How is this solution documented for its users or callers?",
       "answer": ""
     }
   },
@@ -73,6 +74,7 @@
       "install": "",
       "run": "",
       "build": "",
+      "deploy": "",
       "test": ""
     },
     "note": "Based on the go-azure-functions boilerplate; the testing answer above overrides the boilerplate's testing entry."
@@ -107,7 +109,7 @@
       "answer": "dev (AI may deploy), production (people deploy after review)."
     },
     "settings": {
-      "question": "What named settings and secrets does this solution need at runtime?",
+      "question": "What named settings and secrets does this solution need at build or run time?",
       "entries": [
         { "name": "SQL_CONNECTION_STRING", "whatItIs": "Connection to ClothingDatabase", "secret": true, "where": "Azure Key Vault, referenced from Function App settings" },
         { "name": "JWT_SIGNING_KEY", "whatItIs": "Key used to sign and validate JWTs", "secret": true, "where": "Azure Key Vault, referenced from Function App settings" },
@@ -125,7 +127,7 @@
       "answer": ""
     },
     "limits": {
-      "question": "Any limits (rate limits, payload size)?",
+      "question": "Any limits (rate limits, payload size, memory, startup time, supported platforms)?",
       "answer": ""
     }
   }

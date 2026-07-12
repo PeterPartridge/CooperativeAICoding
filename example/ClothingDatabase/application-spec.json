@@ -1,21 +1,26 @@
 {
-  "form": "database-spec",
+  "form": "application-spec",
   "solutionName": "ClothingDatabase",
+  "solutionType": "database",
   "status": "filled",
-  "exampleOf": "../../template/_forms/Database-spec.json",
+  "exampleOf": "../../template/_forms/application-spec.json",
   "exampleNote": "A filled-in example. The solution is the folder this file sits in (ClothingDatabase).",
-  "questions": {
-    "databaseType": {
-      "question": "Which database type does it use?",
-      "answer": "SQL Server."
+  "core": {
+    "purpose": {
+      "question": "What is the purpose of this solution?",
+      "answer": "Stores every clothing-store data model, starting with user login credentials."
     },
     "hosting": {
-      "question": "Where will it be deployed / hosted?",
+      "question": "Where will it be hosted, deployed, or distributed?",
       "answer": "Azure Elastic Pool."
     },
-    "cannotDo": {
-      "question": "What can this solution NOT do / not deploy?",
-      "answer": "SQL Agent Jobs (not supported on an Elastic Pool)."
+    "language": {
+      "question": "What language will it use?",
+      "answer": "SQL Server."
+    },
+    "frameworks": {
+      "question": "What frameworks, libraries, or UI toolkit should it use?",
+      "answer": ""
     }
   },
   "scaffold": {
@@ -67,7 +72,7 @@
       "answer": "dev (AI may deploy), production (people deploy after review)."
     },
     "settings": {
-      "question": "What named settings and secrets does deployment need?",
+      "question": "What named settings and secrets does this solution need at build or run time?",
       "entries": [
         { "name": "AZURE_SQL_DEPLOY_CREDENTIAL", "whatItIs": "Identity the pipeline deploys the DACPAC with", "secret": true, "where": "GitHub federated credential — no stored password" }
       ]
@@ -75,6 +80,16 @@
     "pipeline": {
       "question": "What CI/CD pipeline should this solution have?",
       "answer": "GitHub Actions: on PR → build the database project; on merge to main → deploy the DACPAC to dev."
+    }
+  },
+  "notes": {
+    "mustNotDo": {
+      "question": "Anything this solution must NOT do / cannot deploy?",
+      "answer": "SQL Agent Jobs (not supported on an Elastic Pool)."
+    },
+    "limits": {
+      "question": "Any limits (rate limits, payload size, memory, startup time, supported platforms)?",
+      "answer": ""
     }
   }
 }

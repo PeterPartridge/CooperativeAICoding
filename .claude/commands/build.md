@@ -26,7 +26,7 @@ Workflow:
 0. **Scaffold (first build in a solution only)** — if the solution's repo has no
    code skeleton yet, plan that first, as its own smallest-change plan approved
    before any page or endpoint is built. The shape comes from the `scaffold` block
-   of the solution's spec (`template/<solution>/<Type>-spec.json`): resolve a named
+   of the solution's spec (`template/<solution>/application-spec.json`): resolve a named
    `boilerplate` from `template/_forms/boilerplates.json`, then apply any scaffold
    fields the spec fills in itself as overrides. Use the versions the boilerplate
    pins; anything unpinned gets the latest stable release, with the exact version
@@ -38,7 +38,7 @@ Workflow:
    repos** line (`template/claude-only/Project_system.md`) — that is where the code
    gets built, which may be a different repository from this one; name it in the
    plan, and stop and ask if the location is missing or not checked out. Read the
-   solution's spec (`template/<solution>/<Type>-spec.json`) in full — its
+   solution's spec (`template/<solution>/application-spec.json`) in full — its
    conventions, auth, standard responses, security, scaffold, and mustNotDo all
    bind this build, not just the blocks named elsewhere. Check the item's
    dependencies (`depends-on` in a Markdown brief, `dependsOn.entries` in a JSON

@@ -36,6 +36,30 @@
         "All access from application code uses parameterised queries — never SQL built from strings.",
         "Fields marked sensitive in a database-model brief are stored hashed or encrypted, exactly as the brief says."
       ]
+    },
+    "embedded-database-baseline": {
+      "solutionType": "database",
+      "description": "For a database engine embedded in the application process (e.g. SQLite, Turso/libSQL, DuckDB) rather than reached over a network.",
+      "rules": [
+        "The database file lives inside the application's own data directory — never a world-readable or shared location.",
+        "Data marked sensitive in a database-model brief is encrypted at rest, using the embedded engine's own encryption if it has one.",
+        "No credentials hard-coded — if the engine supports an at-rest encryption key, it is a named setting, never a literal in code.",
+        "All access from application code uses parameterised queries — never SQL built from strings.",
+        "The application opens the database with the least privilege the engine allows for normal operation (no elevated/admin mode)."
+      ]
+    },
+    "application-baseline": {
+      "solutionType": "application",
+      "description": "For a standalone executable (CLI, TUI, or desktop GUI) rather than a hosted website or API.",
+      "rules": [
+        "No secrets in code or config — settings are referenced by name from the infrastructure settings list, never hard-coded.",
+        "All file paths built from user input are validated — no path traversal outside the application's own data directories.",
+        "Any network calls the application makes use HTTPS only.",
+        "Untrusted input (opened files, pasted content, dragged-in items, CLI arguments) is never executed or interpreted as code.",
+        "Unsafe code (Rust `unsafe` blocks) is avoided; where required, it is isolated, documented with the invariant it relies on, and called out in the plan for approval.",
+        "Dependencies are installed from the lockfile (Cargo.lock); new dependencies are named in the plan for approval.",
+        "Crash reports and logs never include user data or secrets."
+      ]
     }
   },
   "boilerplates": {
@@ -106,6 +130,29 @@
         "test": "dotnet test"
       }
     },
+    "rust-cli-app": {
+      "solutionType": "application",
+      "description": "Rust built as a single native executable (CLI/TUI/desktop). The UI toolkit (terminal-only, ratatui TUI, or a GUI crate like egui/Tauri/iced) is a project-specific choice — name it in the solution spec's own scaffold fields; this preset only fixes the parts that don't depend on that choice.",
+      "versions": { "rust": "stable (latest)", "edition": "2021" },
+      "fileLayout": [
+        "src/main.rs — entry point",
+        "src/commands/ — one file per CLI command or terminal action",
+        "src/ui/ — UI/rendering code, in whichever toolkit the spec names",
+        "src/db/ — embedded database access, if the solution has one",
+        "tests/ — integration tests; unit tests live beside their module with #[cfg(test)]",
+        "Cargo.toml, Cargo.lock — project manifest and pinned dependencies"
+      ],
+      "testing": {
+        "framework": "Rust's built-in test framework (cargo test)",
+        "kinds": "TDD per the project's dev-rules: a failing test before each new function. Unit tests beside each module; integration tests in tests/ per command or user action from the brief."
+      },
+      "commands": {
+        "install": "cargo fetch",
+        "run": "cargo run",
+        "build": "cargo build --release",
+        "test": "cargo test"
+      }
+    },
     "sql-server-database-project": {
       "solutionType": "database",
       "description": "SQL Server database project (DACPAC) — one .sql file per table, deployed with sqlpackage.",
@@ -125,6 +172,25 @@
         "build": "dotnet build",
         "deploy": "sqlpackage /Action:Publish",
         "test": "run the tSQLt test classes"
+      }
+    },
+    "turso-embedded": {
+      "solutionType": "database",
+      "description": "Turso (libSQL) opened as a local embedded file from the host application — no separate database server or connection string over the network.",
+      "versions": { "turso-crate": "latest stable — pin the exact version used in Cargo.toml at scaffold time" },
+      "fileLayout": [
+        "src/db/schema.rs (or migrations/) — one migration per database-model brief",
+        "src/db/queries.rs — parameterised queries, grouped by model",
+        "tests/db/ — one test module per database-model brief: uniqueness, nullability, relationships"
+      ],
+      "testing": {
+        "framework": "Rust's built-in test framework (cargo test), against a temporary database file per test run",
+        "kinds": "Per model: uniqueness, nullability, defaults, and relationship constraints from the database-model brief."
+      },
+      "commands": {
+        "install": "cargo fetch",
+        "build": "cargo build --release",
+        "test": "cargo test --lib db"
       }
     }
   }

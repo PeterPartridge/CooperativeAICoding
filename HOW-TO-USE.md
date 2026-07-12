@@ -63,7 +63,8 @@ file inside it.
    This copies the right blank form to `template/ClothingWebsite/userLogin.md`
    (pages are Markdown; endpoints and models are JSON, e.g.
    `template/ClothingAPI/Login.json`). A brand-new solution folder also needs its
-   spec — `Website-spec.json` / `API-spec.json` / `Database-spec.json`; the command reminds you.
+   spec — a copy of `application-spec.json` with `solutionType` set to `website`,
+   `api`, or `database`; the command reminds you.
 
 2. **Fill it in.** Answer in plain English — under the question headings in a
    Markdown form, or in the `answer` fields of a JSON one: what the page is for,

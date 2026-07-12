@@ -1,44 +1,53 @@
 {
-  "form": "website-spec",
+  "form": "application-spec",
   "solutionName": "ClothingWebsite",
+  "solutionType": "website",
   "status": "filled",
-  "exampleOf": "../../template/_forms/Website-spec.json",
+  "exampleOf": "../../template/_forms/application-spec.json",
   "exampleNote": "A filled-in example. The solution is the folder this file sits in (ClothingWebsite).",
-  "theWebsite": {
+  "core": {
     "purpose": {
-      "question": "What is the purpose of this website / front-end?",
+      "question": "What is the purpose of this solution?",
       "answer": "The storefront customers use to browse and buy clothes, and to manage their account."
     },
-    "languageAndFramework": {
-      "question": "What language and framework will it use?",
+    "hosting": {
+      "question": "Where will it be hosted, deployed, or distributed?",
+      "answer": "Azure Static Web Apps."
+    },
+    "language": {
+      "question": "What language will it use?",
       "answer": "TypeScript + React."
     },
-    "hosting": {
-      "question": "Where will it be hosted?",
-      "answer": "Azure Static Web Apps."
+    "frameworks": {
+      "question": "What frameworks, libraries, or UI toolkit should it use?",
+      "answer": ""
     }
   },
-  "lookAndFeel": {
-    "overall": {
-      "question": "What is the overall look and feel?",
-      "answer": "Clean and friendly, lots of white space, large product imagery."
+  "accessAndInterface": {
+    "authType": {
+      "question": "How does this solution authenticate or authorise callers/users?",
+      "answer": "JWT returned by ClothingAPI /users/login, stored client-side. Admin-only pages are gated by the Admin role."
     },
-    "styling": {
-      "question": "What styling approach or component library?",
-      "answer": "Tailwind CSS."
-    }
-  },
-  "behaviour": {
-    "apis": {
+    "rolesOrClaims": {
+      "question": "Does it authorise by Claims or Roles?",
+      "answer": "Roles — see the Project Brief."
+    },
+    "apisItTalksTo": {
       "question": "Which API(s) does it talk to?",
       "answer": "ClothingAPI (/api/)."
     },
-    "authentication": {
-      "question": "How does it authenticate users?",
-      "answer": "JWT returned by ClothingAPI /users/login, stored client-side. Admin-only pages are gated by the Admin role."
+    "lookAndFeel": {
+      "question": "What is the overall look and feel?",
+      "answer": "Clean and friendly, lots of white space, large product imagery."
     },
+    "stylingOrToolkit": {
+      "question": "What styling approach, component library, or UI toolkit?",
+      "answer": "Tailwind CSS."
+    }
+  },
+  "conventions": {
     "errorLogging": {
-      "question": "How do we log front-end errors?",
+      "question": "How do we log errors and issues?",
       "answer": "Azure Application Insights."
     }
   },
@@ -60,6 +69,7 @@
       "install": "",
       "run": "",
       "build": "",
+      "deploy": "",
       "test": ""
     },
     "note": "Everything comes from the react-vite boilerplate in _forms/boilerplates.json — no overrides."
@@ -92,7 +102,7 @@
       "answer": "dev (AI may deploy), production (people deploy after review)."
     },
     "settings": {
-      "question": "What named settings and secrets does this solution need at runtime?",
+      "question": "What named settings and secrets does this solution need at build or run time?",
       "entries": [
         { "name": "API_BASE_URL", "whatItIs": "Base URL of ClothingAPI", "secret": false, "where": "Static Web App application settings" }
       ]
@@ -104,8 +114,12 @@
   },
   "notes": {
     "mustNotDo": {
-      "question": "Anything this solution must NOT do?",
+      "question": "Anything this solution must NOT do / cannot deploy?",
       "answer": "It must not talk to the database directly — all data goes through ClothingAPI."
+    },
+    "limits": {
+      "question": "Any limits (rate limits, payload size, memory, startup time, supported platforms)?",
+      "answer": ""
     }
   }
 }

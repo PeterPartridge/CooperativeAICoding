@@ -9,7 +9,7 @@
   },
   "instructions": {
     "whoFillsThisIn": "Developers.",
-    "when": "For each resource (a group of related operations) an API needs. One file per resource. Lives in the API's solution folder; the API itself is defined in that folder's API-spec.json.",
+    "when": "For each resource (a group of related operations) an API needs. One file per resource. Lives in the API's solution folder; the API itself is defined in that folder's application-spec.json.",
     "how": "Answer in plain English. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md, along with the page and any data models it touches.",
     "note": "Solution = the folder this file sits in."
   },

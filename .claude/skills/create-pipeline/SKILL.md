@@ -35,7 +35,7 @@ approved plan, separate from feature building.
 
 ## Procedure
 
-1. **Read the inputs.** The solution's spec (`template/<solution>/<Type>-spec.json`):
+1. **Read the inputs.** The solution's spec (`template/<solution>/application-spec.json`):
    its `infrastructure` block (resources, provisioning, environments, settings,
    pipeline) and `scaffold` block (commands — resolve a named boilerplate from
    `template/_forms/boilerplates.json`). Get the repo location from the Project

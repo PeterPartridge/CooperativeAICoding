@@ -13,8 +13,9 @@ Steps:
    - `endpoint` → `template/_forms/endpoint.json`
    - `model` → `template/_forms/database-model.json`
 2. Ensure the solution folder exists at `template/<solution>/`. If the folder is
-   new, also remind me it needs a solution spec — copy the matching one from
-   `template/_forms/` (`Website-spec.json` / `API-spec.json` / `Database-spec.json`).
+   new, also remind me it needs a solution spec — copy
+   `template/_forms/application-spec.json` into it and set `solutionType` to
+   `website`, `api`, `database`, or `application` (CLI/TUI/desktop).
 3. Copy the master form to `template/<solution>/<itemName>.<same extension>`
    **without filling it in** — it stays a blank form. A human answers in plain
    English: under the question headings in a Markdown form, or in the `answer`
