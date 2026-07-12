@@ -132,12 +132,12 @@
     },
     "rust-cli-app": {
       "solutionType": "application",
-      "description": "Rust built as a single native executable (CLI/TUI/desktop). The UI toolkit (terminal-only, ratatui TUI, or a GUI crate like egui/Tauri/iced) is a project-specific choice — name it in the solution spec's own scaffold fields; this preset only fixes the parts that don't depend on that choice.",
+      "description": "Rust built as a single native executable (CLI/TUI/desktop) with a plain `cargo new` layout — no GUI webview. For a real windowed GUI (a webview-based UI, e.g. Tauri), use tauri-desktop-app instead; that has a materially different required project layout, not just a different UI folder.",
       "versions": { "rust": "stable (latest)", "edition": "2021" },
       "fileLayout": [
         "src/main.rs — entry point",
         "src/commands/ — one file per CLI command or terminal action",
-        "src/ui/ — UI/rendering code, in whichever toolkit the spec names",
+        "src/ui/ — UI/rendering code, in whichever text-mode toolkit the spec names (e.g. ratatui)",
         "src/db/ — embedded database access, if the solution has one",
         "tests/ — integration tests; unit tests live beside their module with #[cfg(test)]",
         "Cargo.toml, Cargo.lock — project manifest and pinned dependencies"
@@ -151,6 +151,31 @@
         "run": "cargo run",
         "build": "cargo build --release",
         "test": "cargo test"
+      }
+    },
+    "tauri-desktop-app": {
+      "solutionType": "application",
+      "description": "A real windowed desktop GUI: a Rust backend (src-tauri/) driving a native window around a web-based frontend (HTML/CSS/JS), via Tauri. Use this — not rust-cli-app — whenever the brief describes an actual window/canvas/drag-and-drop UI rather than a pure terminal tool. An in-app terminal (real shell or otherwise) is a feature rendered inside this same window, not a separate console.",
+      "versions": { "rust": "stable (latest)", "edition": "2021", "tauri": "2 (pin the exact crate version used in Cargo.toml at scaffold time)", "node": "22 LTS (frontend tooling only — not a runtime dependency of the shipped app)" },
+      "fileLayout": [
+        "src-tauri/Cargo.toml, src-tauri/tauri.conf.json, src-tauri/build.rs — the Tauri backend manifest and config",
+        "src-tauri/src/main.rs — backend entry point; registers Tauri commands the frontend calls",
+        "src-tauri/src/commands/ — one file per Tauri command (backend logic invoked from the frontend)",
+        "src-tauri/src/db/ — embedded database access, if the solution has one",
+        "src-tauri/src/terminal/ — the embedded shell/PTY integration, if the brief calls for a real terminal",
+        "src-tauri/tests/ — integration tests; unit tests live beside their module with #[cfg(test)]",
+        "src/ — the frontend (HTML/CSS/JS or a framework); one view per page/screen brief",
+        "package.json — frontend dependencies and build scripts"
+      ],
+      "testing": {
+        "framework": "Rust's built-in test framework (cargo test) for src-tauri/; a JS test runner (e.g. Vitest) for the frontend if it has real logic beyond markup",
+        "kinds": "TDD per the project's dev-rules for backend commands: a failing test before each new function. Frontend tests per screen brief where the frontend has logic worth testing."
+      },
+      "commands": {
+        "install": "cargo fetch (in src-tauri/) and npm install (frontend)",
+        "run": "npm run tauri dev — or cargo run from src-tauri/ if only the backend is being exercised",
+        "build": "npm run tauri build — produces platform-specific release binaries",
+        "test": "cargo test (from src-tauri/) and the frontend's test command, if it has tests"
       }
     },
     "sql-server-database-project": {
