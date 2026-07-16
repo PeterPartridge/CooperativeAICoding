@@ -35,11 +35,15 @@ approved plan, separate from feature building.
 
 ## Procedure
 
-1. **Read the inputs.** The solution's spec (`template/<solution>/application-spec.json`):
+1. **Read the inputs.** Derive `<projectRoot>` = the nearest ancestor of the
+   solution folder containing `Project_brief.md` (`template/`, `application/`,
+   `example/` each qualify; ask once if ambiguous). The solution's spec
+   (`<projectRoot>/<solution>/application-spec.json`):
    its `infrastructure` block (resources, provisioning, environments, settings,
    pipeline) and `scaffold` block (commands — resolve a named boilerplate from
-   `template/_forms/boilerplates.json`). Get the repo location from the Project
-   Digest's Solutions & repos line (`template/claude-only/Project_system.md`).
+   `template/_forms/boilerplates.json`, a framework asset that always lives at
+   the repo's `template/`). Get the repo location from the Project
+   Digest's Solutions & repos line (`<projectRoot>/claude-only/Project_system.md`).
 2. **Plan** — and wait for approval. State:
    - Resources to create (`existsAlready: false`), with the provisioning tool the
      spec names, and which are left to a person.
@@ -57,5 +61,5 @@ approved plan, separate from feature building.
 5. **Report back & declare debt** — append to the solution spec what was created,
    the named secrets/settings a person still has to supply, and any technical debt.
    Add a row per resource to the solution's section of
-   `template/claude-only/Code_map.md` notes if useful — but never row-by-row
+   `<projectRoot>/claude-only/Code_map.md` notes if useful — but never row-by-row
    pipeline internals.

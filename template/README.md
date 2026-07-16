@@ -21,11 +21,6 @@ template/
 │  ├─ application-spec.json      ← the solution's spec, whatever its solutionType
 │  └─ <item>.md|.json            ← its pages (Markdown) / endpoints / models (JSON)
 │
-├─ example/                      ← a worked Clothing project to copy from
-│  ├─ ClothingWebsite/  (application-spec.json, solutionType website + userLogin.md)
-│  ├─ ClothingAPI/      (application-spec.json, solutionType api + Login.json)
-│  └─ ClothingDatabase/ (application-spec.json, solutionType database + UserCredentials.json)
-│
 └─ claude-only/                  ← Claude's side — no human input
    ├─ 1-translate-to-claude.md   ← the bridge: turns a form into a structured spec + skills
    ├─ 2-claude-system.template.md← the shape Claude's specs come back in
@@ -34,6 +29,8 @@ template/
    │                               what it does + which files/methods it uses
    └─ <solution>/<item>.md       ← Claude mirrors your solution folders here
 ```
+
+**A project is any folder laid out like this whose root holds a `Project_brief.md`** — this `template/` folder is the blank starting copy, `example/` (at the **repo root**, a sibling of `template/`) is a worked Clothing project to copy from, and `application/` (also at the repo root) is a real project: the framework speccing its own desktop app. The `/translate`, `/build`, `/new-item`, and `/pipeline` commands resolve all paths from that project root. The blank master forms and `boilerplates.json` always come from this folder's `_forms/`, whichever project you're in.
 
 **Solutions are typed, but the spec form is one file.** Each solution folder holds one `application-spec.json` describing the whole solution, plus its items. Set `solutionType` to pick which questions apply:
 
@@ -66,7 +63,7 @@ The spec's `core`, `accessAndInterface`, and `conventions` blocks hold every typ
 
 5. **Check and approve.** Read the spec back, fix anything in plain English, then let the AI build — smallest change first, one item at a time.
 
-See [`example/`](example/) for a complete worked project you can copy from.
+See [`example/`](../example/) (at the repo root) for a complete worked project you can copy from.
 
 ## Why two sides
 

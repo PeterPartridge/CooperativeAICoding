@@ -13,21 +13,27 @@ layout, see [`template/README.md`](template/README.md). This file is just *how t
 
 ```
 Fill a form                 →   Translate to a spec   →   Review & approve   →   Build   →   Iterate
-   (you, in template/)          (/translate)              (you)                 (/build)    (add a change round)
+   (you, in your project)       (/translate)              (you)                 (/build)    (add a change round)
 ```
+
+A **project** is any folder whose root holds a `Project_brief.md` — `template/`
+is the blank starting copy, `example/` is a worked project, and `application/`
+is this repo's own real project. Every command resolves paths from that project
+root; the blank forms and boilerplates always come from `template/_forms/`.
 
 Forms come in two shapes, matched to their content. Prose briefs (the project
 brief and page briefs) are **Markdown**: write your plain-English answer under
 each question heading — lines starting with `>` are guidance, everything else is
 yours. Record-style forms (endpoints, database models, solution specs) are
 **JSON**: fill in the `answer` fields and entry lists. Everything Claude
-generates lands in `template/claude-only/`, mirroring your folders.
+generates lands in your project's `claude-only/` folder, mirroring your folders.
 
 ---
 
 ## First-time setup (once per project)
 
-1. **Fill in the project brief.** Open [`template/Project_brief.md`](template/Project_brief.md)
+1. **Fill in the project brief.** Copy [`template/Project_brief.md`](template/Project_brief.md)
+   into your project folder (or fill it in place for a template-based project)
    and answer each question in plain English under its heading (the `>` lines are
    guidance and examples). Set `status: filled` at the top when you're done. This
    is the whole-project "why," the tech direction, the house rules, security, and
@@ -37,11 +43,12 @@ generates lands in `template/claude-only/`, mirroring your folders.
 2. **Translate it.** Run:
 
    ```
-   /translate template/Project_brief.md
+   /translate application/Project_brief.md
    ```
 
    Claude produces a **System Spec**, a compact **Project Digest**, and a
-   **Project Skills** list, and saves them to `template/claude-only/Project_system.md`.
+   **Project Skills** list, and saves them to `<projectRoot>/claude-only/Project_system.md`
+   (e.g. `application/claude-only/Project_system.md`).
 
 3. **Read it back.** Check nothing was invented or misunderstood. If the skills
    list looks surprisingly long, that's a signal the project is too big — split it.
@@ -60,9 +67,11 @@ file inside it.
    /new-item page ClothingWebsite userLogin
    ```
 
-   This copies the right blank form to `template/ClothingWebsite/userLogin.md`
+   This copies the right blank form to `<projectRoot>/ClothingWebsite/userLogin.md`
    (pages are Markdown; endpoints and models are JSON, e.g.
-   `template/ClothingAPI/Login.json`). A brand-new solution folder also needs its
+   `<projectRoot>/ClothingAPI/Login.json`). Add the project root as a fourth
+   argument if you have more than one project (e.g.
+   `/new-item page CoperativeAI workspaceShell application`). A brand-new solution folder also needs its
    spec — a copy of `application-spec.json` with `solutionType` set to `website`,
    `api`, or `database`; the command reminds you.
 
@@ -74,12 +83,13 @@ file inside it.
 3. **Translate it.**
 
    ```
-   /translate template/ClothingWebsite/userLogin.md
+   /translate example/ClothingWebsite/userLogin.md
    ```
 
    Claude reads only the **Project Digest** (not the whole project spec — that keeps
    it token-efficient), then produces a **Page Spec**, **Page Skills**, and a short
-   **PLAN**, saved to `template/claude-only/ClothingWebsite/userLogin.md`.
+   **PLAN**, saved to the mirrored path in the project's own `claude-only/`
+   folder, e.g. `example/claude-only/ClothingWebsite/userLogin.md`.
 
 4. **Approve the plan.** Read it back and approve, or correct it in plain English.
 
@@ -90,7 +100,7 @@ file inside it.
 Once a spec is approved:
 
 ```
-/build template/claude-only/ClothingWebsite/userLogin.md
+/build application/claude-only/CoperativeAI/workspaceShell.md
 ```
 
 Claude will:

@@ -1,5 +1,7 @@
 # CooperativeAICoding
 
+> Note: the local repo folder and the `CoperativeAI` solution names use the historical spelling "Coperative"; the framework itself is "CooperativeAICoding".
+
 A framework that gives **Product, Developers, and AI** a single, shared way of working — so that software is built to clear objectives, within agreed technical guardrails, without the AI wandering off and burning tokens rebuilding things that already work.
 
 Development is a team game, and normally this would involve Product working with Developers and Quality Assurance to build a good product, with continuous feedback from Product to Developers, Developers to Product, and QA to Developers and Product — all about capabilities, general product functionality, and look and feel.
