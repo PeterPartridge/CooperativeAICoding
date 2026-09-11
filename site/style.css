@@ -1,0 +1,431 @@
+/* The site's one stylesheet.
+ *
+ * **Glass, and then the three ways glass normally fails people.** Frosted
+ * panels look good and are a well-known accessibility problem: text loses
+ * contrast against whatever drifts behind it, the blur costs a lot on weak
+ * hardware, and some people get ill looking at it. So the glass here is built
+ * to be removable — `prefers-reduced-transparency` turns every panel solid,
+ * `prefers-contrast` hardens the borders and text, and `prefers-reduced-motion`
+ * stops everything moving. None of those are afterthoughts bolted on at the
+ * bottom; the tokens are arranged so that switching them is a re-tint, not a
+ * different stylesheet.
+ *
+ * **The contrast rule that shapes the alphas.** Body text never sits directly
+ * on the backdrop. It sits on a panel opaque enough that the measured contrast
+ * holds regardless of what is behind it — which is why the surface alphas look
+ * high for "glass". A panel you can see *through* is decoration; a panel you
+ * can read *on* is the job.
+ *
+ * Four colours, one per environment, from the app's own idea that each tab has
+ * its own so you always know where you are. */
+:root {
+  color-scheme: light dark;
+
+  --ink: #12151a;
+  --ink-soft: #454c58;
+  --paper: #eef1f6;
+  --line: rgba(18, 22, 30, 0.14);
+
+  /* The glass itself. Alpha is high on purpose — see the contrast rule above. */
+  --glass: rgba(255, 255, 255, 0.78);
+  --glass-strong: rgba(255, 255, 255, 0.9);
+  --glass-edge: rgba(255, 255, 255, 0.85);
+  --blur: blur(20px) saturate(150%);
+
+  --product: #6d28d9;
+  --develop: #0f766e;
+  --test: #a2540a;
+  --admin: #be123c;
+
+  --accent: var(--develop);
+  --on-accent: #ffffff;
+  --shadow: 0 1px 2px rgba(16, 20, 28, 0.05), 0 10px 30px rgba(16, 20, 28, 0.07);
+  --ring: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eceff4;
+    --ink-soft: #aab2bf;
+    --paper: #0b0e12;
+    --line: rgba(255, 255, 255, 0.14);
+
+    --glass: rgba(24, 29, 37, 0.76);
+    --glass-strong: rgba(24, 29, 37, 0.9);
+    --glass-edge: rgba(255, 255, 255, 0.12);
+
+    /* Lifted for dark: the same hues at light-mode lightness fail against a
+       dark panel, and a colour that fails contrast is not a brand decision. */
+    --product: #c4b5fd;
+    --develop: #5eead4;
+    --test: #fcd34d;
+    --admin: #fda4af;
+
+    --on-accent: #08110f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* **The glass, removed for anyone who asked for it to be.** Not a degraded
+   version — an equally finished one, with solid surfaces and the same layout. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass: #ffffff;
+    --glass-strong: #ffffff;
+    --blur: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --glass: #161a21; --glass-strong: #1b212a; }
+  }
+  .backdrop { display: none; }
+}
+
+/* Where somebody has asked the system for more contrast, give it: solid
+   surfaces, harder edges, and text at full strength rather than softened. */
+@media (prefers-contrast: more) {
+  :root {
+    --glass: #ffffff;
+    --glass-strong: #ffffff;
+    --blur: none;
+    --ink-soft: #23282f;
+    --line: rgba(0, 0, 0, 0.55);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --glass: #0e1116;
+      --glass-strong: #0e1116;
+      --ink-soft: #e6e9ee;
+      --line: rgba(255, 255, 255, 0.6);
+    }
+  }
+  .backdrop { display: none; }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* The colour behind the glass. Fixed, so scrolling does not drag it about —
+   which is both calmer and cheaper to paint. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(46rem 28rem at 12% -8%, color-mix(in srgb, var(--product) 30%, transparent), transparent 62%),
+    radial-gradient(40rem 26rem at 88% 2%, color-mix(in srgb, var(--develop) 28%, transparent), transparent 60%),
+    radial-gradient(38rem 30rem at 78% 92%, color-mix(in srgb, var(--test) 20%, transparent), transparent 62%),
+    radial-gradient(34rem 24rem at 6% 88%, color-mix(in srgb, var(--admin) 20%, transparent), transparent 60%);
+}
+
+/* ---- the things everyone has to be able to use ---- */
+
+/* **Off-screen until focused, not `display: none`.** Hidden the usual way it
+   would never be reachable, which is the opposite of the point. */
+.skip {
+  position: absolute;
+  left: 12px;
+  top: -80px;
+  z-index: 100;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 650;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip:focus { top: 12px; }
+
+/* One visible focus style for everything, and never `outline: none`. Keyboard
+   users need to know where they are as much as anybody looking at a cursor. */
+:focus-visible {
+  outline: var(--ring) solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+/* The prose target of the skip link is focusable but should not draw a ring
+   when it is reached by clicking rather than by keyboard. */
+main:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+a { color: var(--accent); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: 0.9em;
+}
+
+code {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--ink);
+  padding: 0.12em 0.36em;
+  border-radius: 5px;
+}
+
+/* Wide things scroll inside their own box; the page never scrolls sideways. */
+pre {
+  background: var(--glass-strong);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+
+table { border-collapse: collapse; width: 100%; }
+.prose > table, .table-wrap { display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+th { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+img { max-width: 100%; }
+
+/* ---- chrome ---- */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 13px 24px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 680;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+  color: var(--ink);
+}
+/* **`pixelated`, or the point is lost.** An 8x8 sprite scaled up with the
+   browser's default smoothing comes out as a soft blur — the one rendering that
+   makes pixel art look like a mistake rather than a choice. */
+.mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  image-rendering: pixelated;
+  flex: none;
+}
+
+.top nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.top nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 560;
+  /* 44px of target, because a nav that needs a precise tap excludes people. */
+  padding: 11px 14px;
+  border-radius: 9px;
+}
+.top nav a:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.gh { color: var(--accent); }
+
+.cta {
+  background: var(--accent);
+  color: var(--on-accent) !important;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-weight: 650;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid transparent;
+}
+.cta:hover { filter: brightness(1.06); background: var(--accent); }
+.ghost {
+  background: var(--glass-strong);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 11px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 580;
+}
+.ghost:hover { border-color: var(--accent); }
+.big { padding: 14px 24px; font-size: 1.02rem; }
+
+.page { display: block; max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+footer {
+  margin-top: 72px;
+  padding: 32px 24px 56px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.93rem;
+}
+.foot-in { max-width: 1180px; margin: 0 auto; }
+.foot-in p { margin: 8px 0; }
+.foot-links { display: flex; flex-wrap: wrap; gap: 6px 4px; }
+.foot-links a { padding: 9px 12px 9px 0; margin-right: 10px; }
+
+/* ---- landing ---- */
+
+.hero { padding: 76px 0 10px; max-width: 800px; }
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  line-height: 1.1;
+  letter-spacing: -0.026em;
+  margin: 0 0 18px;
+}
+.lede { font-size: clamp(1.05rem, 2.1vw, 1.3rem); color: var(--ink-soft); margin: 0 0 30px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.small { color: var(--ink-soft); font-size: 0.9rem; margin-top: 20px; }
+
+section { padding: 36px 0; }
+section h2 { font-size: 1.6rem; letter-spacing: -0.016em; margin: 0 0 14px; }
+section > p { max-width: 72ch; }
+
+.cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 22px; }
+.card {
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+.card h3 { margin: 0 0 8px; font-size: 1.06rem; }
+.card p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+.cards .card:nth-child(1) { border-top-color: var(--product); }
+.cards .card:nth-child(2) { border-top-color: var(--develop); }
+.cards .card:nth-child(3) { border-top-color: var(--test); }
+.cards .card:nth-child(4) { border-top-color: var(--admin); }
+
+.problem h3 { font-size: 1.06rem; margin: 28px 0 8px; }
+.problem-list { list-style: none; padding: 0; margin: 0; max-width: 72ch; }
+.problem-list li {
+  padding: 11px 0 11px 26px;
+  position: relative;
+  border-bottom: 1px solid var(--line);
+}
+.problem-list li:last-child { border-bottom: none; }
+/* A mark rather than a bullet: these are three ways one thing goes wrong,
+   not a list of options. */
+.problem-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 21px;
+  width: 9px;
+  height: 2px;
+  background: var(--admin);
+  border-radius: 2px;
+}
+
+.feature {
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 30px 32px;
+  margin: 14px 0;
+  box-shadow: var(--shadow);
+}
+
+/* ---- docs ---- */
+
+.page:has(.side) { display: grid; grid-template-columns: 1fr; gap: 36px; }
+@media (min-width: 900px) {
+  .page:has(.side) { grid-template-columns: 258px minmax(0, 1fr); }
+  .side {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+    max-height: calc(100vh - 104px);
+    overflow-y: auto;
+  }
+}
+
+.side {
+  margin-top: 28px;
+  padding: 14px;
+  font-size: 0.93rem;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.side-head {
+  margin: 14px 0 6px;
+  padding: 0 8px;
+  font-size: 0.73rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.side ul { list-style: none; margin: 0; padding: 0; }
+.side li { margin: 1px 0; }
+.side a {
+  display: block;
+  padding: 7px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.side a:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+.side a.here {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  font-weight: 650;
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.prose { padding: 28px 0 0; max-width: 78ch; }
+.prose h1 { font-size: 2rem; letter-spacing: -0.02em; margin: 0 0 18px; }
+.prose h2 { font-size: 1.42rem; margin: 38px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.prose h3 { font-size: 1.13rem; margin: 28px 0 8px; }
+.prose h4 { font-size: 1rem; margin: 20px 0 6px; }
+.prose blockquote {
+  margin: 16px 0;
+  padding: 10px 18px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  color: var(--ink-soft);
+}
+.prose li { margin: 4px 0; }
+.prose hr { border: none; border-top: 1px solid var(--line); margin: 34px 0; }

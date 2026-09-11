@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" shape-rendering="crispEdges"
+     role="img" aria-label="CooperativeAICoding">
+  <!-- 8-bit, on a genuine 8x8 grid: every mark below is one whole pixel, and the
+       viewBox is eight units wide so nothing can land on a half. `crispEdges`
+       keeps the browser from antialiasing the steps back into curves, which is
+       what turns pixel art into a slightly blurry logo at small sizes.
+
+       A "C" drawn once, in the four environment colours the app uses for its
+       four tabs — Product, Develop, Test, Admin — read top to bottom. -->
+  <rect width="8" height="8" fill="#12151a"/>
+
+  <!-- Product -->
+  <rect x="2" y="1" width="3" height="1" fill="#8b5cf6"/>
+  <rect x="1" y="2" width="1" height="1" fill="#8b5cf6"/>
+  <!-- Develop -->
+  <rect x="5" y="1" width="1" height="1" fill="#14b8a6"/>
+  <rect x="6" y="2" width="1" height="1" fill="#14b8a6"/>
+  <rect x="1" y="3" width="1" height="1" fill="#14b8a6"/>
+  <!-- Test -->
+  <rect x="1" y="4" width="1" height="1" fill="#f59e0b"/>
+  <!-- Admin -->
+  <rect x="1" y="5" width="1" height="1" fill="#f43f5e"/>
+  <rect x="6" y="5" width="1" height="1" fill="#f43f5e"/>
+  <rect x="2" y="6" width="3" height="1" fill="#f43f5e"/>
+  <rect x="5" y="6" width="1" height="1" fill="#f43f5e"/>
+</svg>

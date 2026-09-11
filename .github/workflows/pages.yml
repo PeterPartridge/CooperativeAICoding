@@ -1,0 +1,73 @@
+# Publishes the website to GitHub Pages.
+#
+# Separate from Release on purpose. Release builds and ships the desktop app and
+# takes twelve minutes; this builds static HTML and takes seconds. Tying them
+# together would mean a typo on the landing page could not be fixed without
+# cutting a release, and a failed app build would take the website down with it.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    # Only when something the site is actually made of changes. The site is
+    # generated from the documents, so a change to a brief republishes it —
+    # that is the point, not an accident.
+    paths:
+      - "site/**"
+      - "README.md"
+      - "HOW-TO-USE.md"
+      - "application/Project_brief.md"
+      - "application/CoperativeAI/**.md"
+      - ".github/workflows/pages.yml"
+  # So the site can be republished without a commit, e.g. after enabling Pages.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One publish at a time, and a newer commit wins. Cancelling an in-flight run
+# is safe here because the output is generated from scratch every time.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      # `npm ci` rather than install: the lockfile is what makes a build
+      # reproducible, and a site that quietly picks up a new major of its
+      # markdown renderer would change every page without a commit saying so.
+      - name: Install
+        working-directory: site
+        run: npm ci
+
+      - name: Build the site
+        working-directory: site
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
