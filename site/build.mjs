@@ -23,6 +23,12 @@ const repo = path.resolve(here, "..");
 const out = path.join(here, "dist");
 
 const GITHUB = "https://github.com/PeterPartridge/CooperativeAICoding";
+/** Where this is actually served. Pages puts it on a sub-path, which is why
+ *  every link in the templates is relative — an absolute `/style.css` would
+ *  resolve to the wrong origin and break every page. This constant exists only
+ *  for the things that genuinely require an absolute URL: canonical links, the
+ *  share cards, and the sitemap. */
+const SITE = "https://peterpartridge.github.io/CooperativeAICoding";
 /** GitHub redirects this to whatever the newest release is, so the site never
  *  names a version it will be wrong about an hour later. */
 const LATEST = `${GITHUB}/releases/latest`;
@@ -82,8 +88,9 @@ const escape = (s) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** The shell every page shares. */
-function page({ title, body, nav, depth, description }) {
+function page({ title, body, nav, depth, description, canonical }) {
   const root = depth === 0 ? "." : "..";
+  const url = `${SITE}${canonical}`;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -91,28 +98,61 @@ function page({ title, body, nav, depth, description }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escape(title)}</title>
 <meta name="description" content="${escape(description)}">
+<!-- **The one that actually earns its place.** Most of this page's readers will
+     arrive from a link somebody pasted into a chat, and without these they are
+     handed a bare URL to decide about. Search ranking is not the point — a
+     project like this is found through its repository. -->
+<link rel="canonical" href="${url}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CooperativeAICoding">
+<meta property="og:title" content="${escape(title)}">
+<meta property="og:description" content="${escape(description)}">
+<meta property="og:url" content="${url}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="${escape(title)}">
+<meta name="twitter:description" content="${escape(description)}">
 <link rel="icon" href="${root}/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="${root}/style.css">
 </head>
 <body>
+<!-- **First thing in the tab order, and it is not decorative.** Every docs page
+     puts a 21-item sidebar before the text; without this, reaching the prose by
+     keyboard means twenty-one tab presses on every single page. -->
+<a class="skip" href="#content">Skip to content</a>
+<!-- Painted with CSS only and hidden from assistive technology: it carries no
+     information, and announcing it would just be noise. -->
+<div class="backdrop" aria-hidden="true"></div>
 <header class="top">
-  <a class="wordmark" href="${root}/index.html">CooperativeAICoding</a>
-  <nav>
+  <a class="wordmark" href="${root}/index.html">
+    <img class="mark" src="${root}/favicon.svg" alt="" width="28" height="28">CooperativeAICoding
+  </a>
+  <nav aria-label="Main">
     <a href="${root}/docs/index.html">Docs</a>
-    <a href="${GITHUB}">GitHub</a>
+    <a href="${GITHUB}">
+      <span class="gh" aria-hidden="true">&#9670;</span> Repository
+    </a>
     <a class="cta" href="${LATEST}">Download</a>
   </nav>
 </header>
 <div class="page">
 ${nav ?? ""}
-<main class="prose">
+<main class="prose" id="content" tabindex="-1">
 ${body}
 </main>
 </div>
 <footer>
-  <p>CooperativeAICoding is the framework. <strong>CoperativeAI</strong> is the desktop app built with it —
-  the historical spelling is kept because the folders and solution names use it.</p>
-  <p><a href="${GITHUB}">Source on GitHub</a> · <a href="${LATEST}">Latest release</a></p>
+  <div class="foot-in">
+    <p>CooperativeAICoding is the framework. <strong>CoperativeAI</strong> is the
+    desktop app built with it — the historical spelling is kept because the
+    folders and solution names use it.</p>
+    <p class="foot-links">
+      <a href="${GITHUB}">Repository on GitHub</a>
+      <a href="${LATEST}">Latest release</a>
+      <a href="${GITHUB}/issues">Issues</a>
+      <a href="${GITHUB}/blob/main/LICENSE">Licence</a>
+    </p>
+    <p class="small">Free and open source. Built with the framework it documents.</p>
+  </div>
 </footer>
 </body>
 </html>
@@ -184,6 +224,7 @@ async function main() {
         description: `${title}, from the CooperativeAICoding framework.`,
         body: html,
         depth: 1,
+        canonical: `/docs/${doc.slug}.html`,
         nav: sidebar(entries, doc.slug),
       }),
       "utf8",
@@ -203,6 +244,39 @@ async function main() {
   }
 
   await fs.writeFile(path.join(out, "index.html"), landing(entries), "utf8");
+
+  // **A sitemap because the sidebar is the only route to most of these.** Half
+  // the docs are reachable from one nav and nothing else, which is exactly the
+  // shape a crawler gives up on. Dated from each document's own last change, so
+  // "when did this last say something new" is answered by the file rather than
+  // by when the site happened to be rebuilt.
+  const urls = await Promise.all(
+    entries.map(async (doc) => {
+      const stat = await fs.stat(path.join(repo, doc.source));
+      return `  <url>
+    <loc>${SITE}/docs/${doc.slug}.html</loc>
+    <lastmod>${stat.mtime.toISOString().slice(0, 10)}</lastmod>
+  </url>`;
+    }),
+  );
+  await fs.writeFile(
+    path.join(out, "sitemap.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE}/</loc>
+    <priority>1.0</priority>
+  </url>
+${urls.join("\n")}
+</urlset>
+`,
+    "utf8",
+  );
+  await fs.writeFile(
+    path.join(out, "robots.txt"),
+    `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`,
+    "utf8",
+  );
   await fs.copyFile(path.join(here, "style.css"), path.join(out, "style.css"));
   await fs.copyFile(path.join(here, "favicon.svg"), path.join(out, "favicon.svg"));
   // Tells GitHub Pages not to run the output through Jekyll, which would
@@ -358,6 +432,7 @@ function landing(entries) {
       "A desktop workspace where Product, Developers and QA plan, build and test with AI. Deny by default per work item, and never a claim of containment the app has not proved.",
     body,
     depth: 0,
+    canonical: "/",
   });
 }
 
