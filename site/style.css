@@ -1,0 +1,261 @@
+/* The site's one stylesheet.
+ *
+ * Four colours, one per environment, taken from the app's own idea that each
+ * tab has its own so you always know where you are. Everything is defined on
+ * :root first and only re-tinted for dark, so no colour has its single
+ * definition inside a media query. */
+:root {
+  color-scheme: light dark;
+
+  --ink: #14161a;
+  --ink-soft: #4b525e;
+  --paper: #fbfbfc;
+  --raised: #ffffff;
+  --line: #e2e5ea;
+
+  --product: #7c3aed;
+  --develop: #0f766e;
+  --test: #b45309;
+  --admin: #be123c;
+
+  --accent: var(--develop);
+  --shadow: 0 1px 2px rgba(16, 20, 28, 0.06), 0 8px 24px rgba(16, 20, 28, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e8eaee;
+    --ink-soft: #a3abb8;
+    --paper: #0f1216;
+    --raised: #161a20;
+    --line: #262c35;
+
+    --product: #a78bfa;
+    --develop: #2dd4bf;
+    --test: #fbbf24;
+    --admin: #fb7185;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+a:hover { text-decoration-thickness: 2px; }
+
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: 0.9em;
+}
+
+code {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 0.12em 0.36em;
+  border-radius: 4px;
+}
+
+/* Wide things scroll inside their own box; the page itself never does. */
+pre {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+
+table { border-collapse: collapse; width: 100%; }
+.prose > table, .table-wrap { display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+th { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+img { max-width: 100%; }
+
+/* ---- chrome ---- */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--raised);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.wordmark {
+  font-weight: 680;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+  color: var(--ink);
+}
+/* The four environment colours, as a quiet signature rather than decoration. */
+.wordmark::before {
+  content: "";
+  display: inline-block;
+  width: 42px;
+  height: 8px;
+  margin-right: 10px;
+  border-radius: 999px;
+  vertical-align: 1px;
+  background: linear-gradient(
+    to right,
+    var(--product) 0 25%, var(--develop) 25% 50%,
+    var(--test) 50% 75%, var(--admin) 75% 100%
+  );
+}
+
+.top nav { display: flex; align-items: center; gap: 18px; }
+.top nav a { color: var(--ink-soft); text-decoration: none; font-weight: 520; }
+.top nav a:hover { color: var(--ink); }
+
+.cta {
+  background: var(--accent);
+  color: var(--paper) !important;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+}
+.cta:hover { filter: brightness(1.08); }
+.ghost {
+  border: 1px solid var(--line);
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 560;
+}
+.big { padding: 12px 22px; font-size: 1.02rem; }
+
+.page { display: block; max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+footer {
+  border-top: 1px solid var(--line);
+  margin-top: 64px;
+  padding: 28px 24px 48px;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+footer p { max-width: 1180px; margin: 6px auto; }
+
+/* ---- landing ---- */
+
+.hero { padding: 72px 0 8px; max-width: 780px; }
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin: 0 0 18px;
+}
+.lede { font-size: clamp(1.05rem, 2.1vw, 1.3rem); color: var(--ink-soft); margin: 0 0 28px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.small { color: var(--ink-soft); font-size: 0.9rem; margin-top: 18px; }
+
+section { padding: 34px 0; }
+section h2 { font-size: 1.55rem; letter-spacing: -0.015em; margin: 0 0 14px; }
+section > p { max-width: 72ch; }
+
+.cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 20px; }
+.card {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.card h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.card p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+/* Each card takes the colour of the environment it describes. */
+.cards .card:nth-child(1) { border-top: 3px solid var(--product); }
+.cards .card:nth-child(2) { border-top: 3px solid var(--develop); }
+.cards .card:nth-child(3) { border-top: 3px solid var(--test); }
+.cards .card:nth-child(4) { border-top: 3px solid var(--admin); }
+
+.problem h3 { font-size: 1.05rem; margin: 26px 0 8px; }
+.problem-list { list-style: none; padding: 0; margin: 0; max-width: 72ch; }
+.problem-list li {
+  padding: 10px 0 10px 26px;
+  position: relative;
+  border-bottom: 1px solid var(--line);
+}
+.problem-list li:last-child { border-bottom: none; }
+/* A mark rather than a bullet, because these are three ways the same thing
+   goes wrong rather than an unordered list of options. */
+.problem-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 20px;
+  width: 8px;
+  height: 2px;
+  background: var(--admin);
+  border-radius: 2px;
+}
+
+.feature {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 28px 30px;
+  margin: 12px 0;
+}
+
+/* ---- docs ---- */
+
+/* The sidebar only becomes a column when there is room for one; below that it
+ * sits above the text rather than squeezing it. */
+.page:has(.side) { display: grid; grid-template-columns: 1fr; gap: 36px; }
+@media (min-width: 900px) {
+  .page:has(.side) { grid-template-columns: 250px minmax(0, 1fr); }
+  .side { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 96px); overflow-y: auto; }
+}
+
+.side { padding-top: 28px; font-size: 0.93rem; }
+.side-head {
+  margin: 18px 0 6px;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.side ul { list-style: none; margin: 0; padding: 0; }
+.side li { margin: 1px 0; }
+.side a {
+  display: block;
+  padding: 5px 10px;
+  border-radius: 7px;
+  text-decoration: none;
+  color: var(--ink-soft);
+}
+.side a:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--ink); }
+.side a.here { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--ink); font-weight: 600; }
+
+.prose { padding: 28px 0 0; max-width: 78ch; }
+.prose h1 { font-size: 2rem; letter-spacing: -0.02em; margin: 0 0 18px; }
+.prose h2 { font-size: 1.4rem; margin: 36px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.prose h3 { font-size: 1.12rem; margin: 26px 0 8px; }
+.prose h4 { font-size: 1rem; margin: 20px 0 6px; }
+.prose blockquote {
+  margin: 16px 0;
+  padding: 2px 18px;
+  border-left: 3px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--ink-soft);
+}
+.prose li { margin: 4px 0; }
+.prose hr { border: none; border-top: 1px solid var(--line); margin: 32px 0; }
