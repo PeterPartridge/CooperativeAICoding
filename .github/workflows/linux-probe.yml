@@ -13,6 +13,11 @@
 name: Linux probe
 
 on:
+  # A push trigger rather than workflow_dispatch: dispatch only works for
+  # workflows that already exist on the default branch, and this one must never
+  # reach it. Scoped to the branch it was written for, and deleted with it.
+  push:
+    branches: [linux-build]
   workflow_dispatch:
 
 jobs:
