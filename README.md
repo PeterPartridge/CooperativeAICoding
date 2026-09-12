@@ -182,6 +182,18 @@ See [`template/README.md`](template/README.md) for the full layout and step-by-s
 
 ## Getting started
 
+**One command, into any project:**
+
+```bash
+npx github:PeterPartridge/CooperativeAICoding init
+```
+
+That puts the project brief, the blank forms, the four commands and the two
+checks into the folder you run it in — on Windows, macOS or Linux, with nothing
+installed and nothing to build. It never overwrites: a file that already exists
+is left alone and named in the report, so running it again is how you pick up
+forms added since. Add `--dry-run` to see it first.
+
 **Just want the desktop app, or dev on Linux?** [`INSTALL.md`](INSTALL.md) has the installers and packages for both platforms, how to build from source, and the framework-only path — which needs no binary at all and runs wherever Claude Code runs.
 
 New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses three Claude Code slash commands:

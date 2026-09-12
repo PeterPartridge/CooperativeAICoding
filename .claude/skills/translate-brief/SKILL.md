@@ -20,7 +20,7 @@ and `example/` each qualify. All project-relative paths resolve from there:
   `<projectRoot>/claude-only/Code_map.md`, `<projectRoot>/claude-only/<solution>/<item>.md`
 
 **Framework assets always stay at the repo's `template/`** (they are the framework,
-not the project): `template/_forms/*` (blank forms, `boilerplates.json`) and
+not the project): the project's `_forms/*` (blank forms, `boilerplates.json`; `template/_forms/` inside this repository) and
 `template/claude-only/1-translate-to-claude.md`, `2-claude-system.template.md`,
 `3-code-map.template.md`.
 
@@ -46,7 +46,7 @@ Routing:
 - A **Page / endpoint / database-model brief** (e.g. `ClothingWebsite/userLogin.md`, `ClothingAPI/Login.json`) → run the *page* translation.
 
 If you can't tell which, ask once. Don't translate a blank master form from
-`template/_forms/` (`status: blank`, or all answers empty).
+the blank forms in `_forms/` (`status: blank`, or all answers empty).
 
 ## Hard rules (do not break these)
 

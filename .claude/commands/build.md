@@ -20,7 +20,7 @@ Honor the Working Agreement at all times:
 - **Never write a secret value into code, config, or logs** — reference settings by
   name from the solution spec's `infrastructure.settings` list.
 - **Obey the solution spec's `security` block** — resolve its named baseline from
-  `template/_forms/boilerplates.json` (securityBaselines) plus its extra rules, and
+  the project's `_forms/boilerplates.json` (`template/_forms/` inside this repository), securityBaselines plus its extra rules, and
   treat each rule like a test: a build that breaks one is not done. Say in the plan
   if a change touches anything a rule covers.
 - If the change needs **new infrastructure or pipeline work**, stop — that is its own
@@ -32,7 +32,7 @@ Workflow:
    code skeleton yet, plan that first, as its own smallest-change plan approved
    before any page or endpoint is built. The shape comes from the `scaffold` block
    of the solution's spec (`<projectRoot>/<solution>/application-spec.json`): resolve a named
-   `boilerplate` from `template/_forms/boilerplates.json`, then apply any scaffold
+   `boilerplate` from that same `_forms/boilerplates.json`, then apply any scaffold
    fields the spec fills in itself as overrides. Use the versions the boilerplate
    pins; anything unpinned gets the latest stable release, with the exact version
    recorded in the report-back. Use its `commands` to verify the skeleton builds

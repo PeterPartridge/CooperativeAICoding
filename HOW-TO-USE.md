@@ -36,6 +36,17 @@ generates lands in your project's `claude-only/` folder, mirroring your folders.
 
 ## First-time setup (once per project)
 
+0. **Put the framework in the project.**
+
+   ```bash
+   npx github:PeterPartridge/CooperativeAICoding init
+   ```
+
+   It writes `Project_brief.md`, `_forms/`, `claude-only/`, the `.claude/`
+   commands and `tools/` into the folder you run it in, and writes over nothing.
+   Skip this inside the framework's own repository, where `template/` already is
+   the blank copy.
+
 1. **Fill in the project brief.** Copy [`template/Project_brief.md`](template/Project_brief.md)
    into your project folder (or fill it in place for a template-based project)
    and answer each question in plain English under its heading (the `>` lines are

@@ -2,9 +2,14 @@
 
 Two things live in this repository, and **only one of them needs installing**.
 
-- **The framework** — the forms in [`template/`](template/) and four slash
-  commands. Nothing to download: it is Markdown, JSON and prompts, so it runs
-  wherever Claude Code runs — Windows, macOS, Linux alike. Start at
+- **The framework** — the forms and the four commands. **One command and no
+  download**, because it is Markdown, JSON and prompts:
+
+  ```bash
+  npx github:PeterPartridge/CooperativeAICoding init
+  ```
+
+  It runs wherever Claude Code runs — Windows, macOS, Linux alike. More at
   [Framework only](#framework-only-no-download) below.
 - **CoperativeAI, the desktop app** — the Product / Develop / Test / Admin
   workspace built *with* the framework. This is the part with binaries, and the
@@ -157,17 +162,28 @@ cd app/CoperativeAI && npx tsc --noEmit && npm test
 
 ## Framework only (no download)
 
-The way of working needs no binary at all — just this repository and
+The way of working needs no binary at all — one command, and
 [Claude Code](https://claude.com/claude-code):
 
 ```bash
-git clone https://github.com/PeterPartridge/CooperativeAICoding
-cd CooperativeAICoding
+cd my-project
+npx github:PeterPartridge/CooperativeAICoding init
 claude
 ```
 
-Copy [`template/`](template/) to wherever your project lives, fill in
-`Project_brief.md` in plain English, and follow
+**What the two halves actually give you**, since the difference is easy to miss:
+
+| | `npx … init` | The desktop app |
+|---|---|---|
+| What arrives | the brief, the blank forms, four commands, two checks | all of that, plus a product around it |
+| Where the work happens | your editor and Claude Code | a board, a code editor and a real terminal, in four environments |
+| The AI's declared debt | written into the spec, for you to read | filed as work items and questions somebody owns |
+| Repositories | whatever you point it at | several registered at once, switchable |
+| Cost and models | whatever your agent charges you | model and effort per work item, and what each run spent |
+| Runs agents | your own machine, your own rules | on this machine, in a Linux distribution it owns, or a container per run |
+| Costs | nothing, and no install | nothing, and a download |
+
+Then fill in `Project_brief.md` in plain English, and follow
 [`HOW-TO-USE.md`](HOW-TO-USE.md). The slash commands (`/translate`,
 `/new-item`, `/build`, `/pipeline`) are checked into this repository — in
 [`.claude/commands/`](.claude/commands/), with the longer skills they call in

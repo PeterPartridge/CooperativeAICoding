@@ -10,15 +10,17 @@ If type/solution/name are missing, ask once. If the project root was not given
 and more than one non-template project root exists, ask which one; default to
 the only non-template project root otherwise.
 
+**Where the blank forms live.** `<forms>` below means the project's own `_forms/` folder — what `coperativeai init` puts at the project root — falling back to `template/_forms/` when you are working inside the framework's own repository. Use whichever exists.
+
 Steps:
-1. Map the type to its master form in `template/_forms/` (pages are Markdown;
+1. Map the type to its master form in `<forms>/` (pages are Markdown;
    record-style forms are JSON):
-   - `page` → `template/_forms/page.md`
-   - `endpoint` → `template/_forms/endpoint.json`
-   - `model` → `template/_forms/database-model.json`
+   - `page` → `<forms>/page.md`
+   - `endpoint` → `<forms>/endpoint.json`
+   - `model` → `<forms>/database-model.json`
 2. Ensure the solution folder exists at `<projectRoot>/<solution>/`. If the folder is
    new, also remind me it needs a solution spec — copy
-   `template/_forms/application-spec.json` into it and set `solutionType` to
+   `<forms>/application-spec.json` into it and set `solutionType` to
    `website`, `api`, `database`, or `application` (CLI/TUI/desktop).
 3. Copy the master form to `<projectRoot>/<solution>/<itemName>.<same extension>`
    **without filling it in** — it stays a blank form. A human answers in plain
