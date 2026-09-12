@@ -16,6 +16,7 @@ on:
       - "site/**"
       - "README.md"
       - "HOW-TO-USE.md"
+      - "INSTALL.md"
       - "application/Project_brief.md"
       - "application/CoperativeAI/**.md"
       - ".github/workflows/pages.yml"

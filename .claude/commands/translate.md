@@ -17,5 +17,12 @@ Follow the skill exactly:
 - Project Brief → produce System Spec + Project Digest + Project Skills, save to `<projectRoot>/claude-only/Project_system.md`.
 - Page/endpoint/database-model brief → read only the Project Digest from `<projectRoot>/claude-only/Project_system.md`, then produce the Page Spec + Page Skills + PLAN, and save to the mirrored path `<projectRoot>/claude-only/<solution>/<item>.md`.
 
+For an item brief, check its `deliverable` names one of the deliverables the
+Project Brief lists — `node tools/brief-lint.mjs <projectRoot>` answers this for
+every item at once. A name that isn't on the list is a typo or a brief that has
+moved on; say which rather than translating it through, because a deliverable
+nothing is aimed at never completes and `/build` never reaches its stopping
+point.
+
 Do not invent scope; gaps go under Open Questions. Show the result and wait for
 my approval before any building.

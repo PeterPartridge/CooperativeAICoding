@@ -7,6 +7,10 @@ them — making the smallest change each time, and writing down anything it can'
 For the framework's reasoning, see the [main README](README.md). For the folder
 layout, see [`template/README.md`](template/README.md). This file is just *how to run it*.
 
+Nothing here needs the desktop app, or any download: the framework is this
+repository's `template/` folder plus Claude Code, on any operating system. If
+you do want the app — or you build on Linux — that is [`INSTALL.md`](INSTALL.md).
+
 ---
 
 ## The loop in one picture
@@ -32,6 +36,17 @@ generates lands in your project's `claude-only/` folder, mirroring your folders.
 
 ## First-time setup (once per project)
 
+0. **Put the framework in the project.**
+
+   ```bash
+   npx github:PeterPartridge/CooperativeAICoding init
+   ```
+
+   It writes `Project_brief.md`, `_forms/`, `claude-only/`, the `.claude/`
+   commands and `tools/` into the folder you run it in, and writes over nothing.
+   Skip this inside the framework's own repository, where `template/` already is
+   the blank copy.
+
 1. **Fill in the project brief.** Copy [`template/Project_brief.md`](template/Project_brief.md)
    into your project folder (or fill it in place for a template-based project)
    and answer each question in plain English under its heading (the `>` lines are
@@ -56,10 +71,13 @@ generates lands in your project's `claude-only/` folder, mirroring your folders.
 
 ---
 
-## Adding a piece of the product (per page / endpoint / table)
+## Adding an item (a page, an endpoint, or a model)
 
-Each solution (website, API, database) is a folder; each page/endpoint/model is a
-file inside it.
+Each solution (website, API, database) is a folder; each **item** is a file
+inside it. *Item* is the umbrella word for the three kinds: a **page** (one
+screen, panel, or command group), an **endpoint** (one API resource), or a
+**model** (one table). **A backend-only project has no pages** — it is
+endpoints and models, and every step below is identical for them.
 
 1. **Scaffold the form.** For example, a login page in the `ClothingWebsite` solution:
 

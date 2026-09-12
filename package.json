@@ -1,0 +1,39 @@
+{
+  "name": "coperativeai",
+  "version": "0.1.0",
+  "description": "A way of working that Product, Developers, QA and AI share: plain-English briefs, specs the AI translates rather than authors, and debt it has to declare.",
+  "type": "module",
+  "bin": {
+    "coperativeai": "bin/coperativeai.mjs"
+  },
+  "files": [
+    "bin",
+    "template",
+    "tools",
+    ".claude",
+    "README.md",
+    "HOW-TO-USE.md",
+    "INSTALL.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node tools/code-map-lint.mjs && node tools/brief-lint.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "author": "Peter Partridge",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeterPartridge/CooperativeAICoding.git"
+  },
+  "homepage": "https://peterpartridge.github.io/CooperativeAICoding/",
+  "keywords": [
+    "spec-driven-development",
+    "ai-agents",
+    "claude-code",
+    "product-management",
+    "technical-debt"
+  ]
+}

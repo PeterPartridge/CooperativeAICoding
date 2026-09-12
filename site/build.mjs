@@ -33,10 +33,35 @@ const SITE = "https://peterpartridge.github.io/CooperativeAICoding";
  *  names a version it will be wrong about an hour later. */
 const LATEST = `${GITHUB}/releases/latest`;
 
+/** The screenshots, if they are there.
+ *
+ *  **Rendered only when the file exists.** A landing page arguing that the AI
+ *  declares its own debt, above three broken image icons, argues the opposite.
+ *  So the section appears once somebody has taken the shots and not before —
+ *  site/screenshots/README.md says exactly what each one has to show. */
+const SHOTS = [
+  {
+    file: "debt-on-the-board.png",
+    alt: "Work items on the planning board that the AI filed itself, marked as debt it declared",
+    caption: "The AI finished, declared what it had cut — and the debt is a work item somebody owns, not a paragraph in a transcript.",
+  },
+  {
+    file: "plan-approval.png",
+    alt: "A build plan waiting for a person to approve it before any code is written",
+    caption: "Nothing is built until a person approves the plan: what will change, and what it will not touch.",
+  },
+  {
+    file: "sandbox-verdicts.png",
+    alt: "The where-agents-run table, showing which protections are enforced and which are only asked for",
+    caption: "Where agents run, and what that actually guarantees — enforced and asked-for are never blurred into one reassuring icon.",
+  },
+];
+
 /** What gets published, in the order it should be read. */
 const DOCS = [
   { source: "README.md", slug: "index", title: "What this is" },
   { source: "HOW-TO-USE.md", slug: "how-to-use", title: "How to use it" },
+  { source: "INSTALL.md", slug: "install", title: "Install it" },
   {
     source: path.posix.join("application", "Project_brief.md"),
     slug: "project-brief",
@@ -243,7 +268,22 @@ async function main() {
     );
   }
 
-  await fs.writeFile(path.join(out, "index.html"), landing(entries), "utf8");
+  // Only the shots that exist are copied, and the same list decides what the
+  // landing page renders — so the two cannot disagree.
+  const shots = [];
+  for (const shot of SHOTS) {
+    const source = path.join(here, "screenshots", shot.file);
+    try {
+      await fs.access(source);
+    } catch {
+      continue;
+    }
+    await fs.mkdir(path.join(out, "screenshots"), { recursive: true });
+    await fs.copyFile(source, path.join(out, "screenshots", shot.file));
+    shots.push(shot);
+  }
+
+  await fs.writeFile(path.join(out, "index.html"), landing(entries, shots), "utf8");
 
   // **A sitemap because the sidebar is the only route to most of these.** Half
   // the docs are reachable from one nav and nothing else, which is exactly the
@@ -309,14 +349,32 @@ ${group("Page briefs", (e) => e.brief)}
  *  **Says what this is before it says anything else.** A landing page that
  *  opens with a feature list assumes somebody already knows what they are
  *  looking at, and most people arriving here will not. */
-function landing(entries) {
+function landing(entries, shots = []) {
+  // Proof before argument. Empty until the images exist, and then it is the
+  // first thing under the claim it is evidence for.
+  const shotsSection =
+    shots.length === 0
+      ? ""
+      : '<section class="shots">' +
+        '<h2>What that actually looks like</h2><div class="shot-grid">' +
+        shots
+          .map(
+            (s) =>
+              '<figure><img src="screenshots/' + s.file + '" alt="' + escape(s.alt) + '" loading="lazy">' +
+              '<figcaption>' + escape(s.caption) + '</figcaption></figure>',
+          )
+          .join("") +
+        '</div></section>';
   const body = `
 <section class="hero">
-  <h1>Product, Developers, QA and AI, working to one plan.</h1>
-  <p class="lede">A desktop workspace where teams plan products, build them, and
-  design the tests — cooperatively with AI, on their own machine. Nothing is
-  allowed unless a policy says so, and nothing claims to be enforced unless it
-  has been proved.</p>
+  <h1>When the AI cuts a corner, it says so &mdash; on the board.</h1>
+  <p class="lede">Every build ends by declaring the debt it left and what it
+  could not do, and those become <strong>work items somebody owns and questions
+  somebody answers</strong> — not a paragraph in a chat log that scrolls away.
+  Debt that is not on the board is debt that gets paid by surprise.</p>
+  <p class="lede">Around that: one plan shared by Product, Developers, QA and the
+  AI, on your own machine. Nothing is allowed unless a policy says so, and
+  nothing claims to be enforced unless it has been proved.</p>
   <p class="actions">
     <a class="cta big" href="${LATEST}">Download CoperativeAI</a>
     <a class="ghost big" href="docs/index.html">Read the docs</a>
@@ -325,6 +383,36 @@ function landing(entries) {
   from the repository&rsquo;s own pipeline · no accounts, no server, your keys stay
   on your machine</p>
 </section>
+
+<section class="ways">
+  <h2>Two ways in, and only one of them is a download</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>The framework &mdash; nothing to install</h3>
+      <p><code>npx github:PeterPartridge/CooperativeAICoding init</code></p>
+      <p>Drops the project brief, the blank forms and the four commands into
+      any project. You answer in plain English; the AI translates it into the
+      spec it builds from, makes the smallest change, and declares the debt it
+      left. It is Markdown, JSON and prompts &mdash; there is nothing to run.</p>
+      <p class="small">Windows, macOS and Linux alike &middot; needs Node 20+ and
+      Claude Code &middot; free, and the whole way of working</p>
+    </div>
+    <div class="card">
+      <h3>CoperativeAI &mdash; the desktop workspace</h3>
+      <p>The same framework with a product around it: a board where the AI&rsquo;s
+      declared debt lands as work, Product/Develop/Test/Admin as four
+      environments, several repositories at once, a policy per work item, what
+      each run cost, and a bounded place for agents to run.</p>
+      <p class="small">Windows and Linux builds &middot; no account, no server, your
+      keys stay on your machine &middot; also free</p>
+    </div>
+  </div>
+  <p>The app is built <em>with</em> the framework, so the second is the first
+  plus a place to work. Start with whichever suits &mdash; a brief written by one
+  is read by the other.</p>
+</section>
+
+${shotsSection}
 
 <section class="problem">
   <h2>The problem</h2>
@@ -432,7 +520,7 @@ function landing(entries) {
   return page({
     title: "CooperativeAICoding — Product, Developers, QA and AI working to one plan",
     description:
-      "A desktop workspace where Product, Developers and QA plan, build and test with AI. Deny by default per work item, and never a claim of containment the app has not proved.",
+      "The AI declares the debt it leaves and what it could not do, and both become work items somebody owns. One plan shared by Product, Developers, QA and the AI, on your own machine.",
     body,
     depth: 0,
     canonical: "/",

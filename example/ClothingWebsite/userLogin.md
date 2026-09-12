@@ -2,6 +2,7 @@
 form: page-brief
 page: userLogin
 solution: ClothingWebsite
+deliverable: MVP
 depends-on: [ClothingAPI/Login.json]
 status: filled
 ---

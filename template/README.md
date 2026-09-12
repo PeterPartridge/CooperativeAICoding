@@ -43,7 +43,7 @@ template/
 
 The spec's `core`, `accessAndInterface`, and `conventions` blocks hold every type's questions together; each field's `guidance` says which `solutionType`(s) it applies to — leave the rest blank. The `scaffold`, `security`, and `infrastructure` blocks are identical for every type and pull from the same [`boilerplates.json`](_forms/boilerplates.json) presets.
 
-**How the forms work.** Two shapes, matched to their content, and both carry the same metadata (`form`, a name, and `status: blank | filled | approved | built`). Item briefs also declare `depends-on`/`dependsOn` — the briefs that must be built before them (a page depends on its endpoints; an endpoint on its models) — and `/build` refuses to run out of order:
+**How the forms work.** Two shapes, matched to their content, and both carry the same metadata (`form`, a name, and `status: blank | filled | approved | built`). Item briefs also declare two things that decide *when* they get built: `depends-on`/`dependsOn`, the briefs that must be built before them (a page depends on its endpoints; an endpoint on its models), which `/build` refuses to run out of order — and `deliverable`, which of the Project Brief's deliverables the item works towards. A build names the deliverable it advances and **stops** when the last item for one is built, so the stopping point is a real pause rather than a label — and `node tools/brief-lint.mjs` checks every item's `deliverable` against the list its Project Brief actually names, because a misspelled one reads as aimed at something while quietly making that deliverable impossible to finish:
 
 - **Prose briefs are Markdown** (`Project_brief.md`, `page.md`): one `### <id> — <question>` heading per question. Lines starting with `>` are guidance and examples; whatever else you write under the heading is your answer.
 - **Record-style forms are JSON** (endpoints, models, solution specs): question objects with `question` / `guidance` / `example`, where you fill in the `answer` fields — plus `entries` lists for rows like operations and database fields.
@@ -68,8 +68,8 @@ See [`example/`](../example/) (at the repo root) for a complete worked project y
 ## Why two sides
 
 - **You write in plain English.** Whether the form is Markdown or JSON, every answer is a plain-English sentence — no jargon, no prompt-writing. If you can explain it to a colleague, you can fill in a form.
-- **Claude translates, not you.** The bridge turns your words into the labelled structure the AI follows best, and **lists the skills** it needs — for the project and each page. A long or surprising skills list is your cue that something is too big or misunderstood.
-- **The folders mirror each other**, so every human page has exactly one matching Claude spec, organised by solution.
+- **Claude translates, not you.** The bridge turns your words into the labelled structure the AI follows best, and **lists the skills** it needs — for the project and each item. A long or surprising skills list is your cue that something is too big or misunderstood.
+- **The folders mirror each other**, so every human item has exactly one matching Claude spec, organised by solution.
 
 ## Ground rules (carried through every step)
 

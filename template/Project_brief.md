@@ -31,6 +31,21 @@ status: blank            # blank | filled | approved
 > List the kinds of people. For each, say what they're trying to get done.
 > - Person/group: … — they want to: …
 
+### deliverables — What are we working towards, in order? Name the first one.
+> A **deliverable** is a stopping point worth evaluating direction at — not a
+> release date and not a list of features. The first is usually the **MVP**: the
+> smallest version that is genuinely worth putting in front of someone.
+>
+> Everything the AI builds is building towards the deliverable the item names,
+> and when the last item for a deliverable is built the work **stops there** so
+> people can look at it before the next one starts. That pause is the point of
+> naming these at all.
+>
+> - Deliverable: … — done when: …
+> - e.g. Deliverable: MVP — done when: a customer can register, log in, and see
+>   their past orders.
+> - e.g. Deliverable: Checkout — done when: a customer can pay and get a receipt.
+
 ### apps-you-like — Are there any apps or websites you like?
 > Links or names are fine.
 
@@ -60,6 +75,23 @@ status: blank            # blank | filled | approved
 > List rules for how the code will be written in general, plus software development practices to follow and how you define them — the AI must use your definition.
 > e.g. Build this using DRY (Do not repeat yourself) — if you are repeating code three times, put that code into a shared library where it can be accessed.
 > All frontend code will use CamelCase for page names.
+
+### testing — What has to be true before a change counts as tested?
+> **A rule the AI applies to every change, not a list of tests.** Two halves:
+> the level of cover you expect, and what is **not** worth testing here.
+>
+> That way round on purpose. A list of things to test reads to an AI as
+> permission to skip everything not on the list — name a threshold and the
+> exceptions instead, and everything else is included by default.
+>
+> e.g. "New and changed code needs 90% line cover. Anything that *decides*
+> something — a branch, a guard, a permission check — has a test naming the
+> decision. Don't test generated files, plain data holders, or framework glue.
+> A change that can't reach the threshold says so in its debt note rather than
+> lowering it."
+>
+> Each item's own brief still says **how you'll know it works** — those are the
+> acceptance checks for that one thing. This is the floor underneath all of them.
 
 ### roles — List the roles or claims used across the application.
 > The shared vocabulary every solution authorises against.

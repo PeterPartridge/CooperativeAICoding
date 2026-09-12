@@ -22,6 +22,11 @@ Customers can't easily shop our range online today; this gives them a simple sto
 - Customers — they want to: browse and buy clothes, and manage their login.
 - Admins — they want to: manage users and products.
 
+### deliverables — What are we working towards, in order? Name the first one.
+- Deliverable: MVP — done when: a customer can register, log in, and see their account.
+- Deliverable: Storefront — done when: a customer can browse the range and view one item.
+- Deliverable: Checkout — done when: a customer can pay and get a receipt.
+
 ### apps-you-like — Are there any apps or websites you like?
 Clean retail sites with large imagery (e.g. ASOS, Uniqlo).
 
@@ -45,6 +50,9 @@ Multi — separate solutions for the website, API, and database.
 
 ### dev-rules — Software development rules for the codebase.
 DRY — if code is repeated three times, move it to a shared library. Front-end page names use CamelCase.
+
+### testing — What has to be true before a change counts as tested?
+New and changed code needs 90% line cover across the API and the website. Anything that decides something — a permission check, a price calculation, an order-status change — has a test named after the decision it makes. Don't write tests for generated clients, plain data holders, or framework glue. If a change can't reach 90%, say so in the debt note instead of lowering the number.
 
 ### roles — List the roles or claims used across the application.
 Admin, Manager, Customer.

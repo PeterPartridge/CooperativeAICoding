@@ -41,7 +41,7 @@ approved plan, separate from feature building.
    (`<projectRoot>/<solution>/application-spec.json`):
    its `infrastructure` block (resources, provisioning, environments, settings,
    pipeline) and `scaffold` block (commands — resolve a named boilerplate from
-   `template/_forms/boilerplates.json`, a framework asset that always lives at
+   the project's `_forms/boilerplates.json` (`template/_forms/` inside this repository), a framework asset that always lives at
    the repo's `template/`). Get the repo location from the Project
    Digest's Solutions & repos line (`<projectRoot>/claude-only/Project_system.md`).
 2. **Plan** — and wait for approval. State:

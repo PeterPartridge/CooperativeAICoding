@@ -2,6 +2,7 @@
   "form": "endpoint-brief",
   "resourceName": "",
   "status": "blank",
+  "deliverable": "",
   "dependsOn": {
     "guidance": "Briefs that must be built before this one — usually the database models this resource reads or writes.",
     "example": ["ClothingDatabase/UserCredentials.json"],
@@ -11,6 +12,7 @@
     "whoFillsThisIn": "Developers.",
     "when": "For each resource (a group of related operations) an API needs. One file per resource. Lives in the API's solution folder; the API itself is defined in that folder's application-spec.json.",
     "how": "Answer in plain English. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md, along with the page and any data models it touches.",
+    "deliverableNote": "Which deliverable from the Project Brief this works towards, e.g. MVP. Builds say which deliverable each change advances, and stop when the last item for one is built so people can evaluate direction.",
     "note": "Solution = the folder this file sits in."
   },
   "whatItDoes": {
