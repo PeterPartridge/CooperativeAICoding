@@ -76,7 +76,12 @@ function frontMatter(text) {
  *  what comes before the first dash or colon. Guidance lines (`>`) are not
  *  answers and never count as one. */
 function deliverablesIn(brief) {
-  const section = brief.match(/^###\s+deliverables\b[^\n]*\n([\s\S]*?)(?=^###\s|^##\s|^---\s*$)/m);
+  // The last alternative is end-of-input: a brief whose deliverables are its
+  // final section has no heading after them, and without this it read as having
+  // none at all — silently, which is the worst way for a check to be wrong.
+  const section = brief.match(
+    /^###\s+deliverables\b[^\n]*\n([\s\S]*?)(?=^###\s|^##\s|^---\s*$|(?![\s\S]))/m,
+  );
   if (!section) return [];
   const names = [];
   for (const line of section[1].split("\n")) {
@@ -142,16 +147,28 @@ async function lint(root) {
   const brief = await read(briefPath);
   const items = await itemBriefs(root);
 
-  // The blank starting copy claims nothing about anything, so it cannot be
-  // wrong — and reporting it on every run would teach people to skim the output.
-  if ((frontMatter(brief)?.status ?? "blank") === "blank") {
-    return { rel: rel(root), items: items.length, named: [], errors, warnings, notes, blank: true };
+  // **Neither the blank copy nor a drafted one is making a claim.** The first
+  // has not been written; the second was written by /draft and nobody has
+  // accepted it yet. Checking either is checking nobody's answers, and saying
+  // so every run teaches people to skim the output.
+  const status = frontMatter(brief)?.status ?? "blank";
+  if (status === "blank" || status === "drafted") {
+    return { rel: rel(root), items: items.length, named: [], errors, warnings, notes, unfinished: status };
   }
 
   const named = deliverablesIn(brief);
 
-  // A brief nobody has filled in yet claims nothing, so it cannot be wrong.
-  const live = items.filter((i) => i.broken || (i.fields.status ?? "blank") !== "blank");
+  // A brief nobody has filled in claims nothing, and a drafted one is the AI's
+  // proposal rather than the project's answer — so neither is checked here.
+  const unaccepted = (s) => s === undefined || s === "blank" || s === "drafted";
+  const live = items.filter((i) => i.broken || !unaccepted(i.fields.status));
+  const drafted = items.filter((i) => !i.broken && i.fields.status === "drafted");
+  if (drafted.length > 0) {
+    warnings.push(
+      `${drafted.length} item brief(s) drafted from the code and not accepted — ` +
+        "/translate refuses a drafted brief until a person sets status: filled",
+    );
+  }
 
   if (named.length === 0) {
     notes.push(
@@ -200,9 +217,13 @@ if (roots.length === 0) {
 
 let failed = false;
 for (const root of roots.sort()) {
-  const { rel, items, named: deliverables, errors, warnings, notes, blank } = await lint(root);
-  if (blank) {
-    console.log("\n" + rel + " — not filled in yet, nothing to check");
+  const { rel, items, named: deliverables, errors, warnings, notes, unfinished } = await lint(root);
+  if (unfinished) {
+    const why =
+      unfinished === "drafted"
+        ? " — drafted from the code, not yet accepted (/translate refuses it until status: filled)"
+        : " — not filled in yet, nothing to check";
+    console.log("\n" + rel + why);
     continue;
   }
   console.log(

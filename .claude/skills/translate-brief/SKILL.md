@@ -10,6 +10,15 @@ by hand from [`template/claude-only/1-translate-to-claude.md`](../../../template
 It turns a plain-English brief into the structured spec the AI builds from, while
 staying token-efficient (no re-sending the whole project spec for every page).
 
+## Before anything: a drafted brief is not a brief
+
+If the brief's `status` is `drafted`, **stop and do not translate it**. `/draft`
+wrote those answers from the codebase and marked them as its own; they become the
+project's answers when a person has read them and set `status: filled`. Point at
+the question list at the end of the brief, say how many are still open, and offer
+to walk through them. A drafted answer translated is an AI guess promoted to a
+requirement, silently.
+
 ## Resolving paths
 
 **Project root** = the nearest ancestor directory of the given brief/spec path that

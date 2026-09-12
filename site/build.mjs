@@ -367,14 +367,16 @@ function landing(entries, shots = []) {
         '</div></section>';
   const body = `
 <section class="hero">
-  <h1>When the AI cuts a corner, it says so &mdash; on the board.</h1>
-  <p class="lede">Every build ends by declaring the debt it left and what it
-  could not do, and those become <strong>work items somebody owns and questions
-  somebody answers</strong> — not a paragraph in a chat log that scrolls away.
-  Debt that is not on the board is debt that gets paid by surprise.</p>
-  <p class="lede">Around that: one plan shared by Product, Developers, QA and the
-  AI, on your own machine. Nothing is allowed unless a policy says so, and
-  nothing claims to be enforced unless it has been proved.</p>
+  <h1>Developers guide, the AI builds &mdash; and it stops when it doesn&rsquo;t know.</h1>
+  <p class="lede">AI as <strong>part of the team</strong> rather than a tool
+  pointed at a repository. Product says why, developers set the rules it builds
+  inside, QA says what has to be true &mdash; and when the AI cannot understand
+  something, it <strong>says so and stops</strong> instead of inventing an
+  answer. That is what keeps a guess from quietly becoming code.</p>
+  <p class="lede">Feedback runs both ways, the way it does on any team worth
+  being on: the technical debt it leaves and the questions it could not answer
+  come back to the developers as work on the board &mdash; surfaced, not buried
+  in a chat log that scrolls away.</p>
   <p class="actions">
     <a class="cta big" href="${LATEST}">Download CoperativeAI</a>
     <a class="ghost big" href="docs/index.html">Read the docs</a>
@@ -520,7 +522,7 @@ ${shotsSection}
   return page({
     title: "CooperativeAICoding — Product, Developers, QA and AI working to one plan",
     description:
-      "The AI declares the debt it leaves and what it could not do, and both become work items somebody owns. One plan shared by Product, Developers, QA and the AI, on your own machine.",
+      "AI as part of the team: developers guide it, it stops and says so when it does not know rather than inventing an answer, and the debt it leaves is surfaced to the people who have to live with it.",
     body,
     depth: 0,
     canonical: "/",

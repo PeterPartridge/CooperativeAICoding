@@ -28,12 +28,12 @@ Linux builds are never a version apart.
 
 | Platform | Asset | What it is |
 |---|---|---|
-| Windows | `CoperativeAI_<version>_x64_en-US.msi` | The installer most people want (~17 MB). |
+| Windows | `CoperativeAI_<version>_x64_en-US.msi` | The installer most people want (~18 MB). |
 | Windows | `CoperativeAI_<version>_x64-setup.exe` | NSIS installer — same app, smaller download (~13 MB). |
-| Windows | the top-level `.exe` (the one with no `-setup` in its name) | Portable, ~45 MB. No installer; run it where it lands. |
-| Linux | `*_amd64.deb` | Debian, Ubuntu, Mint and derivatives. |
-| Linux | `*.x86_64.rpm` | Fedora, RHEL, openSUSE. |
-| Linux | `*.AppImage` | Any distribution, nothing installed. |
+| Windows | `coperativeai.exe` (lower case — it is named after the crate, not the product) | Portable, ~47 MB. No installer; run it where it lands. |
+| Linux | `*_amd64.deb` | Debian, Ubuntu, Mint and derivatives (~19 MB). |
+| Linux | `*.x86_64.rpm` | Fedora, RHEL, openSUSE (~19 MB). |
+| Linux | `*.AppImage` | Any distribution, nothing installed (~91 MB — it carries what the packages ask your package manager for). |
 
 **[→ Latest release](https://github.com/PeterPartridge/CooperativeAICoding/releases/latest)**
 
@@ -57,7 +57,7 @@ produced it is linked from the release.
 2. Run it. On the SmartScreen warning: **More info → Run anyway**.
 3. Launch **CoperativeAI** from the Start menu.
 
-**Portable instead:** download the top-level `.exe`, put it anywhere, run it.
+**Portable instead:** download `coperativeai.exe`, put it anywhere, run it.
 Be aware that portable means "no installer", **not** "no footprint" — it reads
 and writes the same per-user data folder as an installed copy
 (`%APPDATA%\com.coperativeai.app`), so the two share one database rather than

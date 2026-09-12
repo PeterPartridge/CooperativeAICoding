@@ -13,6 +13,12 @@ JSON — whose `status` is `filled`, or that otherwise look filled in).
 Derive `<projectRoot>` by walking up from the brief path to the nearest folder
 containing `Project_brief.md` (per the skill's "Resolving paths" section).
 
+**Refuse a brief whose `status` is `drafted`.** Those answers were written by
+`/draft` from the code and nobody has accepted them yet. Say which questions are
+still open (they are listed at the end of the brief), and stop — translating
+drafted answers would make the AI's guesses binding, which is the one thing this
+framework exists to prevent.
+
 Follow the skill exactly:
 - Project Brief → produce System Spec + Project Digest + Project Skills, save to `<projectRoot>/claude-only/Project_system.md`.
 - Page/endpoint/database-model brief → read only the Project Digest from `<projectRoot>/claude-only/Project_system.md`, then produce the Page Spec + Page Skills + PLAN, and save to the mirrored path `<projectRoot>/claude-only/<solution>/<item>.md`.

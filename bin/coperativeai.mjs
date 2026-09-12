@@ -100,6 +100,10 @@ Next, in that folder:
 
   1. Answer Project_brief.md in plain English. Lines starting with ">" are
      guidance; everything else you write is your answer. Set status: filled.
+     Already have a codebase? Start Claude Code and run /draft instead — it
+     fills the brief in from the code, says where each answer came from, and
+     asks you a handful of multiple-choice questions rather than twenty open
+     ones. Its answers are marked as its own until you accept them.
   2. Start Claude Code there and run:  /translate Project_brief.md
      It produces the spec, the digest and the skills list, and you read them
      back to check nothing was invented.

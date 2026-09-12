@@ -4,7 +4,7 @@ page: ""
 solution: ""
 deliverable: ""          # which deliverable from the Project Brief this works towards, e.g. MVP
 depends-on: []           # briefs that must be built first, e.g. [ClothingAPI/Login.json]
-status: blank            # blank | filled | approved | built
+status: blank            # blank | drafted | filled | approved | built
 ---
 
 # Page Brief — <Page Name>

@@ -1,7 +1,7 @@
 ---
 form: project-brief
 project: ""
-status: blank            # blank | filled | approved
+status: blank            # blank | drafted | filled | approved
 ---
 
 # Project Brief — <Project Name>

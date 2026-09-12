@@ -150,6 +150,7 @@ and `/build` again. Keep each change small.
 
 | Command | What it does |
 |---------|--------------|
+| `/draft [folder]` | **Existing codebase?** Fill the project brief in from the code — every answer marked with where it came from and how sure it is, and at most five multiple-choice questions at the end. Saved as `status: drafted`; you accept it by reading it and setting `filled`. |
 | `/translate <brief>` | Turn a filled-in brief (project or item) into a structured spec + skills under `claude-only/`. |
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |

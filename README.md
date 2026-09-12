@@ -198,6 +198,7 @@ forms added since. Add `--dry-run` to see it first.
 
 New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses three Claude Code slash commands:
 
+- **`/draft [folder]`** — for a codebase that already exists: fill the brief in from the code, sourced and marked, with a few multiple-choice questions at the end instead of a blank form. The AI's answers stay the AI's until you accept them.
 - **`/translate <brief>`** — turn a filled-in brief into a structured spec + skills.
 - **`/new-item <type> <solution> <name>`** — copy a blank page/endpoint/model form into a solution folder.
 - **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.
