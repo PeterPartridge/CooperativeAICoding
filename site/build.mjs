@@ -321,9 +321,9 @@ function landing(entries) {
     <a class="cta big" href="${LATEST}">Download CoperativeAI</a>
     <a class="ghost big" href="docs/index.html">Read the docs</a>
   </p>
-  <p class="small">Free and open source · Windows build, published from the
-  repository&rsquo;s own pipeline · no accounts, no server, your keys stay on your
-  machine</p>
+  <p class="small">Free and open source · Windows and Linux builds, published
+  from the repository&rsquo;s own pipeline · no accounts, no server, your keys stay
+  on your machine</p>
 </section>
 
 <section class="problem">
@@ -414,6 +414,9 @@ function landing(entries) {
   <p>Which is why the documentation here is not a summary written afterwards. It
   is the same set of briefs the work is actually done from, published as they
   stand, limitations and open questions included.</p>
+  <p class="small">Every release carries a Windows installer and portable
+  binary, and Linux packages — <code>.deb</code>, <code>.rpm</code> and an
+  AppImage — built from the same commit by the same pipeline.</p>
   <p class="actions">
     <a class="cta" href="${LATEST}">Get the latest release</a>
     <a class="ghost" href="docs/${
