@@ -2,6 +2,7 @@
 form: page-brief
 page: ""
 solution: ""
+deliverable: ""          # which deliverable from the Project Brief this works towards, e.g. MVP
 depends-on: []           # briefs that must be built first, e.g. [ClothingAPI/Login.json]
 status: blank            # blank | filled | approved | built
 ---
@@ -10,7 +11,9 @@ status: blank            # blank | filled | approved | built
 
 > **Who fills this in:** Product describes what the page is for; Developers add the building details. One of these per page (a page is one screen or section of the project).
 >
-> **Where it goes:** copy this file into the website **solution folder**, named after the page — e.g. `ClothingWebsite/userLogin.md`. Fill in `page` and `solution` at the top.
+> **Where it goes:** copy this file into the website **solution folder**, named after the page — e.g. `ClothingWebsite/userLogin.md`. Fill in `page`, `solution` and `deliverable` at the top.
+>
+> **`deliverable`** is which of the Project Brief's deliverables this page works towards. It is not decoration: builds say which deliverable each change advances, and when the last item for a deliverable is built the work stops there for people to evaluate direction. An item that serves no named deliverable is a question worth asking out loud.
 >
 > **How:** answer each question in plain English directly under its heading, same as the Project Brief. Lines starting with `>` are guidance — anything else you write under a heading is your answer. When you're done, set `status: filled` and hand it to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md).
 
@@ -49,11 +52,28 @@ status: blank            # blank | filled | approved | built
 > e.g. "Order number (a number), Date (a date), Status (one of: placed / shipped / delivered)."
 > For anything beyond a couple of fields, capture the full detail in a copy of [`_forms/database-model.json`](../_forms/database-model.json) and link it here.
 
-### in-memory — Does anything need to be remembered while the page is open (not saved permanently)?
-> e.g. items in a basket before checkout. "No" is common.
+### in-memory — Is there anything that **must not** be saved permanently, or must survive between screens?
+> Only answer if there's a real constraint — "nothing in particular" is the
+> normal answer and costs you nothing.
+>
+> Asked this way round on purpose. "Do we need to hold data in memory?" invites
+> an answer about *how* to build it, and an AI reads that answer as a
+> requirement it must honour — so a passing thought becomes a design nobody
+> chose. A constraint is different: "the card number is never stored" or "the
+> basket survives moving between pages" are facts about the product, and the AI
+> works out the mechanism.
+>
+> e.g. "The basket has to survive moving between pages before checkout." ·
+> "Nothing here may be written to disk."
 
-### tests — How will we know it works? What should we test?
-> Plain checks are fine, one bullet each: "If I'm not logged in, I can't see this page."
+### tests — How will we know it works? What must be true for this to be accepted?
+> Plain checks, one bullet each: "If I'm not logged in, I can't see this page."
+>
+> **Plain English on purpose — not Given/When/Then.** These are the acceptance
+> checks for this one page; the *floor* underneath them (the level of cover, and
+> what isn't worth testing) is answered once in the Project Brief's `testing`
+> question and applies to every item. So a short list here is not a short list
+> of tests.
 
 ### limits — Any known limits or things to watch out for?
 > e.g. "This page can get slow if there are thousands of orders."

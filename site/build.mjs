@@ -37,6 +37,7 @@ const LATEST = `${GITHUB}/releases/latest`;
 const DOCS = [
   { source: "README.md", slug: "index", title: "What this is" },
   { source: "HOW-TO-USE.md", slug: "how-to-use", title: "How to use it" },
+  { source: "INSTALL.md", slug: "install", title: "Install it" },
   {
     source: path.posix.join("application", "Project_brief.md"),
     slug: "project-brief",

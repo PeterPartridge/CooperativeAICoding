@@ -2,6 +2,7 @@
   "form": "database-model",
   "modelName": "",
   "status": "blank",
+  "deliverable": "",
   "dependsOn": {
     "guidance": "Briefs that must be built before this one — usually the tables this model's relationships point at.",
     "example": ["ClothingDatabase/Customer.json"],
@@ -11,6 +12,7 @@
     "whoFillsThisIn": "Developers (Product can sanity-check the information being stored).",
     "when": "Whenever a page needs to store data. One of these per model/table. Copy it into the same solution folder as the page it belongs to and link it from that page.",
     "how": "Answer in plain English where you can. Then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md along with the page it serves.",
+    "deliverableNote": "Which deliverable from the Project Brief this works towards, e.g. MVP. Builds say which deliverable each change advances, and stop when the last item for one is built so people can evaluate direction.",
     "note": "Solution = the folder this file sits in. Table / object name = this file's name. The database engine is set once for the whole solution in that folder's application-spec.json."
   },
   "whatThisModelIs": {

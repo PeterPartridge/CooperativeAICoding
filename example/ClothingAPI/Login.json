@@ -2,6 +2,7 @@
   "form": "endpoint-brief",
   "resourceName": "User maintenance",
   "status": "filled",
+  "deliverable": "MVP",
   "dependsOn": {
     "entries": ["ClothingDatabase/UserCredentials.json"]
   },

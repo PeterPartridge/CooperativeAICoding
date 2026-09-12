@@ -48,7 +48,13 @@ Workflow:
    bind this build, not just the blocks named elsewhere. Check the item's
    dependencies (`depends-on` in a Markdown brief, `dependsOn.entries` in a JSON
    one): every listed brief must be `status: built` — if any isn't, stop and say
-   which to build first. Check `<projectRoot>/claude-only/Code_map.md` (if it exists):
+   which to build first. **Name the deliverable this change works towards** — the
+   item's `deliverable` field (front matter in a Markdown brief, top level in a
+   JSON one), against the Project Brief's list. If the item names none, say so in
+   the plan and ask rather than picking one; if it names one the brief does not
+   list, stop — `node tools/brief-lint.mjs <projectRoot>` says which items are
+   wrong, and a build aimed at a deliverable that does not exist can never reach
+   the stopping point in step 5. Check `<projectRoot>/claude-only/Code_map.md` (if it exists):
    reuse an existing method
    wherever one already does the job — say so in the plan — instead of writing a
    new one. Wait for my approval before editing code.
@@ -61,5 +67,13 @@ Workflow:
    (create it from `template/claude-only/3-code-map.template.md` if it doesn't exist):
    one row per method you created or changed — the method, its file, one line on what
    it does, and which other files/methods it uses. Fix any rows your changes made stale.
-   On the item's first successful build, set its human brief's `status` to `built`.
+   Then run `node tools/code-map-lint.mjs` and fix what it reports — it checks the
+   files and methods a row names actually exist, and that each summary is still one
+   sentence. On the item's first successful build, set its human brief's `status`
+   to `built`.
 4. **Declare debt** — list any technical debt created or anything you could not implement, and (if useful) score how token-intensive each change was.
+5. **Stop at the end of a deliverable** — after setting a brief to `built`, check
+   the other items naming the same deliverable. If that was the last one, **stop
+   there** and say the deliverable is complete and what it now does end to end,
+   rather than starting the next one. It is a point for people to evaluate
+   direction, which is worth nothing if the AI builds straight past it.
