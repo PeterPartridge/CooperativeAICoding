@@ -1,0 +1,60 @@
+# TEMPORARY. Deleted once it has answered its question.
+#
+# The Linux job dies during `cargo test` at the same point twice, with the
+# runner receiving a shutdown signal rather than a test failing. 736 of 888
+# tests had passed, so it is one of the remaining ~124 — which are the ones
+# that spawn real processes. This runs the suite single-threaded so the last
+# name printed is the one that did it, and reports disk and memory around it
+# because a runner that is *shut down* rather than failed is usually a runner
+# that ran out of one of them.
+#
+# No dependency on the Windows job, so an attempt costs six minutes rather
+# than twenty-five.
+name: Linux probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: What Tauri needs on Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev \
+            librsvg2-dev libxdo-dev libssl-dev libdbus-1-dev patchelf \
+            build-essential file
+
+      - name: Rust (version from rust-toolchain.toml)
+        run: rustup show
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app/CoperativeAI/src-tauri
+          key: linux
+
+      - name: Before
+        run: |
+          echo "--- disk ---"; df -h /
+          echo "--- memory ---"; free -m
+
+      # Single-threaded, unbuffered, and each name flushed as it starts — so
+      # whatever is on screen when the machine goes is the culprit. Piped
+      # through `ts`-style timestamps via awk so a hang is distinguishable from
+      # a kill.
+      - name: Tests, one at a time, named as they go
+        run: |
+          set -o pipefail
+          cargo test --manifest-path app/CoperativeAI/src-tauri/Cargo.toml -- \
+            --test-threads=1 --nocapture 2>&1 \
+            | awk '{ print strftime("%H:%M:%S"), $0; fflush() }'
+
+      - name: After
+        if: always()
+        run: |
+          echo "--- disk ---"; df -h /
+          echo "--- memory ---"; free -m
