@@ -116,7 +116,10 @@ async function isFile(p) {
 
 /** One code map, parsed into solutions and their rows. */
 async function parse(file) {
-  const text = await fs.readFile(file, "utf8");
+  // Normalised on the way in: a row's last cell would otherwise carry a
+  // carriage return on a Windows checkout, and a rule anchored to the end of
+  // a line would quietly stop matching — a green run that had read nothing.
+  const text = (await fs.readFile(file, "utf8")).replace(/\r\n/g, "\n");
   const lines = text.split(/\r?\n/);
   const solutions = [];
   let current = null;

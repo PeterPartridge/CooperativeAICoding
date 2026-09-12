@@ -30,6 +30,19 @@ const repo = path.resolve(
 
 const SKIP = new Set(["node_modules", "target", ".git", "dist", "claude-only", "_forms", ".github"]);
 
+/** Reads a document with its line endings normalised.
+ *
+ *  **A CRLF checkout made this tool pass everything.** Half the rules here end
+ *  a pattern with `$`, and in JavaScript `$` does not match before a carriage
+ *  return and `.` does not cross one — so on a Windows checkout every bullet
+ *  stopped matching, every front-matter comment stayed glued to its value, and
+ *  the run came back green having read nothing. A check that cannot fail is
+ *  worse than no check, so line endings are dealt with once, here, rather than
+ *  in each pattern. */
+async function read(file) {
+  return (await fs.readFile(file, "utf8")).replace(/\r\n/g, "\n");
+}
+
 /** Front matter of a Markdown brief, as flat scalars.
  *
  *  The same deliberately small reader the site build uses: these files carry
@@ -100,12 +113,12 @@ async function itemBriefs(root) {
       if (file === "application-spec.json") continue; // the solution, not an item
       const full = path.join(dir, file);
       if (file.endsWith(".md")) {
-        const fields = frontMatter(await fs.readFile(full, "utf8"));
+        const fields = frontMatter(await read(full));
         if (fields?.form === "page-brief") items.push({ file: full, fields });
       } else if (file.endsWith(".json")) {
         let parsed;
         try {
-          parsed = JSON.parse(await fs.readFile(full, "utf8"));
+          parsed = JSON.parse(await read(full));
         } catch (e) {
           items.push({ file: full, broken: String(e.message) });
           continue;
@@ -126,7 +139,7 @@ async function lint(root) {
   const notes = [];
 
   const briefPath = path.join(root, "Project_brief.md");
-  const brief = await fs.readFile(briefPath, "utf8");
+  const brief = await read(briefPath);
   const items = await itemBriefs(root);
 
   // The blank starting copy claims nothing about anything, so it cannot be

@@ -123,6 +123,52 @@ Things this framework was asked for and chose not to do, recorded so they don't 
 - **Plain English, not Given/When/Then.** Gherkin is more precise and it is not free: a form that has to be written in a syntax is a form Product stops filling in, and the briefs only work because anyone can answer them. Precision is bought back where it pays — the acceptance checks, the endpoint and model forms (which are structured JSON), and the test cases in the app's Test environment, which is the one place a Given/When/Then shape could still earn its keep.
 - **Deliverables as stopping points, not dates.** They exist to force a pause for evaluating direction, which a date does not do.
 
+## How this differs from OpenSpec, Kiro, and friends
+
+Spec-driven development is not a new idea and this is not the only tool doing it. Two come up every time: **[OpenSpec](https://openspec.dev)**, which is free, and **[Kiro](https://kiro.dev)**, which is not. *(Read September 2026. All three move — if this section is stale, it is this repository's fault, not theirs.)*
+
+OpenSpec is a CLI you install with npm. It keeps living requirements in `openspec/specs/`, in-flight work in `changes/`, and finished work in `archive/` by date, driven by five commands: explore, propose, apply, verify, archive. Requirements are SHALL statements with WHEN/THEN scenarios. It works with thirty-plus coding agents and has a year of monthly releases behind it.
+
+**The difference that matters most is who writes the source of truth.** In OpenSpec the AI drafts the spec and you review it. Here, *people* answer plain-English questions and the AI translates them — it never authors the brief it will later build from. Both are defensible, and they fail differently: reviewing a generated spec is exactly where "it wrote what it felt like and I skimmed it" lives, while ours costs you real typing before anything happens, and a form nobody fills in produces nothing at all.
+
+| | OpenSpec | This |
+|---|---|---|
+| The spec is written by | the AI; you review it | people; the AI translates it |
+| Aimed at | a developer with a coding agent | Product, Developers and QA, as separate roles |
+| Requirements are | SHALL + WHEN/THEN scenarios | plain English (see *Decisions taken deliberately*, above) |
+| A change is | a proposal folder, archived when applied | a round appended to the item's brief, which is permanent |
+| Repositories | the one you initialise it in | several, each solution naming its repo and local path |
+| Agents | thirty-plus, generated per tool | Claude Code; the app adds Ollama and Claude subscriptions |
+
+### What OpenSpec does well
+
+- **Starting costs nothing.** One npm command, and it generates the command files for whichever agent you already use. Copying a folder — what this framework asks — is more friction than that.
+- **Agent-agnostic in practice, not in ambition.** Thirty-plus tools, kept working across releases. This is the single biggest thing it has and we don't.
+- **A change is a delta, not an edit.** In-flight work is a folder of its own and the living spec stays clean, so "what is being changed right now" is always answerable.
+- **Verify is its own step.** Checking the implementation against the spec is a command somebody can be made to run, rather than a good intention at the end of a build.
+- **Precise without being a syntax tax.** SHALL and WHEN/THEN are checkable, and cheap enough that engineers actually write them.
+- **It is a year old.** Other people have already found the edges. Nothing here has that.
+
+### What OpenSpec does badly
+
+Our reading, and a trade it has chosen rather than a list of bugs:
+
+- **The AI writes the thing meant to constrain the AI.** Human review is the only gate, and review of generated prose is the weakest gate in software.
+- **No seat for anyone but a developer.** Nothing separates Product's "why" from a developer's "how", so a spec folder is all Product and QA get.
+- **One repository.** Real products span several; nothing in it knows that.
+- **No cost control.** Which model, how hard it thinks, and what a run spent are all outside its scope — while its own docs recommend high-reasoning models.
+- **Nothing flows back.** There is no channel for the AI to declare debt, or to say "I can't implement this" and have that become work somebody sees. The specification is one-directional.
+- **No reuse ledger**, so nothing stops an agent rebuilding what already exists — the failure this framework's code map was built for.
+- **The why scatters.** Archiving by date is tidy, but a feature's reasoning ends up spread across dated folders instead of sitting beside the thing it explains.
+
+### And Kiro
+
+Second-hand — from a developer who uses it daily, not from our own use. It does steering files per repository, specialist subagents (one that knows Terraform, one Ansible, one that reads AWS), interactive design before the agent runs, and it is an IDE as well as an agent. It is more mature than anything here and you are paying for it. Being free is not the interesting difference; **feedback running back from the AI is**, and cost, and the multi-repository case.
+
+### Choose accordingly
+
+One developer, one repository, specs without ceremony — OpenSpec is the lighter tool, and it would be dishonest to pretend otherwise. A team where Product and QA have to be in the loop, work spans several repositories, and somebody has to see the cost and the debt — that is what this is for.
+
 ## Templates
 
 The working layout lives in [`template/`](template/). **You** fill in the forms — prose briefs (the project brief and page briefs) are **Markdown** you answer under question headings; record-style forms (endpoints, database models, solution specs) are **JSON** with `answer` fields and entry lists. Either way you write plain English; **Claude** translates them into structured specs — working out the **skills** it needs — and mirrors your folders on its side.
