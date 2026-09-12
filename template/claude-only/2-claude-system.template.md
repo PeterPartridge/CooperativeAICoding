@@ -21,6 +21,13 @@
 |------|----------------------|
 | <...> | <...> |
 
+**Deliverables** _(in order — the first is what everything is building towards)_
+> Each is a stopping point: when the last item naming it is built, the work stops there to be looked at.
+
+| # | Deliverable | Done when |
+|---|-------------|-----------|
+| 1 | <e.g. MVP> | <...> |
+
 **Platforms & technology constraints**
 
 <...>
@@ -81,6 +88,8 @@
 - **Solutions & repos:** <name → repo, local path; one per solution>
 - **Infra & environments:** <who provisions + tool; envs the AI may deploy to; where secrets live — never values>
 - **House rules:** <names only, e.g. DRY, CamelCase page names>
+- **Testing floor:** <cover expected of every change; what isn't worth testing>
+- **Deliverables:** <in order, e.g. MVP → Checkout → Admin>
 - **Security model:** <how users log in, how endpoints are protected>
 - **Roles:** <...>
 - **Model & effort tiers:** <cheapest → … ; low/med/high effort → …>
@@ -109,6 +118,10 @@
 
 **Model & effort** _(default for this page; override per change)_
 > e.g. "Claude Sonnet, medium effort."
+
+<...>
+
+**Deliverable** _(which one this item works towards)_
 
 <...>
 

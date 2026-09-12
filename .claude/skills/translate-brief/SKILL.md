@@ -70,7 +70,7 @@ If you can't tell which, ask once. Don't translate a blank master form from
 1. **Get project constraints cheaply.** Read `<projectRoot>/claude-only/Project_system.md` and use *only* its **Project Digest** section. Do not load the whole spec unless a specific page decision needs detail the digest doesn't cover. If `Project_system.md` doesn't exist yet, translate the Project Brief first (procedure A).
 2. Read the page brief.
 3. Produce:
-   - **Page Spec** — Page objective, Model & effort, Depends on (the briefs listed in `depends-on`/`dependsOn` that must be built first), Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
+   - **Page Spec** — Page objective, Model & effort, **Deliverable** (the item's `deliverable` field — it must name one of the deliverables the Project Brief lists; if it names something else, say so instead of translating it through, because a deliverable nothing is aimed at never completes and `/build` never reaches its stopping point), Depends on (the briefs listed in `depends-on`/`dependsOn` that must be built first), Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
    - **Page Skills** — table building on the project skills (don't repeat them); flag any skill new for this page.
    - **PLAN** — one-paragraph summary + bullet changes + an honest note of expected technical debt.
 4. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/claude-only/<solution>/<item>.md` (e.g. `example/ClothingWebsite/userLogin.md` → `example/claude-only/ClothingWebsite/userLogin.md`, `application/CoperativeAIdb/WorkItem-model.json` → `application/claude-only/CoperativeAIdb/WorkItem-model.md`).

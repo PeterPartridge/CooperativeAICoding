@@ -62,6 +62,9 @@ Produce THREE sections:
 1. SYSTEM SPEC — reorganise the brief into these labelled headings:
    - Purpose (one line)
    - Users (who, and what each wants)
+   - Deliverables, in order, each with what makes it done — the first is the
+     target everything is currently building towards. Name it as a stopping
+     point, not a date.
    - Platforms & technology constraints
    - Solutions & repositories (each solution, its type, its repo, and its local
      path — so building happens in the right repo when solutions span several)
@@ -69,6 +72,9 @@ Produce THREE sections:
      environments the AI may deploy to, and where secrets live — reference
      secrets by NAME only; never write a secret value anywhere)
    - Coding house rules (with the project-specific meaning of each)
+   - Testing floor — the level of cover expected of every change, and what the
+     project has said is not worth testing. Carry it as the rule it is: a change
+     that cannot reach it records that as debt rather than lowering it.
    - Access & security (who can do what, how people log in)
    - Look & feel / design references
    - Model & effort selection (which AI model — cheapest / mid-range / most capable — and how much reasoning effort, matched to task difficulty)
@@ -78,9 +84,10 @@ Produce THREE sections:
    reuse instead of re-reading the whole spec. Keep it under ~12 lines, just the
    constraints that bind every page: platform/tech, each solution's repo and
    local path, the infra policy and environments (including where secrets live),
-   the house rules (names only), security model, roles, and the model/effort
-   tiers. This is the ONLY part a page translation needs to see from the
-   project level.
+   the house rules (names only), the testing floor, the deliverables in order,
+   security model, roles, and the model/effort tiers. This is the ONLY part a page translation needs to see
+   from the project level — so a rule left out of the digest is a rule no item
+   build will ever see.
 
 3. PROJECT SKILLS — the capabilities you'll need to build this project well.
    Present as a table: Skill | Why it's needed | How you'll use it | Tools/approach.

@@ -23,11 +23,11 @@ The goal is to give AI and all team members a source of truth for the product. C
 The framework is defined in three areas:
 - The Project brief, which is the why we are doing this, plus general development rules and structure, where each solution's code lives (including across multiple repositories), infrastructure/secrets policy, and gives AI the software engineering practices to employ and how the developers it is working with define these ideas.
 - The solution specification, which is where developers define the reason for each solution, give AI the solution-specific guidance, and set it up to successfully move quickly — including its repo scaffold (file layout, tests, commands), its security rules, and the infrastructure and pipeline it needs. Solutions can start from named **boilerplates** (a scaffold preset plus a security baseline) in [`template/_forms/boilerplates.json`](template/_forms/boilerplates.json) instead of being hand-written from scratch.
-- The endpoint/page/database model, which allows us to define the purpose of what we are creating and what we need from the page, and is designed to build a page iteratively. Items can declare what must be built before them, so the AI never guesses at build order across a multi-solution project. AI can do the task and, instead of burning tokens trying to implement something it can't understand, it says "I can implement this" and allows the developers to tell it how to implement it, or go to Product and rethink the feature.
+- The **item** — one page, one endpoint, or one database model — which defines the purpose of the single thing we are creating and what we need from it, and is designed to be built iteratively. Items can declare what must be built before them, so the AI never guesses at build order across a multi-solution project. AI can do the task and, instead of burning tokens trying to implement something it can't understand, it says "I can't implement this" and allows the developers to tell it how to implement it, or go to Product and rethink the feature.
 
 ### Global Setup
 
-Before any page is built, Product and Developers define the shared rules:
+Before any item is built, Product and Developers define the shared rules:
 
 - **Objectives & customers (Product)** — what the software is for and who it serves.
 - **Technology & formats (Developers)** — the tech stack, the platforms the solution must run on, and the formats it must support.
@@ -38,32 +38,42 @@ Before any page is built, Product and Developers define the shared rules:
 
 The aim of the technology rules is that any new endpoint the AI creates works with the target platform and is written so that build errors are less likely.
 
-### Pages
+### Items
 
-Once the global setup is complete, the system is broken into **sub-sections**, and each sub-section is a **page**.
+Once the global setup is complete, the system is broken into **sub-sections**, and each sub-section is an **item** — the smallest thing this framework plans, builds and iterates. An item comes in one of three kinds, each with its own form:
 
-Each page is defined **once** by Product, then built up **iteratively** by Developers — starting from the simplest working version and growing toward the final system one iteration at a time (changing data models, adding behaviour, and so on).
+| Kind | What it is | Form |
+|------|------------|------|
+| **Page** | one screen, panel, or command group of a website or application | [`page.md`](template/_forms/page.md) |
+| **Endpoint** | one API resource and its operations | [`endpoint.json`](template/_forms/endpoint.json) |
+| **Model** | one table or data model | [`database-model.json`](template/_forms/database-model.json) |
 
-#### Page Layout
+**Nothing here assumes a front end.** A backend-only project has no pages at all — it is endpoints and models, and everything below reads the same for them. *Item* is the word the commands already use: `/new-item page|endpoint|model`.
+
+Each item also names the **deliverable** it works towards — see [Deliverables](#deliverables), below.
+
+Each item is defined **once** by Product, then built up **iteratively** by Developers — starting from the simplest working version and growing toward the final system one iteration at a time (changing data models, adding behaviour, and so on).
+
+#### Item Layout
 
 **Product — fixed question (asked once):**
-- *Why do we have this page?* — the overall objective of the page.
+- *Why do we have this item?* — the overall objective of this page, endpoint, or model.
 
 **Product — iterative questions:**
-- How should the page look?
+- How should it look? *(pages and screens)*
 - What information do we want to record?
-- What are the use cases? Who uses this page, and how do they use it under different conditions?
+- What are the use cases? Who uses this item, and how do they use it under different conditions?
 - Who should be able to use it? (This sets the security expectations for developers.)
 
 **Developers — questions:**
 - What should the data model look like?
-- Do we need to hold any data in memory?
-- What tests should we run?
+- Is there anything that must **not** be saved permanently, or must survive between screens? (A constraint if there is one — not a design to impose.)
+- How will we know it works? What must be true for this to be accepted?
 - What endpoints should be used?
 
 ## The AI Workflow
 
-For each page (and each iteration), the AI follows a defined loop:
+For each item (and each iteration), the AI follows a defined loop:
 
 0. **Scaffold** — the first time an approved item is built in a solution with no code yet, the AI creates the repo skeleton from that solution's spec (a named boilerplate, or its own file layout/tests/commands) as its own approved plan, before any feature is built.
 1. **Plan** — the AI generates a plan from the questions above, with a summary at the top and bullet-point changes describing how each use case will be implemented. It checks the item's declared dependencies are already built, checks its **code map** and reuses existing methods rather than rebuilding them, and confirms the change doesn't need new infrastructure (which is its own approved plan, never a side effect of a feature).
@@ -71,7 +81,7 @@ For each page (and each iteration), the AI follows a defined loop:
 3. **Report back** — once complete, the AI runs the solution's test/build commands and updates the plan document with what it did, how each use case was implemented, and what test scenarios it created. It also updates the **code map** (`claude-only/Code_map.md`): one row per method it created or changed — what it does in one line, and which other files and methods it uses.
 4. **Declare debt** — the AI lists any technical debt it created or anything it failed to implement.
 
-> The AI should **not** spend ages trying to fix or reimagine something. It builds the page simply and clearly records where it fell short and what debt it introduced.
+> The AI should **not** spend ages trying to fix or reimagine something. It builds the item simply and clearly records where it fell short and what debt it introduced.
 
 ## Iterations
 
@@ -85,6 +95,14 @@ After the first build, each further iteration defines **what needs to change**:
 - Change in endpoints?
 - How should existing technical debt or earlier AI failures be addressed?
 
+### Deliverables
+
+Iterating needs something to iterate **towards**, or "smallest change" just means "smallest change forever".
+
+The Project Brief names the **deliverables in order**, each with what makes it done — the first is usually the **MVP**, the smallest version genuinely worth putting in front of someone. Every item names the deliverable it serves, so a build says which one the change advances.
+
+**A deliverable is a stopping point, not a date.** When the last item naming it is built, the AI stops there, says what the deliverable now does end to end, and waits — because a point for people to evaluate direction is worth nothing if the AI builds straight past it. That is the whole reason for naming them.
+
 **Guiding principles for changes:**
 
 - The AI should change **only** what the change case requires, making the **smallest possible** change to avoid breaking production code.
@@ -93,7 +111,17 @@ After the first build, each further iteration defines **what needs to change**:
 - **Secret values never go into code, config, or logs** — they're referenced by name from a store the infrastructure block points at.
 - **Infrastructure and pipelines are their own approved plans** — never a side effect of building a feature (see `/pipeline`, below).
 
-> This is not an exhaustive list. Product and Developers need space to define what else each page requires and how the AI should implement those changes.
+> This is not an exhaustive list. Product and Developers need space to define what else each item requires and how the AI should implement those changes.
+
+## Decisions taken deliberately
+
+Things this framework was asked for and chose not to do, recorded so they don't have to be re-argued:
+
+- **"Item", not "page".** A page is one *kind* of item, alongside endpoints and database models. A backend-only project has no pages and loses nothing.
+- **A testing floor, not a list of tests.** The Project Brief states the level of cover expected of every change and what isn't worth testing; items list their own acceptance checks on top. A list of things to test reads to an AI as permission to skip everything not on it.
+- **Constraints, not implementation answers.** Questions ask what must be true of the product, not how to build it — "the basket survives moving between pages", never "hold the basket in memory". An answer about mechanism becomes a requirement the AI then honours, and a passing thought turns into a design nobody chose.
+- **Plain English, not Given/When/Then.** Gherkin is more precise and it is not free: a form that has to be written in a syntax is a form Product stops filling in, and the briefs only work because anyone can answer them. Precision is bought back where it pays — the acceptance checks, the endpoint and model forms (which are structured JSON), and the test cases in the app's Test environment, which is the one place a Given/When/Then shape could still earn its keep.
+- **Deliverables as stopping points, not dates.** They exist to force a pause for evaluating direction, which a date does not do.
 
 ## Templates
 
@@ -101,12 +129,14 @@ The working layout lives in [`template/`](template/). **You** fill in the forms 
 
 - **[`template/Project_brief.md`](template/Project_brief.md)** — plain questions about the whole project, including where each solution's code lives and your infrastructure/secrets policy. Filled in once.
 - **[`template/_forms/`](template/_forms/)** — blank master forms to copy: one [`application-spec.json`](template/_forms/application-spec.json) for every solution (set its `solutionType` to `website`, `api`, `database`, or `application`), item forms ([`page.md`](template/_forms/page.md), [`endpoint.json`](template/_forms/endpoint.json), [`database-model.json`](template/_forms/database-model.json)), and [`boilerplates.json`](template/_forms/boilerplates.json) — named scaffold presets and security baselines a solution spec can adopt by name.
-- **`template/<solution>/`** — one folder per solution (e.g. `frontEnd/`, `backend/`); each page is a file inside it, like `frontEnd/page1.md` or `backend/userLogin.md`.
+- **`template/<solution>/`** — one folder per solution (e.g. `frontEnd/`, `backend/`); each item is a file inside it, like `frontEnd/page1.md` or `backend/userLogin.md`.
 - **[`template/claude-only/`](template/claude-only/)** — Claude's side (no human input): the [translate bridge](template/claude-only/1-translate-to-claude.md), the [spec shape](template/claude-only/2-claude-system.template.md), and the [code map](template/claude-only/3-code-map.template.md) — Claude's running inventory of every method it built, so it reuses instead of rebuilding. Claude mirrors your solution folders here, e.g. `frontEnd/page1.md` → `claude-only/frontEnd/page1.md`.
 
 See [`template/README.md`](template/README.md) for the full layout and step-by-step flow.
 
 ## Getting started
+
+**Just want the desktop app, or dev on Linux?** [`INSTALL.md`](INSTALL.md) has the installers and packages for both platforms, how to build from source, and the framework-only path — which needs no binary at all and runs wherever Claude Code runs.
 
 New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses three Claude Code slash commands:
 
