@@ -59,7 +59,11 @@ Workflow:
    wherever one already does the job — say so in the plan — instead of writing a
    new one. Wait for my approval before editing code.
 2. **Execute** — only after I approve. When the solution's testing answer calls
-   for TDD, follow the `tdd` skill's Red → Green → Refactor cycle.
+   for TDD, work in that cycle: write a test that **fails** for the reason the
+   change exists, write just enough code to pass it, then tidy with the tests
+   green. Start simple and grow the cases with the functionality. (If your
+   setup has a `tdd` skill of its own, use it — this repository does not ship
+   one, so nothing here depends on it.)
 3. **Report back** — run the solution's `test` (and `build`) commands from its
    scaffold block and include the results; then append to the spec what you did,
    how each use case was implemented, and the test scenarios you created. Then

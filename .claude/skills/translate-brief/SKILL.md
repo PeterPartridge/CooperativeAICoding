@@ -82,7 +82,7 @@ the blank forms in `_forms/` (`status: blank`, or all answers empty).
    - **Page Spec** — Page objective, Model & effort, **Deliverable** (the item's `deliverable` field — it must name one of the deliverables the Project Brief lists; if it names something else, say so instead of translating it through, because a deliverable nothing is aimed at never completes and `/build` never reaches its stopping point), Depends on (the briefs listed in `depends-on`/`dependsOn` that must be built first), Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
    - **Page Skills** — table building on the project skills (don't repeat them); flag any skill new for this page.
    - **PLAN** — one-paragraph summary + bullet changes + an honest note of expected technical debt.
-4. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/claude-only/<solution>/<item>.md` (e.g. `example/ClothingWebsite/userLogin.md` → `example/claude-only/ClothingWebsite/userLogin.md`, `application/CoperativeAIdb/WorkItem-model.json` → `application/claude-only/CoperativeAIdb/WorkItem-model.md`).
+4. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/claude-only/<solution>/<item>.md` (e.g. `application/CoperativeAIdb/WorkItem-model.json` → `application/claude-only/CoperativeAIdb/WorkItem-model.md`).
 
 ## After translating
 

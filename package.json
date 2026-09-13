@@ -17,8 +17,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test tools/lint.test.mjs",
-    "check": "node --test tools/lint.test.mjs && node tools/code-map-lint.mjs && node tools/brief-lint.mjs"
+    "test": "node --test tools/lint.test.mjs tools/commands.test.mjs",
+    "check": "npm test && node tools/code-map-lint.mjs && node tools/brief-lint.mjs"
   },
   "engines": {
     "node": ">=20"

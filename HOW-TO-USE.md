@@ -162,6 +162,22 @@ or ask it to build an approved spec — the commands just give you explicit cont
 
 ---
 
+## Checking it still works
+
+```bash
+npm run check
+```
+
+Runs three things: the tests for the two checks themselves (both have silently
+passed while reading nothing, so the faults they exist to catch are tested), the
+**code map** against the code, and every item brief's **deliverable** against the
+list its Project Brief names.
+
+None of that proves a *command* behaves — a command is a prompt, and the thing
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): six scenarios a
+person runs against a real agent, each one naming the failure that would count as
+a fail rather than asking whether the output looked plausible.
+
 ## The promises (true at every step)
 
 - Build the **smallest thing** that answers the request — no surprise extras.
