@@ -123,6 +123,14 @@ Things this framework was asked for and chose not to do, recorded so they don't 
 - **Plain English, not Given/When/Then.** Gherkin is more precise and it is not free: a form that has to be written in a syntax is a form Product stops filling in, and the briefs only work because anyone can answer them. Precision is bought back where it pays — the acceptance checks, the endpoint and model forms (which are structured JSON), and the test cases in the app's Test environment, which is the one place a Given/When/Then shape could still earn its keep.
 - **Deliverables as stopping points, not dates.** They exist to force a pause for evaluating direction, which a date does not do.
 
+## Working with agents other than Claude Code
+
+**One brief, every agent's native guardrails.** `/emit-guardrails` writes the project's rules out in the shape each tool actually reads: [`AGENTS.md`](AGENTS.md) at the root (which **Kiro always includes** and **Cursor accepts** as a plain-markdown alternative to `.mdc` rules), `CLAUDE.md`, Kiro steering files under `.kiro/steering/`, Cursor rules under `.cursor/rules/`, or Copilot instructions. Generated from the same spec, so there is one place to change a rule and no second copy to drift.
+
+Generated files carry a header saying so, and a file without that header is never overwritten — it was written by a person.
+
+**What travels and what does not**, stated plainly because it is discovered otherwise: the guardrails travel — house rules with their definitions, the testing floor, the security baseline, the deliverable in progress, and the working agreement including *stop and say so rather than guess*. The machinery does not — plan approval, model and effort per item, run cost, deny-by-default policy and the sandbox live in the app and its commands. This repository's own [`AGENTS.md`](AGENTS.md) is the worked example, honest gaps included.
+
 ## How this differs from OpenSpec, Kiro, and friends
 
 Spec-driven development is not a new idea and this is not the only tool doing it. Two come up every time: **[OpenSpec](https://openspec.dev)**, which is free, and **[Kiro](https://kiro.dev)**, which is not. *(Read September 2026. All three move — if this section is stale, it is this repository's fault, not theirs.)*
@@ -203,3 +211,4 @@ New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish
 - **`/new-item <type> <solution> <name>`** — copy a blank page/endpoint/model form into a solution folder.
 - **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.
 - **`/pipeline <solution>`** — create the solution's CI/CD pipeline and missing infrastructure from its spec, as its own approved plan. Secret values are never written into code — they're referenced by name from stores you control.
+- **`/emit-guardrails [targets]`** — write the project's rules out in other agents' native formats (`AGENTS.md`, `CLAUDE.md`, Kiro steering, Cursor rules) from the same spec. One brief, every agent's guardrails — see below.

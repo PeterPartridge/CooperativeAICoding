@@ -155,6 +155,7 @@ and `/build` again. Keep each change small.
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |
 | `/pipeline <solution>` | Create the solution's CI/CD pipeline and missing infrastructure from its spec's `infrastructure` block. Secrets are referenced by name only — never written into code. |
+| `/emit-guardrails [targets]` | Write the project's rules out for other agents — `AGENTS.md` (read by Kiro and Cursor too), `CLAUDE.md`, Kiro steering, Cursor rules, Copilot instructions — from the same spec. |
 
 `/translate` and `/build` also trigger automatically when you hand Claude a brief
 or ask it to build an approved spec — the commands just give you explicit control.

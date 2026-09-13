@@ -396,6 +396,9 @@ function landing(entries, shots = []) {
       any project. You answer in plain English; the AI translates it into the
       spec it builds from, makes the smallest change, and declares the debt it
       left. It is Markdown, JSON and prompts &mdash; there is nothing to run.</p>
+      <p>Standardised on another agent? <code>/emit-guardrails</code> writes the
+      same rules out as <code>AGENTS.md</code>, Kiro steering files or Cursor
+      rules &mdash; one brief, every agent&rsquo;s native guardrails.</p>
       <p class="small">Windows, macOS and Linux alike &middot; needs Node 20+ and
       Claude Code &middot; free, and the whole way of working</p>
     </div>
