@@ -153,6 +153,14 @@ async function parse(file) {
 }
 
 async function lint(file) {
+  // **Where a row's paths are resolved from.** A map lives at
+  // `<project>/claude-only/Code_map.md`, so the project is two levels up —
+  // and that is what a row's local path is relative to. The repository this
+  // script sits in is tried as well, because a project inside a larger
+  // repository (this one) writes local paths from the repository root. Both
+  // are cheap to try and getting it wrong reports a file that is really there.
+  const holder = path.dirname(file);
+  const project = path.basename(holder) === "claude-only" ? path.dirname(holder) : repo;
   const errors = [];
   const warnings = [];
   const rel = path.relative(repo, file).split(path.sep).join("/");
@@ -195,13 +203,14 @@ async function lint(file) {
       }
       const present = [];
       for (const p of claimed) {
-        const candidates = base ? [path.join(repo, base, p), path.join(repo, p)] : [path.join(repo, p)];
+        const roots = project === repo ? [repo] : [project, repo];
+        const candidates = roots.flatMap((r) => (base ? [path.join(r, base, p), path.join(r, p)] : [path.join(r, p)]));
         let found = null;
         for (const c of candidates) if (await isFile(c)) { found = c; break; }
         if (found) present.push(found);
         else
           errors.push(
-            `${at}  file not found: ${p}` + (base ? `  (looked under ${base} and the repo root)` : ""),
+            `${at}  file not found: ${p}` + (base ? `  (looked under ${base} and the project root)` : ""),
           );
       }
 
