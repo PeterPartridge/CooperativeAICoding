@@ -167,3 +167,105 @@ test("code-map-lint catches a summary that has grown past one line", async () =>
   assert.equal(code, 1);
   assert.match(out, /first sentence is \d+ chars/);
 });
+
+// ---------------------------------------------------------------------------
+// round-record-lint: the check that reads what an agent wrote *after* the work.
+//
+// **Its faults are absences**, which is the hardest thing for a check to get
+// right — an empty heading and a missing one both look like a quiet pass to a
+// regex that only searches. So every case here is a record with something
+// genuinely missing, plus the shapes that must not be reported.
+
+const record = (did, could, debt) =>
+  `### What I did\n${did}\n\n### What I could not do  (and what you would need to tell me)\n${could}\n\n` +
+  `### Debt I left behind  (one paragraph each)\n${debt}\n`;
+
+const FULL = record(
+  "- Added the cart totals.",
+  "- Could not reach the tax service; its key is not in the store yet.",
+  "- Totals round in two places. One of them should go.",
+);
+
+for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
+  test(`round-record-lint passes a record that answers all three (${name})`, async () => {
+    const root = await project({ "ROUND-RECORD.md": FULL }, eol);
+    const { code, out } = run("round-record-lint.mjs", [path.join(root, "ROUND-RECORD.md")]);
+    assert.equal(code, 0, out);
+    assert.match(out, /all three answered/);
+  });
+
+  test(`round-record-lint catches a missing heading (${name})`, async () => {
+    const short = "### What I did\n- Added the cart totals.\n\n### Debt I left behind\n- None worth the name.\n";
+    const root = await project({ "ROUND-RECORD.md": short }, eol);
+    const { code, out } = run("round-record-lint.mjs", [path.join(root, "ROUND-RECORD.md")]);
+    assert.equal(code, 1);
+    assert.match(out, /no "### What I could not do" heading/);
+  });
+
+  test(`round-record-lint catches a heading with nothing under it (${name})`, async () => {
+    const root = await project({ "ROUND-RECORD.md": record("- Added the cart totals.", "", "- Rounding.") }, eol);
+    const { code, out } = run("round-record-lint.mjs", [path.join(root, "ROUND-RECORD.md")]);
+    assert.equal(code, 1);
+    assert.match(out, /has nothing under it/);
+  });
+}
+
+test("round-record-lint warns, but does not fail, on a shrug", async () => {
+  const root = await project({ "ROUND-RECORD.md": record("- Added the cart totals.", "- Nothing.", "None") });
+  const { code, out } = run("round-record-lint.mjs", [path.join(root, "ROUND-RECORD.md")]);
+  assert.equal(code, 0, out);
+  assert.match(out, /warn .*says only "None"/);
+});
+
+test("round-record-lint warns about a heading the app would file under \"also said\"", async () => {
+  const root = await project({ "ROUND-RECORD.md": FULL + "\n### What I think you should do next\n- Ship it.\n" });
+  const { code, out } = run("round-record-lint.mjs", [path.join(root, "ROUND-RECORD.md")]);
+  assert.equal(code, 0, out);
+  assert.match(out, /also said/);
+});
+
+test("round-record-lint says so, and passes, when nothing has been written yet", async () => {
+  const root = await project({ "README.md": "# Shop\n" });
+  const { code, out } = run("round-record-lint.mjs", [root]);
+  assert.equal(code, 0, out);
+  assert.match(out, /nothing written down yet/);
+});
+
+/** A repository with one commit, so --since has a base to diff against. */
+async function committed(files) {
+  const root = await project(files);
+  const git = (...args) =>
+    execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", ...args], { cwd: root, encoding: "utf8" });
+  git("init", "-q");
+  git("add", "-A");
+  git("commit", "-q", "-m", "base");
+  return { root, git, base: git("rev-parse", "HEAD").trim() };
+}
+
+test("round-record-lint catches solution code that changed without a record", async () => {
+  const { root, git, base } = await committed({ "app/CoperativeAI/src/cart.rs": "fn total() {}\n" });
+  await fs.writeFile(path.join(root, "app/CoperativeAI/src/cart.rs"), "fn total() { let _ = 1; }\n");
+  git("add", "-A");
+  git("commit", "-q", "-m", "change");
+  const { code, out } = run("round-record-lint.mjs", [root, "--since", base]);
+  assert.equal(code, 1);
+  assert.match(out, /changed and no ROUND-RECORD\.md did/);
+});
+
+test("round-record-lint passes when the record changed with the code", async () => {
+  const { root, git, base } = await committed({ "app/CoperativeAI/src/cart.rs": "fn total() {}\n" });
+  await fs.writeFile(path.join(root, "app/CoperativeAI/src/cart.rs"), "fn total() { let _ = 1; }\n");
+  await fs.writeFile(path.join(root, "ROUND-RECORD.md"), FULL);
+  git("add", "-A");
+  git("commit", "-q", "-m", "change");
+  const { code, out } = run("round-record-lint.mjs", [root, "--since", base]);
+  assert.equal(code, 0, out);
+  assert.match(out, /a record changed with them/);
+});
+
+test("round-record-lint checks nothing, rather than guessing, when git cannot answer", async () => {
+  const root = await project({ "README.md": "# Shop\n" });
+  const { code, out } = run("round-record-lint.mjs", [root, "--since", "nosuchref"]);
+  assert.equal(code, 0, out);
+  assert.match(out, /git could not diff/);
+});
