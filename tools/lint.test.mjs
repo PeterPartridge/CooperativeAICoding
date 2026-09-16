@@ -168,6 +168,60 @@ test("code-map-lint catches a summary that has grown past one line", async () =>
   assert.match(out, /first sentence is \d+ chars/);
 });
 
+// The other direction. Every test above reads a row and asks whether the code
+// is real; these ask whether real code has a row. That gap is why a map
+// describing a quarter of its codebase reported `clean`.
+
+const TAURI_CMD = "#[tauri::command]\npub async fn list_orders() -> Vec<String> { vec![] }\n";
+
+test("code-map-lint reports a command that no row mentions", async () => {
+  const root = await project({
+    "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "code/src/cart.js": "export function addItem() {}\n",
+    "code/src-tauri/src/commands/orders.rs": TAURI_CMD,
+  });
+  const { out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  assert.match(out, /1 surface\(s\) have no row/);
+  assert.match(out, /1 Tauri command\(s\), e\.g\. list_orders/);
+});
+
+test("code-map-lint counts a command named anywhere in the map as covered", async () => {
+  const root = await project({
+    "claude-only/Code_map.md": codeMap(
+      "| `list_orders` | src-tauri/src/commands/orders.rs | Lists the orders | nothing |",
+    ),
+    "code/src-tauri/src/commands/orders.rs": TAURI_CMD,
+  });
+  const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  assert.equal(code, 0, out);
+  assert.match(out, /clean/);
+});
+
+test("code-map-lint reports a table that no row mentions", async () => {
+  const root = await project({
+    "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "code/src/cart.js": "export function addItem() {}\n",
+    "code/src-tauri/src/db/order.rs": 'conn.execute("CREATE TABLE IF NOT EXISTS orders (id INTEGER)", ())',
+  });
+  const { out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  assert.match(out, /1 database table\(s\), e\.g\. orders/);
+});
+
+// The guarantee that lets this rule ship to projects that are not this one: a
+// codebase with none of these surfaces is neither helped nor punished by the
+// rule existing. Without this, adding a surface would quietly start failing
+// every Go and Python project that installed the framework.
+test("code-map-lint leaves a project with no such surfaces alone", async () => {
+  const root = await project({
+    "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "code/src/cart.js": "export function addItem() {}\n",
+  });
+  const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  assert.equal(code, 0, out);
+  assert.match(out, /clean/);
+  assert.doesNotMatch(out, /surface/);
+});
+
 // ---------------------------------------------------------------------------
 // round-record-lint: the check that reads what an agent wrote *after* the work.
 //

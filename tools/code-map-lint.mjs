@@ -38,6 +38,51 @@ const SUMMARY_MAX = 200;
 /** A cell that is part of the blank template rather than a claim about code. */
 const isPlaceholder = (s) => /^<.*>$/.test(s.trim()) || s.trim() === "" || s.trim() === "…";
 
+/** **Surfaces: the code that has to appear in the map, checked the other way round.**
+ *
+ *  Every other rule here reads a row and asks whether the code exists. None of
+ *  them can see code that has *no* row — so a map describing a quarter of the
+ *  codebase passed as `clean`, which is the state this repository was actually
+ *  in when this rule was written: 206 Tauri commands and 23 tables appeared
+ *  nowhere in its map, and the run before this rule existed said `clean`.
+ *  A reuse ledger nobody can tell is empty is worse than no ledger, because the
+ *  green run is read as "nothing already does this job".
+ *
+ *  A *surface* is code whose absence from the map is a reuse failure rather
+ *  than a detail: something another build could plausibly rebuild by accident.
+ *  Private helpers are not surfaces; an API command and a database table are.
+ *
+ *  **Declarative on purpose.** This file ships to projects that are not Tauri
+ *  and not SQL, so adding a stack is adding a row here, not editing the walk.
+ *  A pattern that matches nothing contributes nothing and costs nothing — a
+ *  Go project simply finds no `#[tauri::command]` and is neither helped nor
+ *  punished by the rule existing. */
+const SURFACES = [
+  {
+    what: "Tauri command",
+    dir: "src-tauri/src/commands",
+    // The attribute sits above the signature, so the name is on a later line.
+    pattern: /#\[tauri::command\][\s\S]{0,200}?\bfn\s+([a-z_][a-z0-9_]*)/g,
+  },
+  {
+    what: "database table",
+    dir: "src-tauri/src/db",
+    pattern: /CREATE TABLE IF NOT EXISTS\s+([a-z_][a-z0-9_]*)/gi,
+  },
+];
+
+/** How many surfaces may still be missing before this fails rather than warns.
+ *
+ *  **A ratchet, not a target.** Failing on the true number the day the rule
+ *  landed would have produced 229 errors and blocked every other piece of work,
+ *  which is how a good check gets commented out in week two. So the ceiling
+ *  starts at what was already owed and only ever comes down: each build that
+ *  adds rows lowers it, and a build that adds an undocumented surface fails
+ *  immediately because the count went up.
+ *
+ *  Lower this number. Never raise it. */
+const UNCOVERED_CEILING = 229;
+
 /** `{a,b}` → two strings. Tauri-side rows write two files that way, and so do
  *  frontend rows for a component and its helper. */
 function expandBraces(s) {
@@ -114,6 +159,43 @@ async function isFile(p) {
   }
 }
 
+/** Every surface on disk under one solution, as `{ what, name, file }`.
+ *
+ *  A directory that is not there is not a failure — it means this solution has
+ *  no surfaces of that kind, which is the normal case for most projects. */
+async function surfacesUnder(root, base) {
+  const found = [];
+  for (const surface of SURFACES) {
+    const dir = path.join(root, base ?? "", surface.dir);
+    let entries;
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const text = await fs.readFile(path.join(dir, entry.name), "utf8");
+      for (const [, name] of text.matchAll(surface.pattern)) {
+        found.push({ what: surface.what, name, file: `${surface.dir}/${entry.name}` });
+      }
+    }
+  }
+  return found;
+}
+
+/** Is this surface named anywhere in the map?
+ *
+ *  **Deliberately lenient.** A whole-word match against the entire document,
+ *  not against the Method column — rows legitimately group names
+ *  (`work_items::{list_work_items, create_work_item, …}`) and some describe a
+ *  cluster in prose. Being lenient here passes a surface that is only
+ *  mentioned in passing, which under-reports the debt; being strict would
+ *  report hundreds of surfaces that *are* documented and bury the ones that
+ *  are not. Under-reporting is the right way to be wrong for a number whose
+ *  job is to come down. */
+const isNamed = (text, name) => new RegExp(`\\b${name}\\b`).test(text);
+
 /** One code map, parsed into solutions and their rows. */
 async function parse(file) {
   // Normalised on the way in: a row's last cell would otherwise carry a
@@ -165,7 +247,9 @@ async function lint(file) {
   const warnings = [];
   const rel = path.relative(repo, file).split(path.sep).join("/");
   const solutions = await parse(file);
+  const mapText = (await fs.readFile(file, "utf8")).replace(/\r\n/g, "\n");
   let rowCount = 0;
+  const uncovered = [];
 
   for (const solution of solutions) {
     // A solution whose local path is still the template's angle-bracket
@@ -242,9 +326,20 @@ async function lint(file) {
         }
       }
     }
+
+    // --- and the other direction: code with no row at all ------------------
+    if (base) {
+      const roots = project === repo ? [repo] : [project, repo];
+      for (const root of roots) {
+        const found = await surfacesUnder(root, base);
+        if (found.length === 0) continue;
+        for (const s of found) if (!isNamed(mapText, s.name)) uncovered.push(s);
+        break; // The first root that has the code is the one it lives in.
+      }
+    }
   }
 
-  return { rel, rowCount, solutions: solutions.length, errors, warnings };
+  return { rel, rowCount, solutions: solutions.length, errors, warnings, uncovered };
 }
 
 /** Every code map in the repository, when none is named. */
@@ -268,12 +363,49 @@ if (maps.length === 0) {
 
 let failed = false;
 for (const map of maps) {
-  const { rel, rowCount, solutions, errors, warnings } = await lint(map);
+  const { rel, rowCount, solutions, errors, warnings, uncovered } = await lint(map);
   console.log(`\n${rel} — ${rowCount} rows, ${solutions} solution(s)`);
   for (const w of warnings) console.log(`  warn   ${w}`);
   for (const e of errors) console.log(`  ERROR  ${e}`);
-  if (errors.length === 0 && warnings.length === 0) console.log("  clean");
-  else console.log(`  ${errors.length} error(s), ${warnings.length} warning(s)`);
+
+  if (uncovered.length > 0) {
+    // Grouped and counted rather than listed in full: two hundred lines of
+    // "no row for X" is a wall nobody reads, and the number is the part that
+    // has to move. The first few name themselves so there is somewhere to start.
+    const byKind = new Map();
+    for (const s of uncovered) byKind.set(s.what, [...(byKind.get(s.what) ?? []), s]);
+    const over = uncovered.length > UNCOVERED_CEILING;
+    console.log(
+      `  ${over ? "ERROR " : "warn  "} ${uncovered.length} surface(s) have no row ` +
+        `(ceiling ${UNCOVERED_CEILING}) — the map cannot be scanned for what it does not mention`,
+    );
+    for (const [what, items] of byKind) {
+      console.log(
+        `           ${items.length} ${what}(s), e.g. ${items
+          .slice(0, 3)
+          .map((s) => `${s.name} (${s.file})`)
+          .join(", ")}`,
+      );
+    }
+    if (over) {
+      console.log(
+        `           This went UP. Add a row for what you built, or say why it is not a surface.`,
+      );
+      failed = true;
+    } else if (uncovered.length < UNCOVERED_CEILING) {
+      console.log(
+        `           Below the ceiling by ${UNCOVERED_CEILING - uncovered.length} — ` +
+          `lower UNCOVERED_CEILING in tools/code-map-lint.mjs to lock the gain in.`,
+      );
+    }
+  }
+
+  if (errors.length === 0 && warnings.length === 0 && uncovered.length === 0) console.log("  clean");
+  else
+    console.log(
+      `  ${errors.length} error(s), ${warnings.length} warning(s)` +
+        (uncovered.length > 0 ? `, ${uncovered.length} surface(s) with no row` : ""),
+    );
   if (errors.length > 0) failed = true;
 }
 
