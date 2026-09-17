@@ -204,9 +204,23 @@ async function main() {
   await fs.rm(out, { recursive: true, force: true });
   await fs.mkdir(path.join(out, "docs"), { recursive: true });
 
-  const briefFiles = (await fs.readdir(path.join(repo, BRIEFS_DIR)))
+  // A `drafted` brief is the AI's draft that no person has accepted yet, and
+  // `/translate` refuses it for exactly that reason. Publishing one puts an
+  // unreviewed answer on the public docs site in the same styling as the briefs
+  // people actually wrote, where nothing marks it as a draft — the framework
+  // advertising the failure it exists to prevent.
+  //
+  // Excluded here rather than hidden from the sidebar: a page dropped from the
+  // nav is still served at its URL, still in the sitemap, and still indexable.
+  // Not building it is the only thing that actually unpublishes it.
+  const briefFiles = [];
+  for (const f of (await fs.readdir(path.join(repo, BRIEFS_DIR)))
     .filter((f) => f.endsWith(".md"))
-    .sort();
+    .sort()) {
+    const raw = await fs.readFile(path.join(repo, BRIEFS_DIR, f), "utf8");
+    if (frontMatter(raw).fields.status === "drafted") continue;
+    briefFiles.push(f);
+  }
 
   const all = [
     ...DOCS.map((d) => ({ ...d, from: "." })),
