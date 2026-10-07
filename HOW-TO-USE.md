@@ -1,7 +1,7 @@
 # How to Use CooperativeAICoding
 
 A practical, start-to-finish guide. The idea: **you** describe what you want in
-plain English; **Claude** translates that into structured specs and builds from
+plain English; **the AI** translates that into structured specs and builds from
 them — making the smallest change each time, and writing down anything it can't do.
 
 For the framework's reasoning, see the [main README](README.md). For the folder
@@ -10,6 +10,13 @@ layout, see [`template/README.md`](template/README.md). This file is just *how t
 Nothing here needs the desktop app, or any download: the framework is this
 repository's `template/` folder plus Claude Code, on any operating system. If
 you do want the app — or you build on Linux — that is [`INSTALL.md`](INSTALL.md).
+
+**Not using Claude Code?** The steps below are written as Claude Code slash
+commands, but each command is a plain Markdown file in
+[`.claude/commands/`](.claude/commands/). Any coding agent can follow one if you
+tell it to read the file ("read `.claude/commands/build.md` and build this
+spec"). `/emit-guardrails` writes the project's rules into the file your agent
+reads, such as `AGENTS.md`. See [`template/ai-only/README.md`](template/ai-only/README.md).
 
 ---
 
@@ -29,8 +36,9 @@ Forms come in two shapes, matched to their content. Prose briefs (the project
 brief and page briefs) are **Markdown**: write your plain-English answer under
 each question heading — lines starting with `>` are guidance, everything else is
 yours. Record-style forms (endpoints, database models, solution specs) are
-**JSON**: fill in the `answer` fields and entry lists. Everything Claude
-generates lands in your project's `claude-only/` folder, mirroring your folders.
+**JSON**: fill in the `answer` fields and entry lists. Everything the AI
+generates lands in your project's `ai-only/` folder, the AI's workspace,
+mirroring your folders.
 
 ---
 
@@ -42,7 +50,7 @@ generates lands in your project's `claude-only/` folder, mirroring your folders.
    npx github:PeterPartridge/CooperativeAICoding init
    ```
 
-   It writes `Project_brief.md`, `_forms/`, `claude-only/`, the `.claude/`
+   It writes `Project_brief.md`, `_forms/`, `ai-only/`, the `.claude/`
    commands and `tools/` into the folder you run it in, and writes over nothing.
    Skip this inside the framework's own repository, where `template/` already is
    the blank copy.
@@ -53,7 +61,7 @@ generates lands in your project's `claude-only/` folder, mirroring your folders.
    guidance and examples). Set `status: filled` at the top when you're done. This
    is the whole-project "why," the tech direction, the house rules, security, and
    your model/effort tiers — plus **where each solution's code lives** (repo and
-   local path), so Claude can build across multiple repositories.
+   local path), so the AI can build across multiple repositories.
 
 2. **Translate it.** Run:
 
@@ -62,8 +70,8 @@ generates lands in your project's `claude-only/` folder, mirroring your folders.
    ```
 
    Claude produces a **System Spec**, a compact **Project Digest**, and a
-   **Project Skills** list, and saves them to `<projectRoot>/claude-only/Project_system.md`
-   (e.g. `application/claude-only/Project_system.md`).
+   **Project Skills** list, and saves them to `<projectRoot>/ai-only/Project_system.md`
+   (e.g. `application/ai-only/Project_system.md`).
 
 3. **Read it back.** Check nothing was invented or misunderstood. If the skills
    list looks surprisingly long, that's a signal the project is too big — split it.
@@ -106,8 +114,8 @@ endpoints and models, and every step below is identical for them.
 
    Claude reads only the **Project Digest** (not the whole project spec — that keeps
    it token-efficient), then produces a **Page Spec**, **Page Skills**, and a short
-   **PLAN**, saved to the mirrored path in the project's own `claude-only/`
-   folder, e.g. `example/claude-only/ClothingWebsite/userLogin.md`.
+   **PLAN**, saved to the mirrored path in the project's own `ai-only/`
+   folder, e.g. `example/ai-only/ClothingWebsite/userLogin.md`.
 
 4. **Approve the plan.** Read it back and approve, or correct it in plain English.
 
@@ -118,7 +126,7 @@ endpoints and models, and every step below is identical for them.
 Once a spec is approved:
 
 ```
-/build application/claude-only/CoperativeAI/workspaceShell.md
+/build application/ai-only/CoperativeAI/workspaceShell.md
 ```
 
 Claude will:
@@ -130,7 +138,7 @@ Claude will:
    code map instead of rebuilding them, and wait for your go-ahead.
 2. **Execute** — smallest change first, treating existing code as production.
 3. **Report back** — record what it did and the tests it created in the spec, and
-   update `claude-only/Code_map.md`: every method it created or changed, one line
+   update `ai-only/Code_map.md`: every method it created or changed, one line
    on what it does, and which other files/methods it uses.
 4. **Declare debt** — list anything unfinished or any technical debt, instead of
    thrashing on it.
@@ -151,7 +159,7 @@ and `/build` again. Keep each change small.
 | Command | What it does |
 |---------|--------------|
 | `/draft [folder]` | **Existing codebase?** Fill the project brief in from the code — every answer marked with where it came from and how sure it is, and at most five multiple-choice questions at the end. Saved as `status: drafted`; you accept it by reading it and setting `filled`. |
-| `/translate <brief>` | Turn a filled-in brief (project or item) into a structured spec + skills under `claude-only/`. |
+| `/translate <brief>` | Turn a filled-in brief (project or item) into a structured spec + skills under `ai-only/`. |
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |
 | `/pipeline <solution>` | Create the solution's CI/CD pipeline and missing infrastructure from its spec's `infrastructure` block. Secrets are referenced by name only — never written into code. |
@@ -182,7 +190,7 @@ a fail rather than asking whether the output looked plausible.
 
 - Build the **smallest thing** that answers the request — no surprise extras.
 - Treat anything already built as **working in production**; don't break it.
-- If Claude can't finish something, it **says so and writes it down** — no endless retrying.
+- If the AI can't finish something, it **says so and writes it down** — no endless retrying.
 - **A person reviews and approves** every plan before anything is built.
 - **Secret values never go into code** — settings are referenced by name; values live in secret stores you control.
 - **Infrastructure and pipelines are their own approved plans** — never a side effect of building a feature.

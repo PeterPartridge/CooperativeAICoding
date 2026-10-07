@@ -1,8 +1,8 @@
-# Claude System Spec — <Project Name>
+# AI System Spec — <Project Name>
 
-> **What this is:** the structured version of your brief that the AI re-reads every time it builds. You don't write this from scratch — Claude produces it from your plain brief using [`1-translate-to-claude.md`](1-translate-to-claude.md). This file just shows the shape it should come back in, so every project looks the same.
+> **What this is:** the structured version of your brief that the AI re-reads every time it builds. You don't write this from scratch. The AI produces it from your plain brief using [`1-translate-for-ai.md`](1-translate-for-ai.md). This file just shows the shape it should come back in, so every project looks the same.
 >
-> **Where it's saved:** Claude mirrors the human folder layout. The project-level spec is saved as `Project_system.md` here in `claude-only/`; each page spec is saved at `claude-only/<solution>/<page>.md` to match the human `<solution>/<page>.json`.
+> **Where it's saved:** in the AI workspace, `ai-only/`, mirroring the human folder layout. The project-level spec is saved as `ai-only/Project_system.md`; each item spec is saved at `ai-only/<solution>/<item>.md` to match the human `<solution>/<item>.md` or `<solution>/<item>.json`.
 >
 > Read it back against your brief to make sure nothing was changed or invented.
 
@@ -50,6 +50,11 @@
 |------|-------------------------------|
 | <...> | <...> |
 
+**Testing floor**
+> The cover expected of every change, and what the project has said is not worth testing. A change that cannot reach it records that as debt rather than lowering it.
+
+<...>
+
 **Access & security**
 
 <...>
@@ -63,9 +68,9 @@
 
 | Model tier | Example | When to use it |
 |------------|---------|----------------|
-| Cheapest / fastest | Claude Haiku | <...> |
-| Mid-range | Claude Sonnet | <...> |
-| Most capable | Claude Opus | <...> |
+| Cheapest / fastest | <e.g. Claude Haiku, or your provider's smallest model> | <...> |
+| Mid-range | <e.g. Claude Sonnet, or your provider's middle tier> | <...> |
+| Most capable | <e.g. Claude Opus, or your provider's largest model> | <...> |
 
 | Effort level | When to use it |
 |--------------|----------------|
@@ -108,7 +113,7 @@
 
 ## Per-Page Specs
 
-> One block per page, produced from each Page Brief. Page skills build on the project skills above — they don't repeat them.
+> The shape of each item spec (page, endpoint or model), produced from its brief. Each one is saved in its own file at `ai-only/<solution>/<item>.md`, not in this one. Item skills build on the project skills above; they don't repeat them. Each build round later appends its report (what was done, the tests, the debt) to the end of that file.
 
 ### Page — <Page Name>
 
@@ -117,7 +122,7 @@
 <...>
 
 **Model & effort** _(default for this page; override per change)_
-> e.g. "Claude Sonnet, medium effort."
+> e.g. "mid-range tier, medium effort."
 
 <...>
 

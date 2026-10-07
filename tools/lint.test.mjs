@@ -120,12 +120,12 @@ for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
   test(`code-map-lint passes a row that is true (${name})`, async () => {
     const root = await project(
       {
-        "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+        "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
         "code/src/cart.js": "export function addItem() {}\n",
       },
       eol,
     );
-    const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+    const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
     assert.equal(code, 0, out);
     assert.match(out, /clean/);
   });
@@ -133,12 +133,12 @@ for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
   test(`code-map-lint catches a file that has moved (${name})`, async () => {
     const root = await project(
       {
-        "claude-only/Code_map.md": codeMap("| `addItem` | src/gone.js | Adds one item to the basket | nothing |"),
+        "ai-only/Code_map.md": codeMap("| `addItem` | src/gone.js | Adds one item to the basket | nothing |"),
         "code/src/cart.js": "export function addItem() {}\n",
       },
       eol,
     );
-    const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+    const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
     assert.equal(code, 1);
     assert.match(out, /file not found: src\/gone\.js/);
   });
@@ -146,12 +146,12 @@ for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
   test(`code-map-lint catches a method that no longer exists (${name})`, async () => {
     const root = await project(
       {
-        "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+        "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
         "code/src/cart.js": "export function removeItem() {}\n",
       },
       eol,
     );
-    const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+    const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
     assert.equal(code, 1);
     assert.match(out, /"addItem" is not in/);
   });
@@ -160,10 +160,10 @@ for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
 test("code-map-lint catches a summary that has grown past one line", async () => {
   const sprawl = "Adds one item to the basket, and " + "then does something else that matters ".repeat(6);
   const root = await project({
-    "claude-only/Code_map.md": codeMap(`| \`addItem\` | src/cart.js | ${sprawl} | nothing |`),
+    "ai-only/Code_map.md": codeMap(`| \`addItem\` | src/cart.js | ${sprawl} | nothing |`),
     "code/src/cart.js": "export function addItem() {}\n",
   });
-  const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
   assert.equal(code, 1);
   assert.match(out, /first sentence is \d+ chars/);
 });
@@ -176,34 +176,34 @@ const TAURI_CMD = "#[tauri::command]\npub async fn list_orders() -> Vec<String> 
 
 test("code-map-lint reports a command that no row mentions", async () => {
   const root = await project({
-    "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
     "code/src/cart.js": "export function addItem() {}\n",
     "code/src-tauri/src/commands/orders.rs": TAURI_CMD,
   });
-  const { out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  const { out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
   assert.match(out, /1 surface\(s\) have no row/);
   assert.match(out, /1 Tauri command\(s\), e\.g\. list_orders/);
 });
 
 test("code-map-lint counts a command named anywhere in the map as covered", async () => {
   const root = await project({
-    "claude-only/Code_map.md": codeMap(
+    "ai-only/Code_map.md": codeMap(
       "| `list_orders` | src-tauri/src/commands/orders.rs | Lists the orders | nothing |",
     ),
     "code/src-tauri/src/commands/orders.rs": TAURI_CMD,
   });
-  const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
   assert.equal(code, 0, out);
   assert.match(out, /clean/);
 });
 
 test("code-map-lint reports a table that no row mentions", async () => {
   const root = await project({
-    "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
     "code/src/cart.js": "export function addItem() {}\n",
     "code/src-tauri/src/db/order.rs": 'conn.execute("CREATE TABLE IF NOT EXISTS orders (id INTEGER)", ())',
   });
-  const { out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  const { out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
   assert.match(out, /1 database table\(s\), e\.g\. orders/);
 });
 
@@ -213,10 +213,10 @@ test("code-map-lint reports a table that no row mentions", async () => {
 // every Go and Python project that installed the framework.
 test("code-map-lint leaves a project with no such surfaces alone", async () => {
   const root = await project({
-    "claude-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
     "code/src/cart.js": "export function addItem() {}\n",
   });
-  const { code, out } = run("code-map-lint.mjs", [path.join(root, "claude-only/Code_map.md")]);
+  const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
   assert.equal(code, 0, out);
   assert.match(out, /clean/);
   assert.doesNotMatch(out, /surface/);

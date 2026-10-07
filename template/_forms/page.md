@@ -15,7 +15,7 @@ status: blank            # blank | drafted | filled | approved | built
 >
 > **`deliverable`** is which of the Project Brief's deliverables this page works towards. It is not decoration: builds say which deliverable each change advances, and when the last item for a deliverable is built the work stops there for people to evaluate direction. An item that serves no named deliverable is a question worth asking out loud.
 >
-> **How:** answer each question in plain English directly under its heading, same as the Project Brief. Lines starting with `>` are guidance — anything else you write under a heading is your answer. When you're done, set `status: filled` and hand it to Claude using the bridge in [`claude-only/1-translate-to-claude.md`](../claude-only/1-translate-to-claude.md).
+> **How:** answer each question in plain English directly under its heading, same as the Project Brief. Lines starting with `>` are guidance — anything else you write under a heading is your answer. When you're done, set `status: filled` and hand it to your AI using the bridge in [`ai-only/1-translate-for-ai.md`](../ai-only/1-translate-for-ai.md).
 
 ---
 

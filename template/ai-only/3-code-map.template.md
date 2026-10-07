@@ -4,7 +4,7 @@
 >
 > **Why it exists:** before writing any new code, the AI checks this map for a method that already does the job (or nearly does) and **reuses it instead of rebuilding it** — that's the DRY house rule and the token-saving rule in one place. It's also how a developer new to the project sees, at a glance, what exists and what depends on what.
 >
-> **Where it's saved:** `claude-only/Code_map.md` — one file for the whole project, with one section per solution. `/build` updates it in the **Report back** step every time it creates, renames, or removes a method, and reads it in the **Plan** step.
+> **Where it's saved:** `ai-only/Code_map.md`. It is one file for the whole project, with one section per solution. It is a supporting index inside the AI workspace, not the workspace itself: the specs beside it are what the AI builds from (see [`README.md`](README.md)). `/build` updates it in the **Report back** step every time it creates, renames, or removes a method, and reads it in the **Plan** step.
 >
 > **Keeping it honest:** if a method changes so the row is wrong, the same build that changed it fixes the row. Rows are never left stale — an out-of-date map is worse than none. If the project adopts an existing codebase, the map starts empty and grows as builds touch existing methods — add a row for any existing method a build calls or changes, so the map converges on the code that actually matters.
 >
@@ -22,7 +22,7 @@ The map is the one document whose value dies the moment it stops being true, so 
 node tools/code-map-lint.mjs
 ```
 
-It reads every `claude-only/Code_map.md` and reports, with a `file:line` for each:
+It reads every `ai-only/Code_map.md` and reports, with a `file:line` for each:
 
 | Checked | Why it fails the build |
 |---|---|

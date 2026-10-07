@@ -1,12 +1,12 @@
 ---
 name: translate-brief
-description: Translate a filled-in CooperativeAICoding brief (Markdown Project_brief.md or page brief, or a JSON endpoint/database-model/solution-spec form) into a structured Claude System Spec, a reusable Project Digest, and a Skills List, then save it under the project root's claude-only/ folder mirroring the human folder layout. Use whenever the user hands over or points at a filled-in CooperativeAICoding form and wants it turned into instructions Claude can build from.
+description: Translate a filled-in CooperativeAICoding brief (Markdown Project_brief.md or page brief, or a JSON endpoint/database-model/solution-spec form) into a structured AI System Spec, a reusable Project Digest, and a Skills List, then save it in the project root's AI workspace (ai-only/) mirroring the human folder layout. Use whenever the user hands over or points at a filled-in CooperativeAICoding form and wants it turned into instructions an AI can build from.
 ---
 
 # Translate a CooperativeAICoding brief
 
 This skill automates the bridge that previously required pasting Prompt A / Prompt B
-by hand from [`template/claude-only/1-translate-to-claude.md`](../../../template/claude-only/1-translate-to-claude.md).
+by hand from [`template/ai-only/1-translate-for-ai.md`](../../../template/ai-only/1-translate-for-ai.md).
 It turns a plain-English brief into the structured spec the AI builds from, while
 staying token-efficient (no re-sending the whole project spec for every page).
 
@@ -25,12 +25,12 @@ requirement, silently.
 contains `Project_brief.md` (walk up from the argument). `template/`, `application/`,
 and `example/` each qualify. All project-relative paths resolve from there:
 - Solution specs: `<projectRoot>/<solution>/application-spec.json`
-- Claude outputs: `<projectRoot>/claude-only/Project_system.md`,
-  `<projectRoot>/claude-only/Code_map.md`, `<projectRoot>/claude-only/<solution>/<item>.md`
+- AI workspace outputs: `<projectRoot>/ai-only/Project_system.md`,
+  `<projectRoot>/ai-only/Code_map.md`, `<projectRoot>/ai-only/<solution>/<item>.md`
 
 **Framework assets always stay at the repo's `template/`** (they are the framework,
 not the project): the project's `_forms/*` (blank forms, `boilerplates.json`; `template/_forms/` inside this repository) and
-`template/claude-only/1-translate-to-claude.md`, `2-claude-system.template.md`,
+`template/ai-only/1-translate-for-ai.md`, `2-ai-system.template.md`,
 `3-code-map.template.md`.
 
 If no ancestor has a `Project_brief.md`, or no path was given, ask once which
@@ -67,22 +67,22 @@ the blank forms in `_forms/` (`status: blank`, or all answers empty).
 
 ### A. Translating a Project Brief
 
-1. Read the brief. Read [`template/claude-only/2-claude-system.template.md`](../../../template/claude-only/2-claude-system.template.md) for the exact output shape.
+1. Read the brief. Read [`template/ai-only/2-ai-system.template.md`](../../../template/ai-only/2-ai-system.template.md) for the exact output shape.
 2. Produce, in this order:
-   - **System Spec** — the labelled headings from the template (Purpose, Users, Platforms & tech constraints, Solutions & repositories, Infrastructure & environments, Coding house rules, Access & security, Look & feel, Model & effort selection, Open Questions). Solutions & repositories is the table of where each solution's code lives (repo + local path) from the brief's `solutions` answer; Infrastructure & environments comes from the `environments` and `infrastructure-policy` answers (who provisions, tool, deploy permissions, where secrets live — never values). Missing locations or policy → Open Questions.
-   - **Project Digest** — a compact ≤12-line constraints block (platform/tech, solutions & repo locations, infra policy & environments, house-rule names, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.
+   - **System Spec** — the labelled headings from the template (Purpose, Users, Deliverables, Platforms & tech constraints, Solutions & repositories, Infrastructure & environments, Coding house rules, Testing floor, Access & security, Look & feel, Model & effort selection, Open Questions). Solutions & repositories is the table of where each solution's code lives (repo + local path) from the brief's `solutions` answer; Infrastructure & environments comes from the `environments` and `infrastructure-policy` answers (who provisions, tool, deploy permissions, where secrets live — never values). Missing locations or policy → Open Questions.
+   - **Project Digest** — a compact ≤12-line constraints block (platform/tech, solutions & repo locations, infra policy & environments, house-rule names, testing floor, deliverables in order, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.
    - **Project Skills** — table: `Skill | Why it's needed | How you'll use it | Tools/approach`. Keep it to what the brief justifies; if it grows long, flag that the project may need splitting.
-3. Save to `<projectRoot>/claude-only/Project_system.md`.
+3. Save to `<projectRoot>/ai-only/Project_system.md`.
 
 ### B. Translating a Page / endpoint / database-model brief
 
-1. **Get project constraints cheaply.** Read `<projectRoot>/claude-only/Project_system.md` and use *only* its **Project Digest** section. Do not load the whole spec unless a specific page decision needs detail the digest doesn't cover. If `Project_system.md` doesn't exist yet, translate the Project Brief first (procedure A).
+1. **Get project constraints cheaply.** Read `<projectRoot>/ai-only/Project_system.md` and use *only* its **Project Digest** section. Do not load the whole spec unless a specific page decision needs detail the digest doesn't cover. If `Project_system.md` doesn't exist yet, translate the Project Brief first (procedure A).
 2. Read the page brief.
 3. Produce:
    - **Page Spec** — Page objective, Model & effort, **Deliverable** (the item's `deliverable` field — it must name one of the deliverables the Project Brief lists; if it names something else, say so instead of translating it through, because a deliverable nothing is aimed at never completes and `/build` never reaches its stopping point), Depends on (the briefs listed in `depends-on`/`dependsOn` that must be built first), Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
    - **Page Skills** — table building on the project skills (don't repeat them); flag any skill new for this page.
    - **PLAN** — one-paragraph summary + bullet changes + an honest note of expected technical debt.
-4. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/claude-only/<solution>/<item>.md` (e.g. `application/CoperativeAIdb/WorkItem-model.json` → `application/claude-only/CoperativeAIdb/WorkItem-model.md`).
+4. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/ai-only/<solution>/<item>.md` (e.g. `application/CoperativeAIdb/WorkItem-model.json` → `application/ai-only/CoperativeAIdb/WorkItem-model.md`).
 
 ## After translating
 

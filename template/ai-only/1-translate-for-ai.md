@@ -1,6 +1,6 @@
-# Translate Your Brief Into Something Claude Can Build From
+# Translate Your Brief Into Something the AI Can Build From
 
-> **Why this step exists.** People write best in plain language, and the forms keep it that way — prose briefs are Markdown where you answer under question headings, and record-style forms are JSON where you fill in `answer` fields. AI models like **Claude Opus** and **Claude Sonnet** follow instructions most reliably when those same facts are laid out in a clear, labelled structure — a "system spec." This step is the bridge: you hand your filled-in brief to Claude, and Claude rewrites it into that structure **and works out the skills it will need.** You stay in plain English; Claude does the translating.
+> **Why this step exists.** People write best in plain language, and the forms keep it that way — prose briefs are Markdown where you answer under question headings, and record-style forms are JSON where you fill in `answer` fields. AI models (Claude, GPT, Gemini, or one you run locally) follow instructions most reliably when those same facts are laid out in a clear, labelled structure: a "system spec." This step is the bridge. You hand your filled-in brief to the AI, and it rewrites the brief into that structure **and works out the skills it will need.** You stay in plain English; the AI does the translating.
 >
 > You do **not** need to understand the structure yourself. You just check that the result matches what you meant.
 
@@ -8,9 +8,9 @@
 
 ## What you'll get back
 
-When you run the translation, Claude produces three things (the Project Brief gets all three; a Page Brief gets the spec and skills):
+When you run the translation, the AI produces three things (the Project Brief gets all three; a Page Brief gets the spec and skills):
 
-1. **A System Spec** — your brief, reorganised into clear labelled sections (who it's for, the rules, the constraints, the design). This is what the AI re-reads every time it builds. The blank shape of it lives in **[`2-claude-system.template.md`](2-claude-system.template.md)** so the output always looks the same.
+1. **A System Spec** — your brief, reorganised into clear labelled sections (who it's for, the rules, the constraints, the design). This is what the AI re-reads every time it builds. The blank shape of it lives in **[`2-ai-system.template.md`](2-ai-system.template.md)** so the output always looks the same.
 
 2. **A Project Digest** — a short (~12-line) constraints block extracted from the spec. Page translations reuse *this* instead of the whole project spec, so you don't re-send the full document for every page. Only produced at the project level.
 
@@ -30,17 +30,19 @@ The AI defines skills at **two levels**: skills for the **whole project** (fille
 
 ## How to run it
 
-1. Open Claude (Opus or Sonnet).
+**With Claude Code**, `/translate <path to the brief>` runs this for you and saves the result. **With another coding agent**, tell it to read `.claude/commands/translate.md` and translate the brief. **With any chat model**, do it by hand:
+
+1. Open a capable model. The project's most capable or mid-range tier is the right choice for a translation.
 2. Copy **one** of the prompts below.
 3. Paste the contents of your filled-in brief where it says `<<< PASTE … >>>`.
-4. Send it. Claude returns the System Spec and Skills List.
-5. Read it back. If anything's wrong, tell Claude in plain English ("the admin shouldn't be able to delete orders") and it will redo that part.
-6. Save the result inside `claude-only/`, **mirroring the human folder layout**:
-   - the Project Brief → `claude-only/Project_system.md`
-   - a page like `ClothingWebsite/userLogin.md` → `claude-only/ClothingWebsite/userLogin.md`
-   - a resource like `ClothingAPI/Login.json` → `claude-only/ClothingAPI/Login.md`
+4. Send it. The model returns the System Spec and Skills List.
+5. Read it back. If anything's wrong, say so in plain English ("the admin shouldn't be able to delete orders") and it will redo that part.
+6. Save the result in the project's AI workspace, `ai-only/`, **mirroring the human folder layout**:
+   - the Project Brief → `ai-only/Project_system.md`
+   - a page like `ClothingWebsite/userLogin.md` → `ai-only/ClothingWebsite/userLogin.md`
+   - a resource like `ClothingAPI/Login.json` → `ai-only/ClothingAPI/Login.md`
 
-   So for every solution folder on the human side, Claude creates a matching solution folder on its side, with one spec file per item.
+   So for every solution folder on the human side, there is a matching solution folder in `ai-only/`, with one spec file per item.
 
 ---
 
@@ -99,6 +101,7 @@ Follow these ground rules and restate them at the end under "Working Agreement":
 - Treat existing code as working in production; avoid breaking it.
 - If you can't finish something, record it as technical debt rather than retrying endlessly.
 - A person reviews and approves before anything goes live.
+- Score each change by how token-intensive it is likely to be.
 - Never write a secret value into code, config, or documents — reference secrets by name from their stores.
 - Infrastructure and pipeline changes are their own approved plans, never a side effect of a feature.
 
@@ -123,7 +126,7 @@ guidance or example text as an answer, and list unanswered questions under
 
 To stay token-efficient, you do NOT need the full project spec — only its
 Project Digest (the short constraints block). Provide it ONE of these ways:
-  - If you can read files, open `claude-only/Project_system.md` and use its
+  - If you can read files, open `ai-only/Project_system.md` and use its
     Project Digest section. Do not paste it.
   - Otherwise, paste just the Project Digest block where shown below.
 Only ask for more of the project spec if a page decision genuinely needs detail
@@ -138,6 +141,9 @@ Produce TWO sections:
 1. PAGE SPEC — reorganise the page brief into these labelled headings:
    - Page objective (the one unchanging purpose)
    - Model & effort (default model and effort level for this page, from the project's tiers)
+   - Deliverable (the item's "deliverable" field, which must be one the
+     Project Brief lists. If it names one the brief does not list, say so
+     instead of translating it through)
    - Depends on (the briefs the item's depends-on/dependsOn field lists — these
      must be built before this one)
    - Actions (what each kind of user can do)

@@ -20,8 +20,8 @@ drafted answers would make the AI's guesses binding, which is the one thing this
 framework exists to prevent.
 
 Follow the skill exactly:
-- Project Brief → produce System Spec + Project Digest + Project Skills, save to `<projectRoot>/claude-only/Project_system.md`.
-- Page/endpoint/database-model brief → read only the Project Digest from `<projectRoot>/claude-only/Project_system.md`, then produce the Page Spec + Page Skills + PLAN, and save to the mirrored path `<projectRoot>/claude-only/<solution>/<item>.md`.
+- Project Brief → produce System Spec + Project Digest + Project Skills, save to `<projectRoot>/ai-only/Project_system.md`.
+- Page/endpoint/database-model brief → read only the Project Digest from `<projectRoot>/ai-only/Project_system.md`, then produce the Page Spec + Page Skills + PLAN, and save to the mirrored path `<projectRoot>/ai-only/<solution>/<item>.md`.
 
 For an item brief, check its `deliverable` names one of the deliverables the
 Project Brief lists — `node tools/brief-lint.mjs <projectRoot>` answers this for

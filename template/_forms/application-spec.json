@@ -6,7 +6,7 @@
   "instructions": {
     "whoFillsThisIn": "Developers (Product weighs in on look & feel / user interface for website and application solutions).",
     "when": "Once per solution. This file sits at the root of the solution's folder and defines how the whole solution is built. Each item (page, endpoint, or database-model) is a separate file in the same folder.",
-    "how": "Set solutionType first: website | api | database | application. It tells you which of the fields below apply — each one that isn't relevant to your type says so in its guidance; leave those blank. Answer the rest in plain English, then hand it to Claude using the bridge in claude-only/1-translate-to-claude.md.",
+    "how": "Set solutionType first: website | api | database | application. It tells you which of the fields below apply — each one that isn't relevant to your type says so in its guidance; leave those blank. Answer the rest in plain English, then hand it to your AI using the bridge in ai-only/1-translate-for-ai.md.",
     "note": "Solution = the folder this file sits in. One form now covers every solution type, replacing what used to be separate Website-spec.json / API-spec.json / Database-spec.json / Application-spec.json files — every solution folder's spec is named application-spec.json, whatever its solutionType."
   },
   "core": {

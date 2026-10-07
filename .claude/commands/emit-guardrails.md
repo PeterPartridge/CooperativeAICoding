@@ -13,7 +13,7 @@ file-scoped rules a single root file cannot express.
 
 Hold to these:
 
-1. **Generate from `<projectRoot>/claude-only/Project_system.md`** — the Project
+1. **Generate from `<projectRoot>/ai-only/Project_system.md`** — the Project
    Digest is the compact form this needs. Never invent a rule that is not in the
    spec, and never drop a house rule's project-specific definition: the name
    alone is decoration.

@@ -16,7 +16,7 @@
 // would make a passing run mean more than it does.
 //
 // Usage:
-//   node tools/code-map-lint.mjs                  # every claude-only/Code_map.md
+//   node tools/code-map-lint.mjs                  # every ai-only/Code_map.md
 //   node tools/code-map-lint.mjs <path…>          # just these
 //
 // Exit code 1 on an error. Warnings are printed and do not fail the run.
@@ -236,13 +236,13 @@ async function parse(file) {
 
 async function lint(file) {
   // **Where a row's paths are resolved from.** A map lives at
-  // `<project>/claude-only/Code_map.md`, so the project is two levels up —
+  // `<project>/ai-only/Code_map.md`, so the project is two levels up —
   // and that is what a row's local path is relative to. The repository this
   // script sits in is tried as well, because a project inside a larger
   // repository (this one) writes local paths from the repository root. Both
   // are cheap to try and getting it wrong reports a file that is really there.
   const holder = path.dirname(file);
-  const project = path.basename(holder) === "claude-only" ? path.dirname(holder) : repo;
+  const project = path.basename(holder) === "ai-only" ? path.dirname(holder) : repo;
   const errors = [];
   const warnings = [];
   const rel = path.relative(repo, file).split(path.sep).join("/");
