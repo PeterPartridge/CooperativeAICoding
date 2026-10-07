@@ -35,6 +35,12 @@ const LAYOUT = [
   { from: "template/Project_brief.md", to: "Project_brief.md" },
   { from: "template/_forms", to: "_forms" },
   { from: "template/ai-only", to: "ai-only" },
+  // The guardrails any agent reads, before one has been generated from the
+  // brief. It carries the procedures and the working agreement, which are true
+  // on day one, and marks the rules sections as not yet filled in rather than
+  // inventing them. Written with the generated-file header so /emit-guardrails
+  // replaces it once there is a spec to generate from.
+  { from: "template/AGENTS.template.md", to: "AGENTS.md" },
   { from: ".claude/commands", to: ".claude/commands" },
   { from: ".claude/skills", to: ".claude/skills" },
   // All three checks, so a project can run them on its own briefs, code map and
