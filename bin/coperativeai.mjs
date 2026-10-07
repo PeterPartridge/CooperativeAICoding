@@ -34,7 +34,7 @@ const framework = path.resolve(here, "..");
 const LAYOUT = [
   { from: "template/Project_brief.md", to: "Project_brief.md" },
   { from: "template/_forms", to: "_forms" },
-  { from: "template/claude-only", to: "claude-only" },
+  { from: "template/ai-only", to: "ai-only" },
   { from: ".claude/commands", to: ".claude/commands" },
   { from: ".claude/skills", to: ".claude/skills" },
   // The two checks, so a project can run them on its own briefs and code map

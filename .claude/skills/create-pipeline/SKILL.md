@@ -43,7 +43,7 @@ approved plan, separate from feature building.
    pipeline) and `scaffold` block (commands — resolve a named boilerplate from
    the project's `_forms/boilerplates.json` (`template/_forms/` inside this repository), a framework asset that always lives at
    the repo's `template/`). Get the repo location from the Project
-   Digest's Solutions & repos line (`<projectRoot>/claude-only/Project_system.md`).
+   Digest's Solutions & repos line (`<projectRoot>/ai-only/Project_system.md`).
 2. **Plan** — and wait for approval. State:
    - Resources to create (`existsAlready: false`), with the provisioning tool the
      spec names, and which are left to a person.
@@ -61,5 +61,5 @@ approved plan, separate from feature building.
 5. **Report back & declare debt** — append to the solution spec what was created,
    the named secrets/settings a person still has to supply, and any technical debt.
    Add a row per resource to the solution's section of
-   `<projectRoot>/claude-only/Code_map.md` notes if useful — but never row-by-row
+   `<projectRoot>/ai-only/Code_map.md` notes if useful — but never row-by-row
    pipeline internals.

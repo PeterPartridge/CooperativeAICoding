@@ -126,7 +126,7 @@ test("coperativeai init puts every command and skill into a new project", async 
       `the ${dir} skill did not travel`,
     );
   }
-  for (const needed of ["Project_brief.md", "_forms/page.md", "_forms/endpoint.json", "claude-only/1-translate-to-claude.md", "tools/brief-lint.mjs"]) {
+  for (const needed of ["Project_brief.md", "_forms/page.md", "_forms/endpoint.json", "ai-only/1-translate-for-ai.md", "tools/brief-lint.mjs"]) {
     assert.ok(
       await fs.stat(path.join(target, needed)).then(() => true, () => false),
       `${needed} is missing from a fresh project`,

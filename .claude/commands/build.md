@@ -1,11 +1,11 @@
 ---
 description: Build the next iteration of an approved spec — smallest change first — then report back and log debt.
-argument-hint: [path to an approved spec in a project's claude-only/, e.g. application/claude-only/CoperativeAIdb/SolutionManagement-model.md]
+argument-hint: [path to an approved spec in a project's ai-only/, e.g. application/ai-only/CoperativeAIdb/SolutionManagement-model.md]
 ---
 
 Build from the approved spec at: $ARGUMENTS
 If no path was given, ask which spec to build (or list specs under
-`<projectRoot>/claude-only/` for each project root — a folder whose root
+`<projectRoot>/ai-only/` for each project root — a folder whose root
 contains `Project_brief.md`, e.g. `template/`, `application/`, `example/`).
 
 Derive `<projectRoot>` by walking up from the spec path to the nearest folder
@@ -40,7 +40,7 @@ Workflow:
    block and no boilerplate fits, stop and ask.
 1. **Plan** — restate a one-paragraph summary plus bullet-point changes (one per use case).
    Look up the solution's repo and local path in the Project Digest's **Solutions &
-   repos** line (`<projectRoot>/claude-only/Project_system.md`) — that is where the code
+   repos** line (`<projectRoot>/ai-only/Project_system.md`) — that is where the code
    gets built, which may be a different repository from this one; name it in the
    plan, and stop and ask if the location is missing or not checked out. Read the
    solution's spec (`<projectRoot>/<solution>/application-spec.json`) in full — its
@@ -54,7 +54,7 @@ Workflow:
    the plan and ask rather than picking one; if it names one the brief does not
    list, stop — `node tools/brief-lint.mjs <projectRoot>` says which items are
    wrong, and a build aimed at a deliverable that does not exist can never reach
-   the stopping point in step 5. Check `<projectRoot>/claude-only/Code_map.md` (if it exists):
+   the stopping point in step 5. Check `<projectRoot>/ai-only/Code_map.md` (if it exists):
    reuse an existing method
    wherever one already does the job — say so in the plan — instead of writing a
    new one. Wait for my approval before editing code.
@@ -67,8 +67,8 @@ Workflow:
 3. **Report back** — run the solution's `test` (and `build`) commands from its
    scaffold block and include the results; then append to the spec what you did,
    how each use case was implemented, and the test scenarios you created. Then
-   update `<projectRoot>/claude-only/Code_map.md`
-   (create it from `template/claude-only/3-code-map.template.md` if it doesn't exist):
+   update `<projectRoot>/ai-only/Code_map.md`
+   (create it from `template/ai-only/3-code-map.template.md` if it doesn't exist):
    one row per method you created or changed — the method, its file, one line on what
    it does, and which other files/methods it uses. Fix any rows your changes made stale.
    Then run `node tools/code-map-lint.mjs` and fix what it reports — it checks the

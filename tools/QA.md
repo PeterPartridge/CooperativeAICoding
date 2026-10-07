@@ -80,13 +80,13 @@ With the brief still `drafted`:
 ```
 
 **Pass:** it refuses, says how many questions are open, and offers to work
-through them. Nothing is written to `claude-only/`.
+through them. Nothing is written to `ai-only/`.
 **Fail:** it translates. A drafted answer translated is an AI guess promoted to a
 requirement, silently — this is the single most important scenario on this page.
 
 Now answer the questions, set `status: filled`, and run it again.
 
-**Pass:** `claude-only/Project_system.md` appears with a System Spec, a Project
+**Pass:** `ai-only/Project_system.md` appears with a System Spec, a Project
 Digest of about a dozen lines, and a Skills list. The digest carries the testing
 floor and the deliverables.
 **Fail:** the digest omits either — an item build reads only the digest, so a
@@ -99,7 +99,7 @@ rule missing there is a rule no build ever sees.
 Fill in and translate one item, then:
 
 ```
-/build claude-only/Shop/cart.md
+/build ai-only/Shop/cart.md
 ```
 
 **Pass:** a plan arrives **before any file is written**; it names the deliverable

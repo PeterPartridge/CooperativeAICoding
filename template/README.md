@@ -1,6 +1,6 @@
 # Template
 
-This folder is the working layout for a project built with the CooperativeAICoding framework. **People** fill in forms in plain English; **Claude** translates them into structured specs, mirroring the same folders.
+This folder is the working layout for a project built with the CooperativeAICoding framework. **People** fill in forms in plain English; **the AI** (Claude or any other model) translates them into structured specs in its own workspace, `ai-only/`, mirroring the same folders.
 
 ## Layout
 
@@ -21,13 +21,16 @@ template/
 │  ├─ application-spec.json      ← the solution's spec, whatever its solutionType
 │  └─ <item>.md|.json            ← its pages (Markdown) / endpoints / models (JSON)
 │
-└─ claude-only/                  ← Claude's side — no human input
-   ├─ 1-translate-to-claude.md   ← the bridge: turns a form into a structured spec + skills
-   ├─ 2-claude-system.template.md← the shape Claude's specs come back in
-   ├─ 3-code-map.template.md     ← the shape of the code map (below)
-   ├─ Code_map.md                ← Claude's inventory of every method it built:
-   │                               what it does + which files/methods it uses
-   └─ <solution>/<item>.md       ← Claude mirrors your solution folders here
+└─ ai-only/                      ← the AI's workspace — the AI writes, people read and approve
+   ├─ README.md                  ← what the workspace is and how any AI model works in it
+   ├─ 1-translate-for-ai.md      ← the bridge: turns a form into a structured spec + skills
+   ├─ 2-ai-system.template.md    ← the shape the AI's specs come back in
+   ├─ 3-code-map.template.md     ← the shape of the code map
+   ├─ Project_system.md          ← the project's spec, digest and skills (from Project_brief.md)
+   ├─ <solution>/<item>.md       ← one spec per item, mirroring your solution folders:
+   │                               spec, skills, plan, and a report for every build round
+   └─ Code_map.md                ← the reuse index: one row per method the AI built,
+                                   what it does + which files/methods it uses
 ```
 
 **A project is any folder laid out like this whose root holds a `Project_brief.md`** — this `template/` folder is the blank starting copy, `example/` (at the **repo root**, a sibling of `template/`) is a worked Clothing project to copy from, and `application/` (also at the repo root) is a real project: the framework speccing its own desktop app. The `/translate`, `/build`, `/new-item`, and `/pipeline` commands resolve all paths from that project root. The blank master forms and `boilerplates.json` always come from this folder's `_forms/`, whichever project you're in.
@@ -59,7 +62,7 @@ The spec's `core`, `accessAndInterface`, and `conventions` blocks hold every typ
    - API resource → `endpoint.json` → e.g. `ClothingAPI/Login.json`
    - Database table → `database-model.json` → e.g. `ClothingDatabase/UserCredentials.json`
 
-4. **Translate.** Hand any filled-in form to Claude using [`claude-only/1-translate-to-claude.md`](claude-only/1-translate-to-claude.md). Claude returns a structured spec **plus the skills it needs**, and saves it in `claude-only/` mirroring your folders — e.g. `ClothingWebsite/userLogin.md` → `claude-only/ClothingWebsite/userLogin.md`.
+4. **Translate.** Hand any filled-in form to your AI using [`ai-only/1-translate-for-ai.md`](ai-only/1-translate-for-ai.md) (in Claude Code, `/translate`). It returns a structured spec **plus the skills it needs**, saved in `ai-only/` mirroring your folders — e.g. `ClothingWebsite/userLogin.md` → `ai-only/ClothingWebsite/userLogin.md`.
 
 5. **Check and approve.** Read the spec back, fix anything in plain English, then let the AI build — smallest change first, one item at a time.
 
@@ -68,8 +71,8 @@ See [`example/`](../example/) (at the repo root) for a complete worked project y
 ## Why two sides
 
 - **You write in plain English.** Whether the form is Markdown or JSON, every answer is a plain-English sentence — no jargon, no prompt-writing. If you can explain it to a colleague, you can fill in a form.
-- **Claude translates, not you.** The bridge turns your words into the labelled structure the AI follows best, and **lists the skills** it needs — for the project and each item. A long or surprising skills list is your cue that something is too big or misunderstood.
-- **The folders mirror each other**, so every human item has exactly one matching Claude spec, organised by solution.
+- **The AI translates, not you.** The bridge turns your words into the labelled structure the AI follows best, and **lists the skills** it needs — for the project and each item. A long or surprising skills list is your cue that something is too big or misunderstood.
+- **The folders mirror each other**, so every human item has exactly one matching AI spec, organised by solution.
 
 ## Ground rules (carried through every step)
 

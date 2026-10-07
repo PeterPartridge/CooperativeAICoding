@@ -28,7 +28,7 @@ const repo = path.resolve(
   "..",
 );
 
-const SKIP = new Set(["node_modules", "target", ".git", "dist", "claude-only", "_forms", ".github"]);
+const SKIP = new Set(["node_modules", "target", ".git", "dist", "ai-only", "_forms", ".github"]);
 
 /** Reads a document with its line endings normalised.
  *
