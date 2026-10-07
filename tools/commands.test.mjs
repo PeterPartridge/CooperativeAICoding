@@ -126,7 +126,19 @@ test("coperativeai init puts every command and skill into a new project", async 
       `the ${dir} skill did not travel`,
     );
   }
-  for (const needed of ["Project_brief.md", "_forms/page.md", "_forms/endpoint.json", "ai-only/1-translate-for-ai.md", "tools/brief-lint.mjs"]) {
+  // Every check, named one by one rather than as "tools/". round-record-lint
+  // was in the published package and missing from the copy list, so projects
+  // got two of the three — and the one they lost is the one that exists
+  // because agents quietly skip writing the record.
+  for (const needed of [
+    "Project_brief.md",
+    "_forms/page.md",
+    "_forms/endpoint.json",
+    "ai-only/1-translate-for-ai.md",
+    "tools/brief-lint.mjs",
+    "tools/code-map-lint.mjs",
+    "tools/round-record-lint.mjs",
+  ]) {
     assert.ok(
       await fs.stat(path.join(target, needed)).then(() => true, () => false),
       `${needed} is missing from a fresh project`,
