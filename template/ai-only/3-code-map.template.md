@@ -29,10 +29,24 @@ It reads every `ai-only/Code_map.md` and reports, with a `file:line` for each:
 | Every file in the **File** column exists | A row pointing at a moved file sends the next build looking in the wrong place. |
 | Every backticked name appears in one of that row's files | A renamed or deleted method still listed is a reuse invitation into nothing. |
 | The **first sentence** is at most 200 characters | The one-line summary is what makes the map cheaper to read than the code. |
+| Every **surface** is explained somewhere | A reuse scan cannot find what nothing describes, and a green run over an empty map reads as "nothing already does this job". |
 
 Two rows naming the same method in the same file, and an empty **Uses**, come back as warnings rather than errors.
 
-**What it cannot check is whether the sentence is true.** It establishes that a name exists in a file, not that the line describing it is still accurate — that stays a person's job, and a passing run should not be read as more than it is.
+### The two surface numbers
+
+A **surface** is code another build could plausibly rebuild by accident — an API command, a database table — rather than a private helper. Every check above reads a row and asks whether the code exists; the surface check asks the other question, whether existing code is described anywhere. It answers with two numbers, because they are two different debts:
+
+| Number | What it means | What to do |
+|---|---|---|
+| **no explanation anywhere** | No row, and nothing on the code either. Nobody has written down what this is for. | Write it. **A doc comment on the code counts** — it does not have to be a row. Ratcheted: a count that goes up fails the build. |
+| **explained in the code but not indexed** | A doc comment explains it; the map does not mention it. | Judgement. Add a row if a build might rebuild it; otherwise leave it. Reported, never failed on. |
+
+**A doc comment counts because the map is an index, not the content.** An explanation sitting on the function is in a better place than a copy of it in a table: the compiler ships it, the diff shows it changing, and whoever edits the code is looking straight at it. Requiring a row as well would make the map a third copy of prose that already exists, and transcription is not the work this count exists to measure. What the map adds is *findability* — which is why the unindexed number is still reported.
+
+Any comment style counts (`///`, `//!`, `/** */`, `#`, `--`, `"""`), so this works in whatever language a solution is written in. A comment must run to at least 80 characters to count: `/// Writes to the terminal.` is 30 and tells a reuse scan nothing the name did not.
+
+**What it cannot check is whether the sentence is true.** It establishes that a name exists in a file, and that something describes it, not that either description is still accurate — that stays a person's job, and a passing run should not be read as more than it is.
 
 ---
 

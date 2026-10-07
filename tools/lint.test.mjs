@@ -181,7 +181,7 @@ test("code-map-lint reports a command that no row mentions", async () => {
     "code/src-tauri/src/commands/orders.rs": TAURI_CMD,
   });
   const { out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
-  assert.match(out, /1 surface\(s\) have no row/);
+  assert.match(out, /1 surface\(s\) have no explanation anywhere/);
   assert.match(out, /1 Tauri command\(s\), e\.g\. list_orders/);
 });
 
@@ -220,6 +220,87 @@ test("code-map-lint leaves a project with no such surfaces alone", async () => {
   assert.equal(code, 0, out);
   assert.match(out, /clean/);
   assert.doesNotMatch(out, /surface/);
+});
+
+// Two numbers, because they are two different debts. A surface explained in a
+// doc comment is **unindexed**: the reasoning exists where whoever changes the
+// code is already looking, and copying it into the map would make the map a
+// third copy of prose that already lives in two places. A surface explained
+// nowhere is **undocumented**, and that is the one somebody has to sit down and
+// write. Measured on this repository the day this landed: 227 surfaces with no
+// row, of which 160 were already explained in the code. One number blurred
+// 160 transcriptions into 67 pieces of real work.
+
+const DOCUMENTED_CMD =
+  "/// Lists every order placed today, newest first.\n" +
+  "///\n" +
+  "/// Ordered newest-first because the only caller is the fulfilment screen,\n" +
+  "/// which reads the top of the list and never pages. Sorting in SQL rather\n" +
+  "/// than in the component keeps the ordering true for any future caller.\n" +
+  TAURI_CMD;
+
+test("code-map-lint counts a documented surface as unindexed, not undocumented", async () => {
+  const root = await project({
+    "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "code/src/cart.js": "export function addItem() {}\n",
+    "code/src-tauri/src/commands/orders.rs": DOCUMENTED_CMD,
+  });
+  const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
+  assert.equal(code, 0, out);
+  assert.match(out, /1 surface\(s\) explained in the code but not indexed/);
+  assert.doesNotMatch(out, /no explanation anywhere/);
+});
+
+// A passing remark is not an explanation. Without a floor, `// TODO` would
+// discharge the rule and the count would fall to zero without a word being
+// written. 80 characters is well under the 236-character median of the doc
+// comments already in this repository, so it admits every real one.
+test("code-map-lint does not accept a one-line aside as an explanation", async () => {
+  const root = await project({
+    "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "code/src/cart.js": "export function addItem() {}\n",
+    "code/src-tauri/src/commands/orders.rs": "// TODO: tidy this up\n" + TAURI_CMD,
+  });
+  const { out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
+  assert.match(out, /1 surface\(s\) have no explanation anywhere/);
+});
+
+// Every language this can ship to, not just the one this repository is in. A
+// framework that only recognised `///` would report a Python or TypeScript
+// project as entirely undocumented on the day it installed.
+for (const [lang, comment] of [
+  ["TypeScript", "/**\n * Lists every order placed today, newest first, because the only\n * caller reads the top of the list and never pages through it.\n */\n"],
+  ["Python", "# Lists every order placed today, newest first, because the only\n# caller reads the top of the list and never pages through it.\n"],
+]) {
+  test(`code-map-lint reads a ${lang} doc comment as an explanation`, async () => {
+    const root = await project({
+      "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+      "code/src/cart.js": "export function addItem() {}\n",
+      "code/src-tauri/src/commands/orders.rs": comment + TAURI_CMD,
+    });
+    const { out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
+    assert.match(out, /explained in the code but not indexed/);
+    assert.doesNotMatch(out, /no explanation anywhere/);
+  });
+}
+
+// A table's subject is its module, so the explanation that counts for it is the
+// file's own header — not a comment above the `CREATE TABLE` line, which sits
+// inside a `create_table` function several lines down.
+test("code-map-lint reads a module header as a table's explanation", async () => {
+  const root = await project({
+    "ai-only/Code_map.md": codeMap("| `addItem` | src/cart.js | Adds one item to the basket | nothing |"),
+    "code/src/cart.js": "export function addItem() {}\n",
+    "code/src-tauri/src/db/order.rs":
+      "//! The orders table: one row per placed order, keyed by the id the\n" +
+      "//! payment provider returns rather than one of ours, so a retry cannot\n" +
+      "//! create a second order for the same payment.\n\n" +
+      'pub async fn create_table(conn: &Connection) {\n  conn.execute("CREATE TABLE IF NOT EXISTS orders (id INTEGER)", ()).await;\n}\n',
+  });
+  const { code, out } = run("code-map-lint.mjs", [path.join(root, "ai-only/Code_map.md")]);
+  assert.equal(code, 0, out);
+  assert.match(out, /explained in the code but not indexed/);
+  assert.doesNotMatch(out, /no explanation anywhere/);
 });
 
 // ---------------------------------------------------------------------------
