@@ -9,7 +9,8 @@ vi.mock("../../lib/backend", async (importOriginal) => {
   return {
     ...original,
     listProducts: vi.fn(),
-    createProduct: vi.fn(),
+    createDeveloperProject: vi.fn(),
+    handProjectToProduct: vi.fn(),
     listSolutions: vi.fn(),
     // The Solution git panel loads its own state wherever it is shown.
     solutionGitState: vi.fn(),
@@ -55,7 +56,7 @@ async function openGitHub(user: ReturnType<typeof userEvent.setup>): Promise<voi
 
 const mocked = vi.mocked(backend);
 
-const product: Product = { id: 1, name: "Shop App", answers: "{}" };
+const product: Product = { id: 1, name: "Shop App", answers: "{}", stage: "product" };
 const solution: Solution = {
   id: 3,
   name: "Shop API",
@@ -445,13 +446,13 @@ describe("DevelopSolutions (Solution creation + AI settings)", () => {
     ).toBeInTheDocument();
   });
 
-  /// A project is an ordinary Product — the same record the Product tab makes —
-  /// and the new one is selected, so a Solution can be made for it straight away.
-  it("creates a project as a Product and selects it for the next Solution", async () => {
+  /// A developer's own project — hidden from Product until handed over — and
+  /// the new one is selected, so a Solution can be made for it straight away.
+  it("creates a developer project and selects it for the next Solution", async () => {
     const user = userEvent.setup();
-    const created: Product = { id: 7, name: "Side Tool", answers: "{}" };
+    const created: Product = { id: 7, name: "Side Tool", answers: "{}", stage: "developer" };
     mocked.listProducts.mockResolvedValueOnce([product]).mockResolvedValue([product, created]);
-    mocked.createProduct.mockResolvedValue(7);
+    mocked.createDeveloperProject.mockResolvedValue(7);
     render(<DevelopSolutions />);
     await openSection(user, "Map");
 
@@ -459,7 +460,7 @@ describe("DevelopSolutions (Solution creation + AI settings)", () => {
     await user.type(within(card).getByLabelText("Project name"), "Side Tool");
     await user.click(within(card).getByRole("button", { name: "Create project" }));
 
-    await waitFor(() => expect(mocked.createProduct).toHaveBeenCalledWith("Side Tool", "{}"));
+    await waitFor(() => expect(mocked.createDeveloperProject).toHaveBeenCalledWith("Side Tool"));
     await waitFor(() =>
       expect(screen.getByLabelText("Develop product")).toHaveValue("7"),
     );
@@ -477,7 +478,38 @@ describe("DevelopSolutions (Solution creation + AI settings)", () => {
     await user.type(within(card).getByLabelText("Project name"), "   ");
     await user.click(within(card).getByRole("button", { name: "Create project" }));
 
-    expect(mocked.createProduct).not.toHaveBeenCalled();
+    expect(mocked.createDeveloperProject).not.toHaveBeenCalled();
+  });
+
+  /// A developer project says so in the picker, and offers the hand-over —
+  /// with what it means beside the button, because the press is the
+  /// confirmation and it goes one way.
+  it("labels a developer project and hands it to Product", async () => {
+    const user = userEvent.setup();
+    const side: Product = { id: 7, name: "Side Tool", answers: "{}", stage: "developer" };
+    mocked.listProducts
+      .mockResolvedValueOnce([product, side])
+      .mockResolvedValue([product, { ...side, stage: "product" }]);
+    mocked.handProjectToProduct.mockResolvedValue(undefined);
+    render(<DevelopSolutions />);
+
+    const picker = await screen.findByLabelText("Develop product");
+    expect(
+      within(picker).getByRole("option", { name: "Side Tool (developer project)" }),
+    ).toBeInTheDocument();
+    // A Product's own project offers nothing to hand over.
+    expect(screen.queryByRole("button", { name: "Hand to Product" })).not.toBeInTheDocument();
+
+    await user.selectOptions(picker, "7");
+    expect(screen.getByText(/one way/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Hand to Product" }));
+
+    await waitFor(() => expect(mocked.handProjectToProduct).toHaveBeenCalledWith(7));
+    // Product's now: the label and the button are gone.
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: "Hand to Product" })).not.toBeInTheDocument(),
+    );
+    expect(within(picker).getByRole("option", { name: "Side Tool" })).toBeInTheDocument();
   });
 
   /// AI policy stays deny-by-default and stays Admin's. The form says so, so a

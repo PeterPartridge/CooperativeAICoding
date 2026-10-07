@@ -13,6 +13,7 @@ import AgentWorkspace from "../components/ai/AgentWorkspace";
 import {
   deleteSolution,
   githubStatus,
+  handProjectToProduct,
   listProducts,
   listSolutions,
   type Product,
@@ -165,11 +166,23 @@ export default function DevelopSolutions({
             >
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
+                  {p.stage === "developer" ? `${p.name} (developer project)` : p.name}
                 </option>
               ))}
             </select>
           </label>
+        )}
+        {/* The press is the confirmation, so what it means sits beside it. */}
+        {products.find((p) => p.id === activeProduct)?.stage === "developer" && (
+          <p className="develop-hand-over">
+            <button
+              type="button"
+              onClick={() => run(() => handProjectToProduct(Number(activeProduct)))}
+            >
+              Hand to Product
+            </button>{" "}
+            One way: Product sees it in their tab from then on, with its Solutions and work.
+          </p>
         )}
       </div>
 

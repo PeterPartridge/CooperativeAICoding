@@ -11,6 +11,8 @@ pub struct ProductDto {
     pub id: i64,
     pub name: String,
     pub answers: String,
+    /// `developer` or `product` — see `db::product::DEVELOPER`.
+    pub stage: String,
 }
 
 impl From<Product> for ProductDto {
@@ -19,6 +21,7 @@ impl From<Product> for ProductDto {
             id: p.id,
             name: p.name,
             answers: p.answers,
+            stage: p.stage,
         }
     }
 }
@@ -95,6 +98,23 @@ pub async fn update_product_answers(
     product::update_answers(&conn, id, &answers)
         .await
         .map_err(to_message)
+}
+
+/// A developer's own project, started from Develop. Product does not see it
+/// until it is handed over.
+#[tauri::command]
+pub async fn create_developer_project(db: State<'_, AppDb>, name: String) -> Result<i64, String> {
+    let conn = db.0.lock().await;
+    product::create_developer_project(&conn, &name)
+        .await
+        .map_err(to_message)
+}
+
+/// Hands a developer project to Product — one way.
+#[tauri::command]
+pub async fn hand_project_to_product(db: State<'_, AppDb>, id: i64) -> Result<(), String> {
+    let conn = db.0.lock().await;
+    product::hand_to_product(&conn, id).await.map_err(to_message)
 }
 
 #[tauri::command]

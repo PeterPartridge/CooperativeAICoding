@@ -17,7 +17,7 @@ The Develop tab's card for creating a Solution linked to a Product, answering th
 - [x] The project card says AI stays off until an Admin allows it.
 - [x] Deleting a Solution leaves the Product and its work items untouched.
 
-**Status:** built — round 3 (2026-10-07); first built 2026-07-16
+**Status:** built — round 4 (2026-10-07); first built 2026-07-16
 
 ## Report back
 Implemented inside `src/pages/DevelopSolutions.tsx` (the Develop environment page) over `commands/solutions.rs`. Vitest covers the create flow (questions serialised as answers JSON), listing under the product name, and the no-products hint. Generating the framework's actual solution files on disk remains with the Creation Page (self-hosting roadmap item), per the brief's limits answer.
@@ -66,3 +66,24 @@ Implemented inside `src/pages/DevelopSolutions.tsx` (the Develop environment pag
 - **A developer cannot fill in the project's brief.** The Product questions (purpose, problem, users) are edited in Product → Strategy, which the Developer role cannot see, so a developer's project stays with empty answers until someone with Product access fills them.
 - **No framework-file scaffold from Develop.** The Product tab's form can scaffold a Product's files into a folder; the Develop form does not offer that.
 - **Two Product-creation forms.** `ProductPlanning` and `NewProjectForm` both call `createProduct`. They differ on purpose (questions + scaffold vs name only); if a third appears, the DRY rule says extract one.
+
+## Round 4 — Developer projects that grow, and the hand-over
+
+**Asked:** "This isn't just MVP — we should allow Devs to start projects and they grow and become bigger, just as a developer project. Give Devs the option to hand to product." Round 3 had made a project an ordinary Product, visible to Product at once; this round makes it the developer's until they choose otherwise.
+
+**Decided by the person before building:** hidden from the Product tab until handed over; the hand-over is one way; recorded outside the three drafted deliverables (no deliverable named).
+
+**Implemented:**
+- The model: `Product.stage` — see [`../CoperativeAIdb/Product-model.md`](../CoperativeAIdb/Product-model.md) round 2.
+- `NewProjectForm` now calls `createDeveloperProject(name)`; its note says Product does not see the project until it is handed over.
+- `DevelopSolutions` — a developer project reads "*name* (developer project)" in the picker, and when one is selected the bar offers **Hand to Product** with what it means beside it ("One way: …"). The press is the confirmation, as elsewhere in this app; there are no confirm dialogs.
+- `ProductPlanning` lists only `stage === "product"`. Admin and Test still list every project, because a developer project needs an AI policy and tests like any other.
+
+**Tests:** Vitest — creating calls `createDeveloperProject`; the picker labels a developer project, the hand-over button appears only for one, calls `handProjectToProduct`, and disappears once it is Product's; the Product tab does not list a developer project. `npm test` 816/816 across 76 files.
+
+**Not tested:** the real Tauri window; what a Product-role user sees in Develop (Develop is not theirs by default, and nothing here changes that).
+
+**Technical debt:**
+- **Projects made by round 3's form are at the `product` stage.** They were made as ordinary Products, and the migration defaults every existing row to `product`, so any made between rounds 3 and 4 stay in the Product tab. There is no way to turn a Product back into a developer project — by design, since the hand-over is one way.
+- **"Their own" is still not per developer.** Every developer project is visible to everyone in Develop; nothing records which team member started it. Roles are visibility, not access control, and the app says so.
+- **Nothing tells Product a project has arrived.** It simply appears in their tab. A notification, or a note on the hand-over, is not built.

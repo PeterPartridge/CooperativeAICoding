@@ -25,7 +25,8 @@
       { "fieldName": "name", "type": "text", "nullable": false, "default": "", "rules": "unique; not empty", "description": "The Product's title, shown at the top of its workspace" },
       { "fieldName": "answers", "type": "text", "nullable": false, "default": "{}", "rules": "valid JSON keyed by Project_brief question ids (purpose, problem, users, appsYouLike, appsToAvoid, designs)", "description": "The Product's brief answers, in the person's plain English" },
       { "fieldName": "createdAt", "type": "date", "nullable": false, "default": "now", "rules": "", "description": "When the Product was created" },
-      { "fieldName": "updatedAt", "type": "date", "nullable": false, "default": "now", "rules": "updated on every change", "description": "When the Product last changed" }
+      { "fieldName": "updatedAt", "type": "date", "nullable": false, "default": "now", "rules": "updated on every change", "description": "When the Product last changed" },
+      { "fieldName": "stage", "type": "text", "nullable": false, "default": "product", "rules": "one of: developer, product; developer → product only (one way)", "description": "Whose it is: a developer's own project (hidden from the Product tab) or Product's" }
     ]
   },
   "relationships": {
@@ -52,6 +53,8 @@
   },
   "changesOverTime": {
     "guidance": "Each time you come back to change this model, add an entry describing what should change.",
-    "rounds": []
+    "rounds": [
+      "Round 2 (2026-10-07): Developers can start their own projects in Develop and let them grow, then hand them to Product. A developer project is a Product at the 'developer' stage: hidden from the Product tab until handed over, the hand-over is one way, and every existing Product stays at the 'product' stage."
+    ]
   }
 }

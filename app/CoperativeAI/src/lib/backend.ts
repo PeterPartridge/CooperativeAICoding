@@ -22,6 +22,9 @@ export interface Product {
   id: number;
   name: string;
   answers: string;
+  /** `developer` while it is a developer's own project (hidden from the
+   *  Product tab), `product` once it is Product's. One way. */
+  stage: "developer" | "product";
 }
 
 export interface Solution {
@@ -691,6 +694,12 @@ export const createProduct = (
   scaffoldDir?: string,
 ): Promise<number> =>
   invoke("create_product", { name, answers, scaffoldDir: scaffoldDir ?? null });
+/** A developer's own project, made in Develop. */
+export const createDeveloperProject = (name: string): Promise<number> =>
+  invoke("create_developer_project", { name });
+/** Hands a developer project to Product — one way. */
+export const handProjectToProduct = (id: number): Promise<void> =>
+  invoke("hand_project_to_product", { id });
 export const getProduct = (id: number): Promise<Product> =>
   invoke("get_product", { id });
 /** What happened to each generated framework file. `conflicts` are files

@@ -41,7 +41,7 @@ import * as backend from "../../lib/backend";
 
 const mocked = vi.mocked(backend);
 
-const product: Product = { id: 1, name: "Shop App", answers: "{}" };
+const product: Product = { id: 1, name: "Shop App", answers: "{}", stage: "product" };
 const deliverable: Deliverable = {
   id: 7,
   productId: 1,

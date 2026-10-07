@@ -36,7 +36,7 @@ import * as backend from "../../lib/backend";
 
 const mocked = vi.mocked(backend);
 
-const product: Product = { id: 1, name: "Shop App", answers: "{}" };
+const product: Product = { id: 1, name: "Shop App", answers: "{}", stage: "product" };
 
 describe("ProductPlanning (Product home)", () => {
   beforeEach(() => {
@@ -161,5 +161,18 @@ describe("ProductPlanning (Product home)", () => {
     // Overview is a tab now, so open it before looking for its content.
     await user.click(await screen.findByRole("button", { name: "Overview" }));
     expect(await screen.findByText("C:/somewhere/Shop-App")).toBeInTheDocument();
+  });
+
+  /// A developer's own project is theirs until they hand it over — the Product
+  /// tab lists only what is Product's.
+  it("does not list developer projects until they are handed over", async () => {
+    mocked.listProducts.mockResolvedValue([
+      product,
+      { id: 7, name: "Side Tool", answers: "{}", stage: "developer" },
+    ]);
+    render(<ProductPlanning />);
+
+    expect(await screen.findByRole("article", { name: "Shop App" })).toBeInTheDocument();
+    expect(screen.queryByRole("article", { name: "Side Tool" })).not.toBeInTheDocument();
   });
 });

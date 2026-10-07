@@ -6,13 +6,16 @@
 A Product being planned in the app — created from the Project_brief's Product questions; work items, sprints, feature designs, and Solutions all attach to one.
 
 **Data to store**
-id (auto) · name (unique, non-empty — the workspace title) · answers (JSON keyed by brief question ids: purpose, problem, users, appsYouLike, appsToAvoid, designs) · createdAt/updatedAt (millis).
+id (auto) · name (unique, non-empty — the workspace title) · answers (JSON keyed by brief question ids: purpose, problem, users, appsYouLike, appsToAvoid, designs) · createdAt/updatedAt (millis) · stage (`developer` | `product`, default `product` — round 2).
 
 **Invariants / tests**
 - [x] name unique and non-empty; answers valid JSON.
 - [x] Deleting a Product removes its work items (cascading their policies/designs), sprints, and solutions.
+- [x] A developer project starts at `developer`; a Product made the usual way at `product`.
+- [x] Handing over moves `developer` → `product` and keeps the row's Solutions; it is refused for a Product already at `product` or an unknown id (one way).
+- [x] An existing table gains `stage` by `ALTER TABLE`, every existing row reading `product`.
 
-**Status:** built (2026-07-16)
+**Status:** built — round 2 (2026-10-07); first built 2026-07-16
 
 ## Report back
 Implemented as `src-tauri/src/db/product.rs` (`create_table/create/list_all/find_by_id/delete`); delete cascades in code via `work_item::delete` per item then sprints/solutions/product. cargo tests: listing, name rules, JSON rule, full cascade. Command layer: `commands/products.rs` (list/create/get/delete).
@@ -44,3 +47,16 @@ The fix is one shared helper, `db::table_columns`, using turso's own `pragma_que
 - **Nothing stops the bad spelling coming back.** `table_columns` is a convention, not a barrier — a new migration can still hand-roll the SELECT. A lint or a grep in CI would close it.
 - **The `:memory:` blind spot is only closed for startup.** Three file-backed tests now exist; every other data test still runs where this class of bug cannot appear.
 - **No integrity check on open.** The app cannot currently tell a healthy database from one missing two thirds of its schema, and would not have told anyone.
+
+## Round 2 — Developer projects, and the hand-over to Product
+
+**Asked:** developers should be able to start projects of their own that grow and become bigger, as developer projects, with the option to hand them to Product. Decided with the person: hidden from the Product tab until handed over; the hand-over is one way; recorded outside the three drafted deliverables.
+
+**Implemented:**
+- `db/product.rs` — `stage` column (`developer` | `product`). New tables get it in `CREATE TABLE`; existing ones gain it with `ALTER TABLE ... DEFAULT 'product'`, asked through `db::table_columns` (never a `SELECT` over `pragma_table_info`). Added, not recreated: answers are person-written. `create` is unchanged for callers and writes `product`; `create_developer_project(name)` writes `developer` with answers `{}`; `hand_to_product(id)` refuses anything not at `developer`.
+- `commands/products.rs` — `ProductDto.stage`; `create_developer_project`, `hand_project_to_product`. `list_products` still returns every stage — filtering is per screen.
+
+**Tests:** cargo — the five cases above (written first, seen failing to compile). Full suite 917 passed, 35 ignored; clippy clean.
+
+**Technical debt:**
+- **Stage is filtered in the frontend, not the backend.** `list_products` returns developer projects too, and only the Product tab drops them. A new screen that lists Products has to decide for itself; the MCP server's `list_products` tool is not yet built, and when it is, it must make the same decision.

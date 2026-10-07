@@ -137,6 +137,30 @@ one tidy-up would be the exact failure this work was commissioned to fix.
   -- -D warnings` clean, `cargo test` 912 passed, 0 failed, 35 ignored
   (live-only).
 
+**2026-10-07 — developer projects, and the hand-over to Product**
+
+- **Asked:** "This isn't just MVP — we should allow Devs to start projects and
+  they grow and become bigger, just as a developer project. Give Devs the
+  option to hand to product." That answers last round's open question: it
+  belongs to no drafted goal. Decided when asked: a developer project is hidden
+  from the Product tab until handed over, and the hand-over is one way.
+- **Model:** `products.stage` (`developer` | `product`). Added with
+  `ALTER TABLE ... DEFAULT 'product'` through `db::table_columns`, so every
+  existing Product stays Product's. `create_developer_project` and
+  `hand_to_product`, which refuses anything not at `developer`, plus the
+  commands of the same names.
+- **Screens:** Develop's "Create a project" now makes a developer project.
+  The picker labels it "(developer project)", and selecting one offers **Hand to
+  Product** with "One way: …" beside it. The Product tab lists only
+  `stage === "product"`. Admin and Test still list every project, because a
+  developer project needs an AI policy and tests too.
+- **TDD:** five cargo tests and three Vitest tests written first and seen
+  failing. `cargo clippy --all-targets -- -D warnings` clean, `cargo test` 917
+  passed (35 ignored, live-only), `npm test` 816/816, `npm run check` clean
+  apart from the existing deliverable warnings.
+- Recorded as round 2 on `Product-model.json` and its spec, and round 4 on
+  `solutionCreation.md` and its spec. Code_map rows updated.
+
 ### What I could not do (and what you would need to tell me)
 - I could not dynamically test the CI/CD pipeline or linter tools (`node tools/code-map-lint.mjs`) directly because those require a Node.js environment or GitHub Actions to run, and my task was scoped purely to documentation edits. 
 
@@ -180,6 +204,15 @@ one tidy-up would be the exact failure this work was commissioned to fix.
   "mine" shown first). You chose not to for now. If wanted later it needs an
   owner column and a statement that it is visibility only, not access control.
 - **Not run in the real Tauri window.** The form is covered by mocked tests only.
+
+**2026-10-07 — developer projects, and the hand-over to Product**
+
+- **Whether the app should tell Product a project has arrived.** It just
+  appears in their tab. I did not invent a notification or a hand-over note.
+- **Whether developer projects should belong to one developer.** Every
+  developer project is visible to everyone in Develop. Nothing records who
+  started it, and you chose no ownership last round.
+- **Not run in the real Tauri window.** Mocked UI tests only.
 
 ### Debt I left behind
 - I entirely neglected to append this round record upon completing my task, breaking the project's framework rules. I failed to automatically register my completed work, missing debt, and open questions into this file. This was a process failure on my end.
@@ -279,3 +312,21 @@ one tidy-up would be the exact failure this work was commissioned to fix.
 - **Two Product-creation forms.** `ProductPlanning` and `NewProjectForm` both
   call `createProduct`. They differ on purpose: questions and scaffold, versus a
   name only. A third would trip the DRY rule and should become one shared form.
+
+
+**2026-10-07 — developer projects, and the hand-over to Product**
+
+- **Stage is filtered per screen, not in the backend.** `list_products`
+  returns developer projects too, and only the Product tab drops them. Any new
+  screen that lists Products must decide for itself, and so must the MCP
+  server's `list_products` tool when it is built. Otherwise developer projects
+  leak to whatever reads that list.
+
+- **Projects made with last round's form are Product's.** Between rounds 3 and
+  4, Develop made ordinary Products, and the migration keeps every existing row
+  at `product`. Any made in that window stay in the Product tab, and the app has
+  no way to turn a Product back into a developer project, by design.
+
+- **Hand-over has no record beyond the stage.** It does not record who handed
+  it over, when (apart from `updatedAt`), or why. If Product needs to know where
+  a project came from, that needs its own field or a log entry.

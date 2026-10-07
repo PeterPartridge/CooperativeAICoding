@@ -24,7 +24,8 @@ export default function ProductPlanning() {
 
   const refresh = useCallback(async () => {
     try {
-      setProducts(await listProducts());
+      // A developer project is theirs until they hand it over.
+      setProducts((await listProducts()).filter((p) => p.stage === "product"));
       setError(null);
     } catch (e) {
       setError(String(e));
@@ -40,7 +41,12 @@ export default function ProductPlanning() {
     if (!name.trim()) return;
     try {
       const id = await createProduct(name, JSON.stringify(answers), scaffoldDir);
-      const created = { id, name, answers: JSON.stringify(answers) };
+      const created: Product = {
+        id,
+        name,
+        answers: JSON.stringify(answers),
+        stage: "product",
+      };
       setName("");
       setAnswers({});
       setScaffoldDir("");

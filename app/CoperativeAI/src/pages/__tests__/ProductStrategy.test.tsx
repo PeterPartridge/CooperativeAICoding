@@ -100,6 +100,7 @@ describe("ProductStrategy — generating the work for a Deliverable", () => {
       id: 1,
       name: "Shop App",
       answers: JSON.stringify({ purpose: "sell coffee" }),
+      stage: "product",
     });
     mocked.getProductBudget.mockResolvedValue(null);
     mocked.getSpendSummary.mockResolvedValue({

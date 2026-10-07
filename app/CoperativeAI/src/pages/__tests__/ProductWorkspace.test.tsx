@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ProductWorkspace from "../../components/product/ProductWorkspace";
 import { PermissionProvider } from "../../lib/permissions";
-import type { ActivePermissions } from "../../lib/backend";
+import type { ActivePermissions, Product } from "../../lib/backend";
 
 // The workspace's own job is which panels exist; the panels' insides are
 // tested in their own files, so they are stubbed here rather than letting
@@ -41,7 +41,7 @@ function perms(overrides: Partial<ActivePermissions>): ActivePermissions {
   };
 }
 
-const product = { id: 7, name: "Shop App", answers: "{}" };
+const product: Product = { id: 7, name: "Shop App", answers: "{}", stage: "product" };
 
 function renderWorkspace() {
   return render(

@@ -104,6 +104,8 @@ fn main() {
             commands::work_items::generate_deliverable_work,
             commands::products::list_products,
             commands::products::create_product,
+            commands::products::create_developer_project,
+            commands::products::hand_project_to_product,
             commands::products::get_product,
             commands::products::get_product_scaffold,
             commands::products::update_product_answers,

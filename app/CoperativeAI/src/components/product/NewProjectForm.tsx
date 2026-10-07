@@ -1,14 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { createProduct } from "../../lib/backend";
+import { createDeveloperProject } from "../../lib/backend";
 
-/** Starting a project from Develop.
+/** Starting a developer's own project from Develop.
  *
- *  **A project is a Product** — the same record, made by the same
- *  `create_product` the Product tab uses, so Solutions, rules and work items
- *  attach to it exactly as they do to any other, and Product people see it in
- *  their tab. It exists because the Developer role cannot open the Product tab,
- *  and every Solution needs a Product: without this, a developer on their own
- *  could not start anything.
+ *  **A Product at the developer stage** — the same record, so Solutions, rules
+ *  and work items attach to it exactly as they do to any other and it can grow
+ *  as large as a Product. It stays out of the Product tab until the developer
+ *  hands it over (one way), from the Develop bar. It exists because the
+ *  Developer role cannot open the Product tab, and every Solution needs a
+ *  Product: without this, a developer on their own could not start anything.
  *
  *  **Name only.** The Product brief's questions are Product's to answer, and the
  *  framework-file scaffold stays with the Product tab's form.
@@ -29,7 +29,7 @@ export default function NewProjectForm({
     const wanted = name.trim();
     if (!wanted) return;
     try {
-      const id = await createProduct(wanted, "{}");
+      const id = await createDeveloperProject(wanted);
       setName("");
       setError(null);
       onCreated(id);
@@ -47,8 +47,8 @@ export default function NewProjectForm({
       </label>
       <button type="submit">Create project</button>
       <p className="hint">
-        A project is a Product, so it also appears in the Product tab. AI is off for a
-        new project until an Admin allows it (Admin → AI).
+        A developer project is yours: Product does not see it until you hand it to
+        Product. AI is off for a new project until an Admin allows it (Admin → AI).
       </p>
     </form>
   );
