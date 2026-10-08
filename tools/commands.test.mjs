@@ -63,18 +63,29 @@ for (const dir of skillDirs) {
   });
 }
 
-test("every skill a command asks for exists", async () => {
-  for (const file of commandFiles) {
-    const body = await read(`.claude/commands/${file}`);
-    const invoked = body.matchAll(/(?:[Rr]un|[Ff]ollow|[Uu]se) the \x60([a-z][a-z0-9-]+)\x60 skill|\(the \x60([a-z][a-z0-9-]+)\x60 skill\)/g);
-    for (const m of invoked) {
-      const skill = m[1] ?? m[2];
+// Commands used to say "run the `x` skill" and this test checked that skill
+// existed. They now point at a procedure instead, so that version of the test
+// matched nothing and passed on an empty set — coverage in name only. It checks
+// the new wiring instead, and specifically the **unrooted** `ai-only/…` form,
+// which is the path a project uses and which the rooted-path test below skips
+// by design.
+test("every procedure a command or skill asks for exists", async () => {
+  const sources = [
+    ...commandFiles.map((f) => `.claude/commands/${f}`),
+    ...skillDirs.map((d) => `.claude/skills/${d}/SKILL.md`),
+  ];
+  let checked = 0;
+  for (const source of sources) {
+    const body = await read(source);
+    for (const [, name] of body.matchAll(/ai-only\/procedures\/([a-z-]+\.md)/g)) {
+      checked++;
       assert.ok(
-        skillDirs.includes(skill),
-        `/${file.replace(/\.md$/, "")} calls the "${skill}" skill, which does not exist`,
+        await exists(`template/ai-only/procedures/${name}`),
+        `${source} points at procedures/${name}, which does not exist`,
       );
     }
   }
+  assert.ok(checked >= commandFiles.length, `only ${checked} pointers found — commands stopped naming procedures`);
 });
 
 // **The one that would have caught the `template/_forms/` breakage.** Only
@@ -99,6 +110,49 @@ test("every repository path the commands and skills name is really there", async
     }
   }
   assert.deepEqual(missing, [], "paths named but not present");
+});
+
+// ---------------------------------------------------------------------------
+// The procedures, and the rule that keeps them the single copy.
+//
+// Each procedure used to be the body of a skill or a command. The text was
+// never Claude-specific; its location was. Now it lives once under
+// template/ai-only/procedures/ and every tool holds a pointer. These two tests
+// are what stops that arrangement decaying back into copies: one catches a
+// procedure nothing can invoke, the other catches a pointer that has started
+// carrying behaviour of its own.
+
+const procedureFiles = (await fs.readdir(path.join(repo, "template/ai-only/procedures")))
+  .filter((f) => f.endsWith(".md") && f !== "README.md");
+
+test("every procedure is reachable from a command or a skill", async () => {
+  const pointers = [
+    ...commandFiles.map((f) => `.claude/commands/${f}`),
+    ...skillDirs.map((d) => `.claude/skills/${d}/SKILL.md`),
+  ];
+  const allText = (await Promise.all(pointers.map(read))).join("\n");
+  const orphans = procedureFiles.filter((f) => !allText.includes(`procedures/${f}`));
+  assert.deepEqual(orphans, [], "procedures nothing points at — unreachable from any tool");
+});
+
+// A size ceiling, because the failure is gradual. Nobody moves a procedure back
+// into a skill in one commit; a sentence of behaviour gets added here because it
+// was quicker, and six months later the skill and the procedure disagree and
+// only Claude Code follows the newer one. The pointers are ~0.6–1.2 KB, so 2 KB
+// admits a longer description without admitting a procedure.
+const POINTER_MAX = 2048;
+
+test("a skill or command stays a pointer, not a second copy of its procedure", async () => {
+  const fat = [];
+  for (const source of [
+    ...commandFiles.map((f) => `.claude/commands/${f}`),
+    ...skillDirs.map((d) => `.claude/skills/${d}/SKILL.md`),
+  ]) {
+    const body = await read(source);
+    if (!/procedures\/[a-z-]+\.md/.test(body)) continue;
+    if (body.length > POINTER_MAX) fat.push(`${source} (${body.length} B)`);
+  }
+  assert.deepEqual(fat, [], `a pointer grew past ${POINTER_MAX} B — move the behaviour into the procedure`);
 });
 
 test("the documentation lists exactly the commands that ship", async () => {
@@ -126,7 +180,24 @@ test("coperativeai init puts every command and skill into a new project", async 
       `the ${dir} skill did not travel`,
     );
   }
-  for (const needed of ["Project_brief.md", "_forms/page.md", "_forms/endpoint.json", "ai-only/1-translate-for-ai.md", "tools/brief-lint.mjs"]) {
+  // Every check, named one by one rather than as "tools/". round-record-lint
+  // was in the published package and missing from the copy list, so projects
+  // got two of the three — and the one they lost is the one that exists
+  // because agents quietly skip writing the record.
+  for (const needed of [
+    "Project_brief.md",
+    "_forms/page.md",
+    "_forms/endpoint.json",
+    "ai-only/1-translate-for-ai.md",
+    "tools/brief-lint.mjs",
+    "tools/code-map-lint.mjs",
+    "tools/round-record-lint.mjs",
+    // So an agent that is not Claude Code arrives to instructions addressed to
+    // it, rather than to a .claude/ folder meant for somebody else.
+    "AGENTS.md",
+    "ai-only/procedures/build.md",
+    "ai-only/procedures/translate.md",
+  ]) {
     assert.ok(
       await fs.stat(path.join(target, needed)).then(() => true, () => false),
       `${needed} is missing from a fresh project`,
@@ -138,6 +209,38 @@ test("coperativeai init puts every command and skill into a new project", async 
   const second = execFileSync("node", [path.join(repo, "bin/coperativeai.mjs"), "init", target], { encoding: "utf8" });
   assert.match(second, /wrote 0 file\(s\)/, "a second init overwrote something");
   assert.match(second, /left alone, already there/);
+});
+
+// **The same breakage as `template/_forms/`, one layer out.** The starter
+// AGENTS.md names paths by hard string, and it is the first and possibly only
+// file a non-Claude agent reads. A path that is right in this repository and
+// absent from a project would send that agent looking in the wrong place with
+// nothing to tell it so.
+test("every path the starter AGENTS.md names exists in a fresh project", async () => {
+  const target = await fs.mkdtemp(path.join(os.tmpdir(), "cai-init-"));
+  execFileSync("node", [path.join(repo, "bin/coperativeai.mjs"), "init", target], { encoding: "utf8" });
+  const agents = await fs.readFile(path.join(target, "AGENTS.md"), "utf8");
+
+  const cited = new Set();
+  for (const line of agents.split("\n")) {
+    // A line that says so is describing an output, not somewhere to look today.
+    // The document has to admit that for the reader's sake, and the check reads
+    // the same admission rather than carrying its own list of exceptions.
+    if (/does not exist yet/i.test(line)) continue;
+    for (const [, p] of line.matchAll(/`([^`\s|]+\/[^`\s|]*)`/g)) {
+      const clean = p.replace(/[.,;:)]+$/, "");
+      // `<solution>/<item>.md` and the like are per-project by design.
+      if (clean.includes("<") || clean.includes("*") || clean.endsWith("/")) continue;
+      cited.add(clean);
+    }
+  }
+  assert.ok(cited.size >= 6, `only ${cited.size} paths found — the regex stopped matching`);
+
+  const missing = [];
+  for (const p of cited) {
+    if (!(await fs.stat(path.join(target, p)).then(() => true, () => false))) missing.push(p);
+  }
+  assert.deepEqual(missing, [], "AGENTS.md names paths a fresh project does not have");
 });
 
 test("a fresh project's own checks run in it", async () => {

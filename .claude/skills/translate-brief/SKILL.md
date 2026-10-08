@@ -3,89 +3,13 @@ name: translate-brief
 description: Translate a filled-in CooperativeAICoding brief (Markdown Project_brief.md or page brief, or a JSON endpoint/database-model/solution-spec form) into a structured AI System Spec, a reusable Project Digest, and a Skills List, then save it in the project root's AI workspace (ai-only/) mirroring the human folder layout. Use whenever the user hands over or points at a filled-in CooperativeAICoding form and wants it turned into instructions an AI can build from.
 ---
 
-# Translate a CooperativeAICoding brief
+Read **`ai-only/procedures/translate.md`** under the project root you are working in,
+and follow it exactly. In this repository the canonical copy is
+`template/ai-only/procedures/translate.md`; a project created with
+`npx github:PeterPartridge/CooperativeAICoding init` has it at
+`ai-only/procedures/translate.md`.
 
-This skill automates the bridge that previously required pasting Prompt A / Prompt B
-by hand from [`template/ai-only/1-translate-for-ai.md`](../../../template/ai-only/1-translate-for-ai.md).
-It turns a plain-English brief into the structured spec the AI builds from, while
-staying token-efficient (no re-sending the whole project spec for every page).
-
-## Before anything: a drafted brief is not a brief
-
-If the brief's `status` is `drafted`, **stop and do not translate it**. `/draft`
-wrote those answers from the codebase and marked them as its own; they become the
-project's answers when a person has read them and set `status: filled`. Point at
-the question list at the end of the brief, say how many are still open, and offer
-to walk through them. A drafted answer translated is an AI guess promoted to a
-requirement, silently.
-
-## Resolving paths
-
-**Project root** = the nearest ancestor directory of the given brief/spec path that
-contains `Project_brief.md` (walk up from the argument). `template/`, `application/`,
-and `example/` each qualify. All project-relative paths resolve from there:
-- Solution specs: `<projectRoot>/<solution>/application-spec.json`
-- AI workspace outputs: `<projectRoot>/ai-only/Project_system.md`,
-  `<projectRoot>/ai-only/Code_map.md`, `<projectRoot>/ai-only/<solution>/<item>.md`
-
-**Framework assets always stay at the repo's `template/`** (they are the framework,
-not the project): the project's `_forms/*` (blank forms, `boilerplates.json`; `template/_forms/` inside this repository) and
-`template/ai-only/1-translate-for-ai.md`, `2-ai-system.template.md`,
-`3-code-map.template.md`.
-
-If no ancestor has a `Project_brief.md`, or no path was given, ask once which
-project root to use.
-
-## When to use
-
-Trigger when the user provides, or points at, a filled-in form from this framework.
-Forms come in two shapes; both carry a `form` key (which kind it is) and a `status`
-key (`blank | filled | approved | built`):
-- **Markdown briefs** (project brief, page briefs) — YAML frontmatter + one `###
-  <id> — <question>` heading per question. Under a heading, lines starting with `>`
-  are form guidance/examples; everything else is the person's answer. Never treat
-  guidance as an answer.
-- **JSON forms** (endpoint, database-model, and the three solution specs) — question
-  objects with `question` / `guidance` / `example` fields plus the person's
-  plain-English `answer` (or `entries` lists). Same rule: only `answer`/`entries`
-  content is the person's input.
-
-Routing:
-- A **Project Brief** (`<projectRoot>/Project_brief.md`, e.g. `template/`, `application/`, `example/`; `form: project-brief`) → run the *project* translation.
-- A **Page / endpoint / database-model brief** (e.g. `ClothingWebsite/userLogin.md`, `ClothingAPI/Login.json`) → run the *page* translation.
-
-If you can't tell which, ask once. Don't translate a blank master form from
-the blank forms in `_forms/` (`status: blank`, or all answers empty).
-
-## Hard rules (do not break these)
-
-- **Do not invent** features, scope, technology, or security that isn't in the brief. Gaps go under **Open Questions**, never guesses.
-- **Stay inside** the project's platform, house rules, roles, and security.
-- Restate the **Working Agreement** at the end (smallest change, treat existing code as production, log technical debt instead of retrying endlessly, a person approves before building, score each change by token cost, never put secret values in code or config, infrastructure/pipelines are their own approved plans).
-
-## Procedure
-
-### A. Translating a Project Brief
-
-1. Read the brief. Read [`template/ai-only/2-ai-system.template.md`](../../../template/ai-only/2-ai-system.template.md) for the exact output shape.
-2. Produce, in this order:
-   - **System Spec** — the labelled headings from the template (Purpose, Users, Deliverables, Platforms & tech constraints, Solutions & repositories, Infrastructure & environments, Coding house rules, Testing floor, Access & security, Look & feel, Model & effort selection, Open Questions). Solutions & repositories is the table of where each solution's code lives (repo + local path) from the brief's `solutions` answer; Infrastructure & environments comes from the `environments` and `infrastructure-policy` answers (who provisions, tool, deploy permissions, where secrets live — never values). Missing locations or policy → Open Questions.
-   - **Project Digest** — a compact ≤12-line constraints block (platform/tech, solutions & repo locations, infra policy & environments, house-rule names, testing floor, deliverables in order, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.
-   - **Project Skills** — table: `Skill | Why it's needed | How you'll use it | Tools/approach`. Keep it to what the brief justifies; if it grows long, flag that the project may need splitting.
-3. Save to `<projectRoot>/ai-only/Project_system.md`.
-
-### B. Translating a Page / endpoint / database-model brief
-
-1. **Get project constraints cheaply.** Read `<projectRoot>/ai-only/Project_system.md` and use *only* its **Project Digest** section. Do not load the whole spec unless a specific page decision needs detail the digest doesn't cover. If `Project_system.md` doesn't exist yet, translate the Project Brief first (procedure A).
-2. Read the page brief.
-3. Produce:
-   - **Page Spec** — Page objective, Model & effort, **Deliverable** (the item's `deliverable` field — it must name one of the deliverables the Project Brief lists; if it names something else, say so instead of translating it through, because a deliverable nothing is aimed at never completes and `/build` never reaches its stopping point), Depends on (the briefs listed in `depends-on`/`dependsOn` that must be built first), Actions, Information shown/collected, Data to store, Access & security, Tests, Open Questions.
-   - **Page Skills** — table building on the project skills (don't repeat them); flag any skill new for this page.
-   - **PLAN** — one-paragraph summary + bullet changes + an honest note of expected technical debt.
-4. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/ai-only/<solution>/<item>.md` (e.g. `application/CoperativeAIdb/WorkItem-model.json` → `application/ai-only/CoperativeAIdb/WorkItem-model.md`).
-
-## After translating
-
-- Show the result and **wait for the person to approve** before any building.
-- If the skills list looks too big or has surprises, say so — that's the signal the brief is too large or was misunderstood.
-- When a brief changes later, re-run this skill for that item so spec, digest, and skills stay in sync.
+**The procedure is the instruction, and it lives there rather than here** so that
+an agent which is not Claude Code reads the same text from `AGENTS.md` instead of
+a copy that has drifted. Do not add behaviour to this file: a rule that exists in
+`.claude/` and nowhere else is a rule only one model follows.

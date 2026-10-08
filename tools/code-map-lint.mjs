@@ -63,25 +63,49 @@ const SURFACES = [
     dir: "src-tauri/src/commands",
     // The attribute sits above the signature, so the name is on a later line.
     pattern: /#\[tauri::command\][\s\S]{0,200}?\bfn\s+([a-z_][a-z0-9_]*)/g,
+    explainedBy: "comment-above",
   },
   {
     what: "database table",
     dir: "src-tauri/src/db",
     pattern: /CREATE TABLE IF NOT EXISTS\s+([a-z_][a-z0-9_]*)/gi,
+    // A table's subject is its module. The `CREATE TABLE` line sits inside a
+    // `create_table` function, so a comment above *it* describes the function;
+    // the file header is what describes the table.
+    explainedBy: "module-header",
   },
 ];
 
-/** How many surfaces may still be missing before this fails rather than warns.
+/** The least comment, in characters, that counts as an explanation.
+ *
+ *  **A floor, because a passing remark is not an explanation.** Without one,
+ *  `// TODO: tidy this up` would discharge the rule and the count would fall to
+ *  zero without a word being written. The doc comments already in this
+ *  repository run to a median of 236 characters and a mean of 274, so 80 is
+ *  well under every real one and well over every aside. */
+const EXPLANATION_MIN = 80;
+
+/** How many surfaces may have **no explanation anywhere** before this fails
+ *  rather than warns.
  *
  *  **A ratchet, not a target.** Failing on the true number the day the rule
- *  landed would have produced 229 errors and blocked every other piece of work,
- *  which is how a good check gets commented out in week two. So the ceiling
- *  starts at what was already owed and only ever comes down: each build that
- *  adds rows lowers it, and a build that adds an undocumented surface fails
- *  immediately because the count went up.
+ *  landed would have blocked every other piece of work, which is how a good
+ *  check gets commented out in week two. So the ceiling starts at what was
+ *  already owed and only ever comes down: each explanation written lowers it,
+ *  and a build that adds an unexplained surface fails immediately because the
+ *  count went up.
+ *
+ *  **It counts the undocumented, not the unindexed** — see `unindexed` below
+ *  for why those are two debts and only one of them is work.
+ *
+ *  **Why 106 and not 67.** Counting any doc comment at all as an explanation
+ *  gives 67. Applying `EXPLANATION_MIN` gives 106, because 44 of them are a
+ *  single line restating the name — `/// Writes to the terminal.` is 30
+ *  characters and tells a reuse scan nothing the name did not. The higher
+ *  number is the honest one.
  *
  *  Lower this number. Never raise it. */
-const UNCOVERED_CEILING = 229;
+const UNDOCUMENTED_CEILING = 106;
 
 /** `{a,b}` → two strings. Tauri-side rows write two files that way, and so do
  *  frontend rows for a component and its helper. */
@@ -159,7 +183,64 @@ async function isFile(p) {
   }
 }
 
-/** Every surface on disk under one solution, as `{ what, name, file }`.
+/** Is this line a comment, in any language this might ship to?
+ *
+ *  **Deliberately broad.** A framework that only recognised Rust's `///` would
+ *  report a TypeScript or Python project as entirely unexplained on the day it
+ *  installed. Doc markers (`///`, `//!`, `/**`, `"""`) and plain comments
+ *  (`//`, `#`, `--`, ` *` inside a block) all count; the `EXPLANATION_MIN`
+ *  floor is what separates an explanation from an aside, not the marker. */
+const COMMENT_LINE = /^\s*(\/\/\/?!?|\/\*\*?|\*|#|--|"""|''')/;
+
+/** The comment text immediately above `index`, as one string.
+ *
+ *  Walks back over blank lines first, so a comment separated from its
+ *  declaration by one still counts, then takes the contiguous comment block. */
+function commentAbove(text, index) {
+  const lines = text.slice(0, index).split("\n");
+  // The last element is the partial line the match sits on.
+  lines.pop();
+  const block = [];
+  let i = lines.length - 1;
+  while (i >= 0 && lines[i].trim() === "") i--;
+  while (i >= 0 && COMMENT_LINE.test(lines[i])) {
+    block.unshift(lines[i].replace(COMMENT_LINE, "").trim());
+    i--;
+  }
+  return block.join(" ").trim();
+}
+
+/** The comment block at the very top of a file, as one string.
+ *
+ *  Attributes and `use` lines may sit above a module header in Rust, so those
+ *  are stepped over rather than ending the search. */
+function moduleHeader(text) {
+  const block = [];
+  for (const line of text.split("\n")) {
+    const t = line.trim();
+    if (t === "" || t.startsWith("#![") || t.startsWith("use ")) continue;
+    if (!COMMENT_LINE.test(line)) break;
+    block.push(line.replace(COMMENT_LINE, "").trim());
+  }
+  return block.join(" ").trim();
+}
+
+/** Is this surface explained where somebody changing it would see it?
+ *
+ *  **Why a doc comment counts.** The map's job is to be an index — the AI
+ *  workspace README says so: *"the code map is a supporting index"*. An
+ *  explanation already sitting on the function is in a better place than a copy
+ *  of it in a table: the compiler ships it, the diff shows it changing, and the
+ *  person editing the code is looking straight at it. Requiring a row as well
+ *  would make the map a third copy of prose that already lives in two places,
+ *  and transcription is not the work this count exists to measure. */
+function explained(text, index, how) {
+  const prose = how === "module-header" ? moduleHeader(text) : commentAbove(text, index);
+  return prose.length >= EXPLANATION_MIN;
+}
+
+/** Every surface on disk under one solution, as
+ *  `{ what, name, file, explained }`.
  *
  *  A directory that is not there is not a failure — it means this solution has
  *  no surfaces of that kind, which is the normal case for most projects. */
@@ -176,8 +257,13 @@ async function surfacesUnder(root, base) {
     for (const entry of entries) {
       if (!entry.isFile()) continue;
       const text = await fs.readFile(path.join(dir, entry.name), "utf8");
-      for (const [, name] of text.matchAll(surface.pattern)) {
-        found.push({ what: surface.what, name, file: `${surface.dir}/${entry.name}` });
+      for (const m of text.matchAll(surface.pattern)) {
+        found.push({
+          what: surface.what,
+          name: m[1],
+          file: `${surface.dir}/${entry.name}`,
+          explained: explained(text, m.index, surface.explainedBy),
+        });
       }
     }
   }
@@ -368,43 +454,70 @@ for (const map of maps) {
   for (const w of warnings) console.log(`  warn   ${w}`);
   for (const e of errors) console.log(`  ERROR  ${e}`);
 
-  if (uncovered.length > 0) {
-    // Grouped and counted rather than listed in full: two hundred lines of
-    // "no row for X" is a wall nobody reads, and the number is the part that
-    // has to move. The first few name themselves so there is somewhere to start.
+  // **Two debts, counted separately, because only one of them is work.**
+  // A surface explained in a doc comment is *unindexed*: the reasoning is
+  // already where whoever changes the code is looking, and adding a row would
+  // copy it. A surface explained nowhere is *undocumented*, and that is the one
+  // somebody has to sit down and write. A single number put 160 transcriptions
+  // and 67 pieces of real work behind the same figure, so the figure could only
+  // be paid down by transcribing.
+  const undocumented = uncovered.filter((s) => !s.explained);
+  const unindexed = uncovered.filter((s) => s.explained);
+
+  // Grouped and counted rather than listed in full: two hundred lines of
+  // "no row for X" is a wall nobody reads, and the number is the part that has
+  // to move. The first few name themselves so there is somewhere to start.
+  const report = (items, label) => {
     const byKind = new Map();
-    for (const s of uncovered) byKind.set(s.what, [...(byKind.get(s.what) ?? []), s]);
-    const over = uncovered.length > UNCOVERED_CEILING;
-    console.log(
-      `  ${over ? "ERROR " : "warn  "} ${uncovered.length} surface(s) have no row ` +
-        `(ceiling ${UNCOVERED_CEILING}) — the map cannot be scanned for what it does not mention`,
-    );
-    for (const [what, items] of byKind) {
+    for (const s of items) byKind.set(s.what, [...(byKind.get(s.what) ?? []), s]);
+    for (const [what, group] of byKind) {
       console.log(
-        `           ${items.length} ${what}(s), e.g. ${items
+        `           ${group.length} ${what}(s)${label}, e.g. ${group
           .slice(0, 3)
           .map((s) => `${s.name} (${s.file})`)
           .join(", ")}`,
       );
     }
+  };
+
+  if (undocumented.length > 0) {
+    const over = undocumented.length > UNDOCUMENTED_CEILING;
+    console.log(
+      `  ${over ? "ERROR " : "warn  "} ${undocumented.length} surface(s) have no explanation anywhere ` +
+        `(ceiling ${UNDOCUMENTED_CEILING}) — no row, and nothing on the code either`,
+    );
+    report(undocumented, "");
     if (over) {
       console.log(
-        `           This went UP. Add a row for what you built, or say why it is not a surface.`,
+        `           This went UP. Explain what you built — a doc comment on it counts — ` +
+          `or say why it is not a surface.`,
       );
       failed = true;
-    } else if (uncovered.length < UNCOVERED_CEILING) {
+    } else if (undocumented.length < UNDOCUMENTED_CEILING) {
       console.log(
-        `           Below the ceiling by ${UNCOVERED_CEILING - uncovered.length} — ` +
-          `lower UNCOVERED_CEILING in tools/code-map-lint.mjs to lock the gain in.`,
+        `           Below the ceiling by ${UNDOCUMENTED_CEILING - undocumented.length} — ` +
+          `lower UNDOCUMENTED_CEILING in tools/code-map-lint.mjs to lock the gain in.`,
       );
     }
+  }
+
+  // Reported, never failed on. The explanation exists; where it is indexed is a
+  // judgement about reuse, not a gap in the record, and failing a build over it
+  // would buy a row nobody needed with prose that already existed.
+  if (unindexed.length > 0) {
+    console.log(
+      `  note   ${unindexed.length} surface(s) explained in the code but not indexed ` +
+        `— reuse scans read the map, so add a row for any of these a build might rebuild`,
+    );
+    report(unindexed, " explained on the code");
   }
 
   if (errors.length === 0 && warnings.length === 0 && uncovered.length === 0) console.log("  clean");
   else
     console.log(
       `  ${errors.length} error(s), ${warnings.length} warning(s)` +
-        (uncovered.length > 0 ? `, ${uncovered.length} surface(s) with no row` : ""),
+        (undocumented.length > 0 ? `, ${undocumented.length} unexplained` : "") +
+        (unindexed.length > 0 ? `, ${unindexed.length} unindexed` : ""),
     );
   if (errors.length > 0) failed = true;
 }

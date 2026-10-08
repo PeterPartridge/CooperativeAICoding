@@ -35,12 +35,23 @@ const LAYOUT = [
   { from: "template/Project_brief.md", to: "Project_brief.md" },
   { from: "template/_forms", to: "_forms" },
   { from: "template/ai-only", to: "ai-only" },
+  // The guardrails any agent reads, before one has been generated from the
+  // brief. It carries the procedures and the working agreement, which are true
+  // on day one, and marks the rules sections as not yet filled in rather than
+  // inventing them. Written with the generated-file header so /emit-guardrails
+  // replaces it once there is a spec to generate from.
+  { from: "template/AGENTS.template.md", to: "AGENTS.md" },
   { from: ".claude/commands", to: ".claude/commands" },
   { from: ".claude/skills", to: ".claude/skills" },
-  // The two checks, so a project can run them on its own briefs and code map
-  // rather than only inside this repository.
+  // All three checks, so a project can run them on its own briefs, code map and
+  // round record rather than only inside this repository. The round record one
+  // was published and never copied, which left every project with the two
+  // checks that read what an agent wrote *while* working and none of the one
+  // that reads what it wrote afterwards — the only rule here that rests
+  // entirely on the agent remembering.
   { from: "tools/brief-lint.mjs", to: "tools/brief-lint.mjs" },
   { from: "tools/code-map-lint.mjs", to: "tools/code-map-lint.mjs" },
+  { from: "tools/round-record-lint.mjs", to: "tools/round-record-lint.mjs" },
 ];
 
 const written = [];
@@ -111,8 +122,10 @@ Next, in that folder:
      (or endpoint, or model — a backend-only project has no pages at all.)
   4. Fill it in, /translate it, then /build it.
 
-  node tools/brief-lint.mjs      checks every item names a real deliverable
-  node tools/code-map-lint.mjs   checks the code map still matches the code
+  node tools/brief-lint.mjs        checks every item names a real deliverable
+  node tools/code-map-lint.mjs     checks the code map still matches the code
+  node tools/round-record-lint.mjs checks a round record was written, and answers
+                                   all three of its questions
 `);
 }
 

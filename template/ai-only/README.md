@@ -23,6 +23,7 @@ its brief, and a person approves every plan before any code is written.
 | [`1-translate-for-ai.md`](1-translate-for-ai.md) | The bridge: the prompts that turn a filled-in brief into a spec and a skills list. Paste them into any model, or let a command run them. | the framework |
 | [`2-ai-system.template.md`](2-ai-system.template.md) | The shape every spec comes back in, so every project's specs look the same. | the framework |
 | [`3-code-map.template.md`](3-code-map.template.md) | The shape of the code map, and how it is checked. | the framework |
+| [`procedures/`](procedures/README.md) | One file per thing the framework asks an AI to do — draft, translate, new-item, build, pipeline, emit-guardrails. Plain Markdown; any model can be pointed at one and follow it. Each tool holds a pointer, never a copy. | the framework |
 | `Project_system.md` | The **System Spec**, the short **Project Digest**, and the **Project Skills**, translated from `Project_brief.md`. | the AI, from the brief |
 | `<solution>/<item>.md` | One **item spec** per page, endpoint or model, mirroring the human folders (`ClothingAPI/Login.json` → `ClothingAPI/Login.md`). Each holds the spec, the skills, the plan, and a report for every build round. | the AI, from the item's brief |
 | `Code_map.md` | The **reuse index**: one row per method the AI built, saying what it does and what it uses. | the AI, as it builds |
