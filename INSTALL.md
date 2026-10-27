@@ -12,9 +12,13 @@ claude
 
 It runs wherever Claude Code runs — Windows, macOS, Linux alike. Nothing in
 it is platform-specific. `coperativeai init --dry-run` shows what it would
-write first, and it never overwrites a file that is already there — so
-running it again after `npm update -g coperativeai` is how a project picks up
-forms added since.
+write first, and it never overwrites a file that is already there.
+
+To bring a project up to date, run `npm update -g coperativeai`, then
+`coperativeai update` in the project (add `--dry-run` to see it first):
+- framework files nobody changed are replaced;
+- edited ones are kept, with the new version beside them as `<file>.update`;
+- your answers are never touched.
 
 Then fill in `Project_brief.md` in plain English, and follow
 [`HOW-TO-USE.md`](HOW-TO-USE.md). `init` puts the slash commands (`/draft`,

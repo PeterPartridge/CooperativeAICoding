@@ -25,7 +25,8 @@
   ],
   "scripts": {
     "test": "node --test tools/lint.test.mjs tools/commands.test.mjs",
-    "check": "npm test && node tools/check.mjs"
+    "check": "npm test && node tools/check.mjs",
+    "prepublishOnly": "node tools/known-versions.mjs"
   },
   "engines": {
     "node": ">=20"

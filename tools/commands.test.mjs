@@ -18,7 +18,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync, promises as fs } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -364,4 +365,193 @@ test("the published package is what init copies, plus the CLI and its docs", () 
 
   const missing = LAYOUT_SOURCES.filter((src) => !packed.some((p) => p === src || p.startsWith(`${src}/`)));
   assert.deepEqual(missing, [], "init copies these but the package would not contain them");
+});
+
+// ---------------------------------------------------------------------------
+// coperativeai update: framework fixes reach projects that already ran init.
+//
+// **Its fault would be destroying somebody's work.** So every rule is tested
+// from the side of the person who owns the file: an answered brief is never
+// touched; an edited procedure is kept, with the new version beside it; only a
+// framework file nobody changed since it was installed is replaced. And the
+// quieter faults: a second run that changes something, a dry run that writes,
+// a dropped file deleted rather than reported.
+
+const fingerprint = (text) =>
+  createHash("sha256").update(String(text).replace(/\r\n/g, "\n")).digest("hex");
+
+function cli(...args) {
+  try {
+    return { code: 0, out: execFileSync("node", [path.join(repo, "bin/coperativeai.mjs"), ...args], { encoding: "utf8" }) };
+  } catch (e) {
+    return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
+  }
+}
+
+async function freshProject() {
+  const target = await fs.mkdtemp(path.join(os.tmpdir(), "cai-update-"));
+  cli("init", target);
+  return target;
+}
+
+const inProject = (t, p) => path.join(t, p);
+const readIn = (t, p) => fs.readFile(inProject(t, p), "utf8");
+const manifestOf = async (t) => JSON.parse(await readIn(t, ".coperativeai.json"));
+
+/** Makes a framework file look as if an older version had been installed. */
+async function installedOld(t, p, text = "OLD VERSION\n") {
+  await fs.writeFile(inProject(t, p), text);
+  const m = await manifestOf(t);
+  m.files[p] = fingerprint(text);
+  await fs.writeFile(inProject(t, ".coperativeai.json"), JSON.stringify(m));
+}
+
+const BUILD = "ai-only/procedures/build.md";
+
+test("init records a fingerprint of every file it wrote", async () => {
+  const t = await freshProject();
+  const m = await manifestOf(t);
+  assert.ok(m.framework, "no framework version recorded");
+  assert.equal(m.files[BUILD], fingerprint(await readIn(t, BUILD)));
+  assert.ok(Object.keys(m.files).length >= 20, `only ${Object.keys(m.files).length} files recorded`);
+});
+
+test("update on a current project changes nothing", async () => {
+  const t = await freshProject();
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.match(out, /0 updated/);
+  assert.doesNotMatch(out, /\.update/);
+});
+
+test("update replaces a framework file nobody changed since it was installed", async () => {
+  const t = await freshProject();
+  await installedOld(t, BUILD);
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, BUILD), await read(`template/${BUILD}`));
+  assert.match(out, /updated[\s\S]*procedures\/build\.md/);
+  assert.equal((await manifestOf(t)).files[BUILD], fingerprint(await readIn(t, BUILD)));
+});
+
+test("update keeps an edited framework file and puts the new version beside it", async () => {
+  const t = await freshProject();
+  await installedOld(t, BUILD);
+  await fs.writeFile(inProject(t, BUILD), "MY OWN EDITS\n");
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, BUILD), "MY OWN EDITS\n", "an edited file was overwritten");
+  assert.equal(await readIn(t, `${BUILD}.update`), await read(`template/${BUILD}`));
+  assert.match(out, /kept yours[\s\S]*procedures\/build\.md/);
+});
+
+test("update never touches a brief somebody has answered", async () => {
+  const t = await freshProject();
+  const answered = (await readIn(t, "Project_brief.md")).replace("status: blank", "status: filled");
+  await fs.writeFile(inProject(t, "Project_brief.md"), answered);
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, "Project_brief.md"), answered);
+  assert.equal(existsSync(inProject(t, "Project_brief.md.update")), false, "a people's file got a .update");
+});
+
+test("update adds framework files a project does not have yet", async () => {
+  const t = await freshProject();
+  await fs.rm(inProject(t, "qa/signoff.md"));
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.ok(existsSync(inProject(t, "qa/signoff.md")));
+  assert.match(out, /added[\s\S]*qa\/signoff\.md/);
+});
+
+test("update handles a project from before the record existed, without losing anything", async () => {
+  const t = await freshProject();
+  await fs.rm(inProject(t, ".coperativeai.json"));
+  await fs.writeFile(inProject(t, BUILD), "OLD VERSION\n");
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, BUILD), "OLD VERSION\n", "an unrecorded file was overwritten");
+  assert.ok(existsSync(inProject(t, `${BUILD}.update`)));
+  const m = await manifestOf(t);
+  assert.ok(m.files["ai-only/procedures/translate.md"], "files that already match were not recorded");
+  assert.equal(m.files[BUILD], undefined, "a kept file was recorded as if installed");
+});
+
+test("update --dry-run writes nothing", async () => {
+  const t = await freshProject();
+  await installedOld(t, BUILD);
+  const before = await readIn(t, ".coperativeai.json");
+  const { code, out } = cli("update", t, "--dry-run");
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, BUILD), "OLD VERSION\n");
+  assert.equal(await readIn(t, ".coperativeai.json"), before);
+  assert.match(out, /would update/);
+});
+
+test("update says how to bring specs in the old format up to date", async () => {
+  const t = await freshProject();
+  await fs.writeFile(inProject(t, "ai-only/Project_system.md"), "# AI System Spec\n\n## Project Digest\n- **Platform:** web\n");
+  const { out } = cli("update", t);
+  assert.match(out, /old format/);
+  assert.match(out, /\/translate/);
+});
+
+test("update reports a file the framework dropped, and does not delete it", async () => {
+  const t = await freshProject();
+  await fs.writeFile(inProject(t, "tools/retired-lint.mjs"), "// retired\n");
+  const m = await manifestOf(t);
+  m.files["tools/retired-lint.mjs"] = fingerprint("// retired\n");
+  await fs.writeFile(inProject(t, ".coperativeai.json"), JSON.stringify(m));
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.ok(existsSync(inProject(t, "tools/retired-lint.mjs")), "a file was deleted");
+  assert.match(out, /no longer part of the framework.*retired-lint\.mjs/s);
+});
+
+// **A project from before the record still updates cleanly** when its files
+// are versions the framework once shipped. bin/known-versions.json holds a
+// fingerprint of every committed version of every file a project receives,
+// so an old, untouched procedure is recognised rather than kept as "yours".
+test("update recognises an old version the framework shipped, with no record", async () => {
+  const t = await freshProject();
+  await fs.rm(inProject(t, ".coperativeai.json"));
+  const old = execFileSync("git", ["show", `444f2f5:template/${BUILD}`], { cwd: repo, encoding: "utf8" });
+  await fs.writeFile(inProject(t, BUILD), old);
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, BUILD), await read(`template/${BUILD}`), "a shipped old version was not updated");
+  assert.equal(existsSync(inProject(t, `${BUILD}.update`)), false);
+});
+
+test("bin/known-versions.json is what tools/known-versions.mjs produces", () => {
+  const generated = execFileSync("node", [path.join(repo, "tools/known-versions.mjs"), "--print"], { cwd: repo, encoding: "utf8" });
+  const committed = readFileSync(path.join(repo, "bin/known-versions.json"), "utf8");
+  const parse = (s) => JSON.parse(s);
+  // Every version committed today must be in the shipped list. Newer versions
+  // need not be: projects installed from now on carry their own record.
+  const want = parse(committed);
+  for (const [file, prints] of Object.entries(parse(generated))) {
+    if (!want[file]) continue;
+    for (const p of want[file]) assert.ok(prints.includes(p), `${file}: a shipped fingerprint is not in its history`);
+  }
+  assert.ok(Object.keys(want).length >= 20, "the known versions list is nearly empty");
+});
+
+test("update replaces the starter AGENTS.md, whose header says it may", async () => {
+  const t = await freshProject();
+  await installedOld(t, "AGENTS.md", "<!-- Generated by CooperativeAICoding from template/AGENTS.template.md. -->\n# old starter\n");
+  await fs.rm(inProject(t, ".coperativeai.json"));
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, "AGENTS.md"), await read("template/AGENTS.template.md"));
+});
+
+test("update leaves an AGENTS.md written from the project's own spec", async () => {
+  const t = await freshProject();
+  const emitted = "<!-- Generated by CooperativeAICoding from ai-only/Project_digest.md. -->\n# this project's rules\n";
+  await fs.writeFile(inProject(t, "AGENTS.md"), emitted);
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.equal(await readIn(t, "AGENTS.md"), emitted);
+  assert.match(out, /\/emit-guardrails/);
 });
