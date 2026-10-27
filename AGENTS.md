@@ -21,7 +21,7 @@ there, not here.
 | `example/` | A worked Clothing project to read before writing your own |
 | `.claude/` | The slash commands and skills — thin pointers to the procedures, never copies of them |
 | `tools/` | The checks (every `*-lint.mjs`, run together by `check.mjs`) and their tests |
-| `bin/` | The `coperativeai init` CLI that copies the template into a project |
+| `bin/` | The `coperativeai` CLI: `init` copies the template into a project, `update` brings it up to date |
 | `site/` | The GitHub Pages site, built from `README.md`, `HOW-TO-USE.md` and `INSTALL.md` |
 
 ## House rules
@@ -46,6 +46,9 @@ From the repository root, these must pass:
 npm test          # the checks' own tests, and every command points at something real
 npm run check     # npm test, then every check over this repository
 ```
+
+Publishing runs `tools/known-versions.mjs` first (`prepublishOnly`), so
+`coperativeai update` can recognise every version a project might hold.
 
 If you touched `site/`, build it: `cd site && npm ci && node build.mjs`.
 

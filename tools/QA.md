@@ -191,3 +191,26 @@ Now break the app so that test fails, and run `/qa run`.
 Then run `/build` on another item and watch what it reads.
 
 **Fail:** it opens anything under `qa/`.
+
+---
+
+## 8. `coperativeai update`: fixes arrive, nobody's work is lost
+
+In a project made by an older version, answer the Project Brief, edit one
+procedure, then:
+
+```bash
+npm update -g coperativeai
+coperativeai update --dry-run
+coperativeai update
+```
+
+**Pass:**
+- The dry run writes nothing.
+- The real run adds new files and updates the untouched ones.
+- It keeps your edited procedure, with a `.update` beside it.
+- It does not touch the answered brief.
+- It says what to re-translate if the specs are in an old format.
+- Run it again: nothing changes.
+
+**Fail:** any file somebody wrote, or edited, is different afterwards.

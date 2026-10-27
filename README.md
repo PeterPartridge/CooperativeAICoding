@@ -219,8 +219,15 @@ coperativeai init
 That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the seven commands and the
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
 to build. It never overwrites: a file that already exists
-is left alone and named in the report, so running it again is how you pick up
-forms added since. Add `--dry-run` to see it first.
+is left alone and named in the report. Add `--dry-run` to see it first.
+
+**Keeping a project up to date.** After `npm update -g coperativeai`, run
+`coperativeai update` in the project:
+- **Framework files nobody changed** are replaced.
+- **Files you edited** are kept, with the new version beside them as `<file>.update` to compare.
+- **Your answers** (the briefs, `AGENTS.md`, QA's suite and sign-off) are never touched.
+
+It tells the difference from `.coperativeai.json`, a record of what was installed (commit it). A project made before that record existed is recognised from every version the framework has ever shipped.
 
 **Looking for the desktop app?** [Swarm](https://github.com/PeterPartridge/Swarm) is built with this framework and lives in its own repository, with its installers and build steps. The framework itself needs no binary at all — [`INSTALL.md`](INSTALL.md) — and runs wherever Claude Code runs.
 

@@ -54,7 +54,8 @@ mirroring your folders.
    It writes `Project_brief.md`, `_forms/`, `ai-only/`, the `.claude/`
    commands and `tools/` into the folder you run it in, and writes over nothing.
    Skip this inside the framework's own repository, where `template/` already is
-   the blank copy.
+   the blank copy. Later, `coperativeai update` brings in framework fixes. It
+   replaces only files nobody changed, and keeps your edits and answers.
 
 1. **Fill in the project brief.** Copy [`template/Project_brief.md`](template/Project_brief.md)
    into your project folder (or fill it in place for a template-based project)
@@ -211,7 +212,7 @@ against the list its Project Brief names, QA's **regression suite and sign-off**
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
-running it is a model. That pass is [`tools/QA.md`](tools/QA.md): seven scenarios a
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): eight scenarios a
 person runs against a real agent, each one naming the failure that would count as
 a fail rather than asking whether the output looked plausible.
 
