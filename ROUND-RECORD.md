@@ -118,3 +118,38 @@
 - **Projects created before this fix keep the broken procedures.** `init` never
   overwrites, so the fix only reaches projects that run `init` afterwards. This
   is gap 7 (updates never reach existing projects).
+
+## 2026-10-27 — Lean AI layer, step 2: the baseline
+
+### What I did
+- **Translated the example with today's procedures**, so there is something
+  real to measure. `example/ai-only/Project_system.md` comes from the Project
+  Brief, and `example/ai-only/ClothingWebsite/userLogin.md` from the login page.
+  This also gives `example/` the translated spec it never had.
+- **Measured what each step reads**, at four characters per token: always
+  loaded ~1,340; translate project ~4,460; translate item ~4,050; build up to
+  the plan ~11,100. The whole chain is **~21,000 tokens**. The read lists and
+  the script are in the PR description.
+- **The translation found four real gaps in the example**, now listed as Open
+  Questions:
+  - the MVP needs customers to register, but `CreateUser` is Admin-only;
+  - nothing covers "see their account";
+  - the Manager role is never used;
+  - a logged-out customer is offered a password reset that needs a login.
+
+### What I could not do  (and what you would need to tell me)
+- **These are estimates, not tokenizer counts.** Exact counts need the API's
+  token-counting endpoint and a key. The same estimator is used before and
+  after, so the comparison holds.
+- **The target is yours to set** now that the baseline exists.
+
+### Debt I left behind
+- **My earlier guess aimed at the wrong place.** The procedures are only about
+  15% of the chain (~3,150 tokens). The biggest single read is
+  `_forms/boilerplates.json` (~3,590 tokens, a third of the build step), read
+  whole to resolve one preset and one baseline. Build also re-reads the Project
+  Brief (~1,260) for deliverables the Digest already carries. Trimming the
+  procedures alone cannot reach a large cut.
+
+- **The example's four open questions are real gaps in a worked example
+  people copy.** Answering them is Product's job, not mine, so they stay open.
