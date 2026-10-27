@@ -18,7 +18,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { promises as fs } from "node:fs";
+import { existsSync, promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -241,6 +241,50 @@ test("every path the starter AGENTS.md names exists in a fresh project", async (
     if (!(await fs.stat(path.join(target, p)).then(() => true, () => false))) missing.push(p);
   }
   assert.deepEqual(missing, [], "AGENTS.md names paths a fresh project does not have");
+});
+
+// **The same breakage again, one layer further in.** The commands were fixed to
+// point at procedures, but the procedures themselves still linked
+// `../../../template/ai-only/…` and told the agent to copy
+// `template/ai-only/3-code-map.template.md` — paths that exist in this
+// repository and nowhere in a project. The pointer test above never reads a
+// procedure, so it could not see them. This reads what a project actually
+// receives, from where the project receives it.
+test("every path the AI workspace names exists in a fresh project", async () => {
+  const target = await fs.mkdtemp(path.join(os.tmpdir(), "cai-init-"));
+  execFileSync("node", [path.join(repo, "bin/coperativeai.mjs"), "init", target], { encoding: "utf8" });
+
+  const docs = [];
+  const walk = async (dir) => {
+    for (const e of await fs.readdir(dir, { withFileTypes: true })) {
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) await walk(full);
+      else if (e.name.endsWith(".md")) docs.push(full);
+    }
+  };
+  await walk(path.join(target, "ai-only"));
+  assert.ok(docs.length >= 8, `only ${docs.length} documents found — the walk stopped finding them`);
+
+  const broken = [];
+  for (const doc of docs) {
+    const at = path.relative(target, doc).split(path.sep).join("/");
+    const lines = (await fs.readFile(doc, "utf8")).replace(/\r\n/g, "\n").split("\n");
+    lines.forEach((line, i) => {
+      // A Markdown link must land inside the project and on something real.
+      for (const [, href] of line.matchAll(/\]\(([^)\s]+)\)/g)) {
+        if (/^(https?:|mailto:|#)/.test(href)) continue;
+        const resolved = path.resolve(path.dirname(doc), href.split("#")[0]);
+        const inside = !path.relative(target, resolved).startsWith("..");
+        if (!inside || !existsSync(resolved)) broken.push(`${at}:${i + 1} links ${href}`);
+      }
+      // A `template/<file>` path is this repository's layout. It may be named
+      // only as such — "inside this repository" — never as where to look.
+      for (const [, p] of line.matchAll(/`(template\/[^`\s]+)`/g)) {
+        if (!/in(side)? (this|the framework's own) repository/.test(line)) broken.push(`${at}:${i + 1} names ${p} as if a project had it`);
+      }
+    });
+  }
+  assert.deepEqual(broken, [], "the AI workspace sends an agent to paths a project does not have");
 });
 
 test("a fresh project's own checks run in it", async () => {

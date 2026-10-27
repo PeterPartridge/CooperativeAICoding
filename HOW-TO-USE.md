@@ -29,7 +29,8 @@ Fill a form                 →   Translate to a spec   →   Review & approve  
 
 A **project** is any folder whose root holds a `Project_brief.md` — `template/`
 is the blank starting copy and `example/` is a worked project. Every command resolves paths from that project
-root; the blank forms and boilerplates always come from `template/_forms/`.
+root; the blank forms and boilerplates come from the project's `_forms/` (in this
+repository, `template/_forms/`).
 
 Forms come in two shapes, matched to their content. Prose briefs (the project
 brief and page briefs) are **Markdown**: write your plain-English answer under
@@ -132,7 +133,7 @@ Once a spec is approved:
 Claude will:
 0. **Scaffold** (first build in a solution only) — create the repo skeleton from
    the solution spec's `scaffold` block: a named boilerplate from
-   `template/_forms/boilerplates.json`, or the layout/tests/commands the
+   the project's `_forms/boilerplates.json`, or the layout/tests/commands the
    developers wrote, as its own approved plan.
 1. **Plan** — summary + bullet changes, reusing methods already listed in its
    code map instead of rebuilding them, and wait for your go-ahead.

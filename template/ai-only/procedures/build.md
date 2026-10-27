@@ -65,7 +65,7 @@ Workflow:
    scaffold block and include the results; then append to the spec what you did,
    how each use case was implemented, and the test scenarios you created. Then
    update `<projectRoot>/ai-only/Code_map.md`
-   (create it from `template/ai-only/3-code-map.template.md` if it doesn't exist):
+   (create it from `<projectRoot>/ai-only/3-code-map.template.md` if it doesn't exist):
    one row per method you created or changed — the method, its file, one line on what
    it does, and which other files/methods it uses. Fix any rows your changes made stale.
    Then run `node tools/code-map-lint.mjs` and fix what it reports — it checks the

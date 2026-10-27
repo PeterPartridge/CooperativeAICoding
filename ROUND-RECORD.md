@@ -75,3 +75,46 @@
 - **`package.json`'s file list and `init`'s copy list are two lists.** The new
   test keeps them in step, but adding a folder to `init` means adding it in
   both places.
+
+## 2026-10-27 — Procedure paths and quick fixes
+
+### What I did
+- **The procedures no longer send a project to paths it does not have.**
+  `translate.md` linked `../../../template/ai-only/…` for the bridge and the
+  spec shape, `build.md` said to create the code map from
+  `template/ai-only/3-code-map.template.md`, and `pipeline.md` said framework
+  assets "always live at the repo's `template/`". In a project made by
+  `coperativeai init` none of those exist — the same breakage as the earlier
+  `template/_forms/` one, one layer further in. They now name the project's own
+  `ai-only/` and `_forms/`, with the repository's `template/` given only as
+  "inside this repository".
+- **A test that reads what a project receives.** `commands.test.mjs` now runs
+  `init` and checks every Markdown link in the project's `ai-only/` lands inside
+  the project on a real file, and that no `template/<file>` path is named except
+  as this repository's layout. It failed on the six faults above before the fix.
+- **Docs that had drifted.** "four commands" → six in `README.md`,
+  `INSTALL.md` and the site; `INSTALL.md` now lists all six and says `init`
+  installs them and that each points at a procedure; `HOW-TO-USE.md` says the
+  forms come from the project's `_forms/`; `ai-only/README.md` points at
+  `procedures/build.md` rather than the command file for the code-map rule.
+- **The example caught up with the form.** `example/ClothingWebsite/userLogin.md`
+  still asked the old `in-memory` and `tests` questions. Both headings now match
+  `page.md`, and the `in-memory` answer is restated as the constraint the
+  ClothingWebsite spec already carries "from the userLogin page brief": the
+  typed password is never saved.
+
+### What I could not do  (and what you would need to tell me)
+- **The code-map surfaces and the `app/`-only round-record rule are not quick
+  fixes.** Both ship Swarm's layout to every project, and changing what they
+  watch changes every project, so they need deciding rather than patching.
+
+### Debt I left behind
+- **The new test checks backticked `template/<file>` paths by the words on the
+  same line** ("inside this repository"). A sentence that wraps the qualifier
+  onto the next line would be reported wrongly. That is a false alarm, not a
+  missed fault, which is the safer way to be wrong, but it may still need a
+  rewording one day.
+
+- **Projects created before this fix keep the broken procedures.** `init` never
+  overwrites, so the fix only reaches projects that run `init` afterwards. This
+  is gap 7 (updates never reach existing projects).

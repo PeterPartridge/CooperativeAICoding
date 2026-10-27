@@ -1,7 +1,7 @@
 # Translate a CooperativeAICoding brief
 
 This procedure automates the bridge that previously required pasting Prompt A / Prompt B
-by hand from [`template/ai-only/1-translate-for-ai.md`](../../../template/ai-only/1-translate-for-ai.md).
+by hand from [`ai-only/1-translate-for-ai.md`](../1-translate-for-ai.md).
 It turns a plain-English brief into the structured spec the AI builds from, while
 staying token-efficient (no re-sending the whole project spec for every page).
 
@@ -23,10 +23,10 @@ and `example/` each qualify. All project-relative paths resolve from there:
 - AI workspace outputs: `<projectRoot>/ai-only/Project_system.md`,
   `<projectRoot>/ai-only/Code_map.md`, `<projectRoot>/ai-only/<solution>/<item>.md`
 
-**Framework assets always stay at the repo's `template/`** (they are the framework,
-not the project): the project's `_forms/*` (blank forms, `boilerplates.json`; `template/_forms/` inside this repository) and
-`template/ai-only/1-translate-for-ai.md`, `2-ai-system.template.md`,
-`3-code-map.template.md`.
+**Framework assets** are the files `coperativeai init` put into the project: the
+blank forms and `boilerplates.json` in `<projectRoot>/_forms/`, and
+`1-translate-for-ai.md`, `2-ai-system.template.md` and `3-code-map.template.md` in
+`<projectRoot>/ai-only/`. (Inside this repository they are under `template/`.)
 
 If no ancestor has a `Project_brief.md`, or no path was given, ask once which
 project root to use.
@@ -62,7 +62,7 @@ the blank forms in `_forms/` (`status: blank`, or all answers empty).
 
 ### A. Translating a Project Brief
 
-1. Read the brief. Read [`template/ai-only/2-ai-system.template.md`](../../../template/ai-only/2-ai-system.template.md) for the exact output shape.
+1. Read the brief. Read [`ai-only/2-ai-system.template.md`](../2-ai-system.template.md) for the exact output shape.
 2. Produce, in this order:
    - **System Spec** — the labelled headings from the template (Purpose, Users, Deliverables, Platforms & tech constraints, Solutions & repositories, Infrastructure & environments, Coding house rules, Testing floor, Access & security, Look & feel, Model & effort selection, Open Questions). Solutions & repositories is the table of where each solution's code lives (repo + local path) from the brief's `solutions` answer; Infrastructure & environments comes from the `environments` and `infrastructure-policy` answers (who provisions, tool, deploy permissions, where secrets live — never values). Missing locations or policy → Open Questions.
    - **Project Digest** — a compact ≤12-line constraints block (platform/tech, solutions & repo locations, infra policy & environments, house-rule names, testing floor, deliverables in order, security model, roles, model/effort tiers). This is the only project-level context a page translation will need.

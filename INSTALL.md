@@ -1,6 +1,6 @@
 # Install
 
-The framework is the forms and the four commands, and it installs from npm.
+The framework is the forms and the six commands, and it installs from npm.
 You need Node 20 or later and [Claude Code](https://claude.com/claude-code):
 
 ```bash
@@ -17,11 +17,11 @@ running it again after `npm update -g coperativeai` is how a project picks up
 forms added since.
 
 Then fill in `Project_brief.md` in plain English, and follow
-[`HOW-TO-USE.md`](HOW-TO-USE.md). The slash commands (`/translate`,
-`/new-item`, `/build`, `/pipeline`) are checked into this repository — in
-[`.claude/commands/`](.claude/commands/), with the longer skills they call in
-[`.claude/skills/`](.claude/skills/) — so they exist the moment Claude Code
-starts from this folder, and travel with a copy of it.
+[`HOW-TO-USE.md`](HOW-TO-USE.md). `init` puts the slash commands (`/draft`,
+`/translate`, `/new-item`, `/build`, `/pipeline`, `/emit-guardrails`) into the
+project's `.claude/commands/`, so they exist the moment Claude Code starts
+there. Each one points at a plain-Markdown procedure in
+`ai-only/procedures/`, which any other agent can be told to follow.
 
 [`example/`](example/) is a worked project to read before you write your own.
 
