@@ -378,3 +378,39 @@
 
 - **Swarm's Test area should read `qa/`**, not keep a second copy of the suite.
   That work belongs in the Swarm repository.
+
+## 2026-10-27 — One copy list
+
+### What I did
+- **`init` copies what `package.json` publishes, and nothing else.**
+  `bin/layout.mjs` derives the copy list from `files`:
+  - `template/<path>` lands at `<path>`;
+  - `template/<name>.template.md` lands at `<name>.md`;
+  - `.claude/` and `tools/` land where they are;
+  - the CLI and docs are published but not copied.
+
+  The two lists that had to be kept in step are now one. The derived list
+  matched the old one exactly, plus the new runner.
+- **`tools/check.mjs` runs every `*-lint.mjs` beside it.** All of them, always:
+  a failure does not stop the rest. `package.json` publishes `tools/*-lint.mjs`.
+  `npm run check`, CI, the starter `AGENTS.md`, the CLI's next steps and the
+  docs name that one command. Two tests, written first, give it a check no list
+  names and a failing check followed by a passing one.
+- **Adding a check is now adding a file.** It used to mean five edits. The
+  fresh-project test finds the checks by file name rather than from a list, and
+  a mutation check confirmed it fails ("tools/brief-lint.mjs is missing from a
+  fresh project") when `package.json` stops publishing them.
+
+### What I could not do  (and what you would need to tell me)
+- **CI still runs `round-record-lint` a second time**, with `--since`, because
+  only it can ask "did this change bring a record?", and that needs the pull
+  request's base. One special case, said so in the workflow.
+
+### Debt I left behind
+- **Splitting `brief-lint` is now cheap**, but not done: it wasn't asked for. A
+  new `qa-lint.mjs` would run everywhere with no other edits.
+
+- **The `*-lint.mjs` naming is now load-bearing.** A check named anything else
+  silently doesn't run. This is written in `check.mjs` and `AGENTS.md`, not
+  enforced. A test that every `.mjs` in `tools/` is either a check, a test,
+  `check.mjs` or listed as a helper would close it.

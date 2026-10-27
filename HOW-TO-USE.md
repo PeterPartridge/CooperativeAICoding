@@ -205,9 +205,9 @@ npm run check
 ```
 
 Runs the tests for the checks themselves (two have silently passed while
-reading nothing, so the faults each exists to catch are tested), then the four
-checks: the **code map** against the code, every item brief's **deliverable**
-against the list its Project Brief names, the **round record**, and every line
+reading nothing, so the faults each exists to catch are tested), then every
+check, through `node tools/check.mjs`: the **code map** against the code, every item brief's **deliverable**
+against the list its Project Brief names, QA's **regression suite and sign-off**, the **round record**, and every line
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing

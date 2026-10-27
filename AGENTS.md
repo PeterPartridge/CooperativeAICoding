@@ -20,7 +20,7 @@ there, not here.
 | `template/` | The blank copy `init` hands to a project: the brief, the forms in `_forms/`, and the procedures in `ai-only/procedures/` |
 | `example/` | A worked Clothing project to read before writing your own |
 | `.claude/` | The slash commands and skills — thin pointers to the procedures, never copies of them |
-| `tools/` | The checks (`brief-lint`, `code-map-lint`, `round-record-lint`) and their tests |
+| `tools/` | The checks (every `*-lint.mjs`, run together by `check.mjs`) and their tests |
 | `bin/` | The `coperativeai init` CLI that copies the template into a project |
 | `site/` | The GitHub Pages site, built from `README.md`, `HOW-TO-USE.md` and `INSTALL.md` |
 
@@ -44,7 +44,7 @@ From the repository root, these must pass:
 
 ```bash
 npm test          # the checks' own tests, and every command points at something real
-npm run check     # npm test, then the four checks over this repository
+npm run check     # npm test, then every check over this repository
 ```
 
 If you touched `site/`, build it: `cd site && npm ci && node build.mjs`.

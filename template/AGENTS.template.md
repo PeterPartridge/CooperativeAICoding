@@ -56,12 +56,8 @@ Append to `ROUND-RECORD.md`, one heading each:
 
 ## The checks: run them, they are not advisory
 
-```bash
-node tools/brief-lint.mjs         every item names a deliverable the brief lists
-node tools/spec-lint.mjs          every spec line has a source; gaps are marked
-node tools/code-map-lint.mjs      the code map matches the code
-node tools/round-record-lint.mjs  the round record answers all three questions
-```
+`node tools/check.mjs` runs every check: briefs, specs, code map, QA's suite and
+the round record.
 
 ## What this file cannot give you
 
