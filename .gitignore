@@ -1,11 +1,4 @@
-# Rust build artifacts
-/target/
-**/target/
-
-# Cargo lockfile (optional for libraries, but commonly committed for apps)
-# Cargo.lock
-
-# Rust IDE/editor files
+# Editor files
 .vscode/
 .idea/
 

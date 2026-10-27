@@ -19,6 +19,17 @@
   Where the framework names the app in text it is emitted into projects with
   (`emit-guardrails`, `AGENTS.template.md`, `ai-only/README.md`), it now says
   Swarm.
+- **Tidied after the move.** `.gitignore` loses its Rust and Cargo rules;
+  `lint.test.mjs` uses a neutral `app/Shop/` fixture path instead of the old
+  app's name. The repository has a description, the Pages site as its
+  website, and the five topics from `package.json`. Locally: the merged
+  branches and the leftover `app/` build output are gone, and the loose
+  objects from the deletion were packed. This answers the debt item below
+  about the `app/` folder surviving on disk.
+- **`commands.test.mjs` keeps `application` in its list of real top-level
+  folders, on purpose.** A command that still cited `application/…` would now
+  fail that test, which is right; dropping it from the list would let the
+  dead reference through unchecked.
 
 ### What I could not do (and what you would need to tell me)
 - **The framework has no Project brief of its own,** so `AGENTS.md` and
