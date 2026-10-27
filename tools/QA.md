@@ -18,8 +18,9 @@ these commands is that a plausible wrong answer is the expensive outcome.
 ## 0. Set up a scratch project
 
 ```bash
+npm install -g coperativeai
 mkdir /tmp/qa-shop && cd /tmp/qa-shop
-npx github:PeterPartridge/CooperativeAICoding init
+coperativeai init
 claude
 ```
 

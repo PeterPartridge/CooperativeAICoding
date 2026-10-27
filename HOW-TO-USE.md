@@ -46,7 +46,8 @@ mirroring your folders.
 0. **Put the framework in the project.**
 
    ```bash
-   npx github:PeterPartridge/CooperativeAICoding init
+   npm install -g coperativeai   # once per machine
+   coperativeai init
    ```
 
    It writes `Project_brief.md`, `_forms/`, `ai-only/`, the `.claude/`

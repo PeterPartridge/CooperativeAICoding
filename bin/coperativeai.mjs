@@ -12,10 +12,11 @@
 // is already set up is therefore safe, and is how you pick up forms added
 // since — with `--dry-run` first if you want to see it before it happens.
 //
-// No dependencies, on purpose: this runs through npx on somebody else's
-// machine, and the thing it is asking for is trust.
+// No dependencies, on purpose: this is installed on somebody else's machine,
+// and the thing it is asking for is trust.
 //
-//   npx github:PeterPartridge/CooperativeAICoding init [folder]
+//   npm install -g coperativeai
+//   coperativeai init [folder]
 //   node bin/coperativeai.mjs init ../my-project --dry-run
 
 import { promises as fs } from "node:fs";
@@ -133,7 +134,9 @@ function usage() {
   console.log(`
 CooperativeAICoding — a way of working that Product, Developers, QA and AI share.
 
-  npx github:PeterPartridge/CooperativeAICoding init [folder] [--dry-run]
+  coperativeai init [folder] [--dry-run]
+
+  Installed with: npm install -g coperativeai
 
   init        put the brief, the forms and the commands into a project
   --dry-run   say what it would write, and write nothing

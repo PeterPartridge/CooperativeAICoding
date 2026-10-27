@@ -251,3 +251,36 @@ test("a fresh project's own checks run in it", async () => {
   const out = execFileSync("node", [path.join(target, "tools/brief-lint.mjs")], { encoding: "utf8" });
   assert.match(out, /not filled in yet/);
 });
+
+// ---------------------------------------------------------------------------
+// The published package.
+//
+// **It carries what `init` copies, and nothing else.** `files` in package.json
+// used to name the whole `.claude/` folder, so a publish from a working copy
+// would have shipped that machine's `settings.local.json` — its local
+// permissions — to everybody. The list is now exact, and this asks npm itself
+// what it would publish rather than trusting the list to stay exact.
+
+const LAYOUT_SOURCES = [...(await read("bin/coperativeai.mjs")).matchAll(/\{ from: "([^"]+)"/g)].map(
+  (m) => m[1],
+);
+const ALSO_PUBLISHED = ["package.json", "README.md", "HOW-TO-USE.md", "INSTALL.md", "LICENSE"];
+
+test("the published package is what init copies, plus the CLI and its docs", () => {
+  const packed = JSON.parse(
+    execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
+      cwd: repo,
+      encoding: "utf8",
+      shell: process.platform === "win32",
+    }),
+  )[0].files.map((f) => f.path.split(path.sep).join("/"));
+
+  const allowed = (p) =>
+    p.startsWith("bin/") ||
+    ALSO_PUBLISHED.includes(p) ||
+    LAYOUT_SOURCES.some((src) => p === src || p.startsWith(`${src}/`));
+  assert.deepEqual(packed.filter((p) => !allowed(p)), [], "published but not needed by init");
+
+  const missing = LAYOUT_SOURCES.filter((src) => !packed.some((p) => p === src || p.startsWith(`${src}/`)));
+  assert.deepEqual(missing, [], "init copies these but the package would not contain them");
+});

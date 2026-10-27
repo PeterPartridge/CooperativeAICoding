@@ -6,7 +6,7 @@ description: Fill in a CooperativeAICoding Project Brief (or an item brief) from
 Read **`ai-only/procedures/draft.md`** under the project root you are working in,
 and follow it exactly. In this repository the canonical copy is
 `template/ai-only/procedures/draft.md`; a project created with
-`npx github:PeterPartridge/CooperativeAICoding init` has it at
+`coperativeai init` has it at
 `ai-only/procedures/draft.md`.
 
 **The procedure is the instruction, and it lives there rather than here** so that

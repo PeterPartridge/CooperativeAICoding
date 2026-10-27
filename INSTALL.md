@@ -1,17 +1,20 @@
 # Install
 
-The framework is the forms and the four commands. **One command and no
-download**, because it is Markdown, JSON and prompts — and
-[Claude Code](https://claude.com/claude-code):
+The framework is the forms and the four commands, and it installs from npm.
+You need Node 20 or later and [Claude Code](https://claude.com/claude-code):
 
 ```bash
+npm install -g coperativeai
 cd my-project
-npx github:PeterPartridge/CooperativeAICoding init
+coperativeai init
 claude
 ```
 
 It runs wherever Claude Code runs — Windows, macOS, Linux alike. Nothing in
-it is platform-specific.
+it is platform-specific. `coperativeai init --dry-run` shows what it would
+write first, and it never overwrites a file that is already there — so
+running it again after `npm update -g coperativeai` is how a project picks up
+forms added since.
 
 Then fill in `Project_brief.md` in plain English, and follow
 [`HOW-TO-USE.md`](HOW-TO-USE.md). The slash commands (`/translate`,
