@@ -1,80 +1,78 @@
 # Build the next iteration of an approved spec
 
-Build from the approved spec named in the request.
-If no path was given, ask which spec to build (or list specs under
-`<projectRoot>/ai-only/` for each project root — a folder whose root
-contains `Project_brief.md`, e.g. `template/`, `example/`).
+Build from the spec named in the request: `ai-only/<solution>/<item>.md`. If
+none was named, list the specs under each project's `ai-only/` and ask.
+`<projectRoot>` is the nearest folder above it that holds `Project_brief.md`.
 
-Derive `<projectRoot>` by walking up from the spec path to the nearest folder
-containing `Project_brief.md` — the human briefs are its siblings via the
-mirrored layout. If none is found, stop and ask which project root to use.
+## Read only these
 
-Honor the Working Agreement at all times:
-- Make the **smallest change** that satisfies the spec / this iteration — no unrequested extras.
-- Treat all existing code as **working in production**; do not break it. Assume it works even if it looks broken.
-- Pick the **model & effort** the spec specifies for this item.
-- If you cannot finish something, **stop and record it as technical debt** rather than retrying endlessly.
-- **Never write a secret value into code, config, or logs** — reference settings by
-  name from the solution spec's `infrastructure.settings` list.
-- **Obey the solution spec's `security` block** — resolve its named baseline from
-  the project's `_forms/boilerplates.json` (`template/_forms/` inside this repository), securityBaselines plus its extra rules, and
-  treat each rule like a test: a build that breaks one is not done. Say in the plan
-  if a change touches anything a rule covers.
-- If the change needs **new infrastructure or pipeline work**, stop — that is its own
-  approved plan via the **pipeline procedure** (`/pipeline` in Claude Code), never a side effect
-  of building this item.
+- `ai-only/Project_digest.md`: the rules every build obeys.
+- `ai-only/<solution>/_solution.md`: repo, layout, commands and security rules.
+  If it is missing, translate `<solution>/application-spec.json` first.
+- The item's spec, and its human brief's front matter (`status`, `deliverable`,
+  `depends-on` / `dependsOn`).
+- `ai-only/Code_map.md`, if it exists: the first sentence of each row.
 
-Workflow:
-0. **Scaffold (first build in a solution only)** — if the solution's repo has no
-   code skeleton yet, plan that first, as its own smallest-change plan approved
-   before any page or endpoint is built. The shape comes from the `scaffold` block
-   of the solution's spec (`<projectRoot>/<solution>/application-spec.json`): resolve a named
-   `boilerplate` from that same `_forms/boilerplates.json`, then apply any scaffold
-   fields the spec fills in itself as overrides. Use the versions the boilerplate
-   pins; anything unpinned gets the latest stable release, with the exact version
-   recorded in the report-back. Use its `commands` to verify the skeleton builds
-   and its tests run before calling scaffolding done. If the spec has no scaffold
-   block and no boilerplate fits, stop and ask.
-1. **Plan** — restate a one-paragraph summary plus bullet-point changes (one per use case).
-   Look up the solution's repo and local path in the Project Digest's **Solutions &
-   repos** line (`<projectRoot>/ai-only/Project_system.md`) — that is where the code
-   gets built, which may be a different repository from this one; name it in the
-   plan, and stop and ask if the location is missing or not checked out. Read the
-   solution's spec (`<projectRoot>/<solution>/application-spec.json`) in full — its
-   conventions, auth, standard responses, security, scaffold, and mustNotDo all
-   bind this build, not just the blocks named elsewhere. Check the item's
-   dependencies (`depends-on` in a Markdown brief, `dependsOn.entries` in a JSON
-   one): every listed brief must be `status: built` — if any isn't, stop and say
-   which to build first. **Name the deliverable this change works towards** — the
-   item's `deliverable` field (front matter in a Markdown brief, top level in a
-   JSON one), against the Project Brief's list. If the item names none, say so in
-   the plan and ask rather than picking one; if it names one the brief does not
-   list, stop — `node tools/brief-lint.mjs <projectRoot>` says which items are
-   wrong, and a build aimed at a deliverable that does not exist can never reach
-   the stopping point in step 5. Check `<projectRoot>/ai-only/Code_map.md` (if it exists):
-   reuse an existing method
-   wherever one already does the job — say so in the plan — instead of writing a
-   new one. Wait for my approval before editing code.
-2. **Execute** — only after I approve. When the solution's testing answer calls
-   for TDD, work in that cycle: write a test that **fails** for the reason the
-   change exists, write just enough code to pass it, then tidy with the tests
-   green. Start simple and grow the cases with the functionality. (If your
-   setup has a `tdd` skill of its own, use it — this repository does not ship
-   one, so nothing here depends on it.)
-3. **Report back** — run the solution's `test` (and `build`) commands from its
-   scaffold block and include the results; then append to the spec what you did,
-   how each use case was implemented, and the test scenarios you created. Then
-   update `<projectRoot>/ai-only/Code_map.md`
-   (create it from `<projectRoot>/ai-only/3-code-map.template.md` if it doesn't exist):
-   one row per method you created or changed — the method, its file, one line on what
-   it does, and which other files/methods it uses. Fix any rows your changes made stale.
-   Then run `node tools/code-map-lint.mjs` and fix what it reports — it checks the
-   files and methods a row names actually exist, and that each summary is still one
-   sentence. On the item's first successful build, set its human brief's `status`
-   to `built`.
-4. **Declare debt** — list any technical debt created or anything you could not implement, and (if useful) score how token-intensive each change was.
-5. **Stop at the end of a deliverable** — after setting a brief to `built`, check
-   the other items naming the same deliverable. If that was the last one, **stop
-   there** and say the deliverable is complete and what it now does end to end,
-   rather than starting the next one. It is a point for people to evaluate
-   direction, which is worth nothing if the AI builds straight past it.
+## Stop before planning if
+
+- `node tools/spec-lint.mjs --ready <spec>` fails. Name the open `UNKNOWN`s; a
+  person answers them.
+- A brief it depends on is not `status: built`. Say which to build first.
+- `node tools/brief-lint.mjs <projectRoot>` reports an error for this item's deliverable.
+- The repo or local path in `_solution.md` is missing or not checked out.
+- It needs new infrastructure or a pipeline. That is `/pipeline`, its own plan.
+
+## 1. Plan, then wait
+
+Open with the **approval card**: plain English, 10 lines or fewer, for a person:
+
+```
+Change:      <one sentence>
+Deliverable: <name> — <what this adds to it>
+Where:       <solution> in <repo / local path>
+Reuses:      <code-map rows, or "nothing found">
+Rules hit:   <security or house rules this touches, or "none">
+New deps:    <packages to add, or "none">
+Debt:        <what will be left undone, or "none expected">
+Unknowns:    0
+```
+
+Below it, the plan for the AI: one line per action and check in the spec, and
+how each is done. **Wait for approval before touching code.**
+
+**First build in a solution with no code yet:** the plan is the scaffold alone,
+from `_solution.md`'s `layout`, `test` and `cmd` lines. Use pinned versions;
+anything unpinned gets the latest stable, and its version goes in the report.
+
+## 2. Build
+
+- Use the model and effort the spec's `model` line names.
+- Make the smallest change that meets the spec. Existing code is production,
+  even if it looks wrong.
+- Obey every `rule` in `_solution.md` and the digest. Breaking one means not done.
+- Never write a secret value into code, config or logs. Use setting names.
+- If the testing floor or `test` line calls for TDD: write a failing test, make it
+  pass, then tidy.
+- Stuck? Stop and record it as debt. Don't loop.
+
+## 3. Report
+
+Run the `cmd: test` and `cmd: build` commands. Append to the spec:
+
+```
+## Round <n>
+### What I did
+### What I could not do  (and what you would need to tell me)
+### Debt I left behind
+```
+
+Include the command results, each check and the test that proves it, and an
+estimate of the tokens the round used. Update `ai-only/Code_map.md` (create it
+from `ai-only/3-code-map.template.md`): one row per method you created or
+changed, describing it now. Run `node tools/code-map-lint.mjs` and fix what it
+reports. On the first successful build, set the brief's `status: built`.
+
+## 4. Stop at the end of a deliverable
+
+If this was the last item naming its deliverable, stop. Say what the deliverable
+now does end to end, and wait. Don't start the next one.

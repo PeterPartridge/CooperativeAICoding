@@ -71,10 +71,10 @@ Each item is defined **once** by Product, then built up **iteratively** by Devel
 
 ## The AI Workflow
 
-For each item (and each iteration), the AI follows a defined loop:
+For each item (and each iteration), the AI follows a defined loop. Before it, `/translate` turns each brief into a terse spec where every line names the answer it came from, and anything it cannot tell becomes an `UNKNOWN` line rather than a guess; a build will not start while one is open.
 
 0. **Scaffold** — the first time an approved item is built in a solution with no code yet, the AI creates the repo skeleton from that solution's spec (a named boilerplate, or its own file layout/tests/commands) as its own approved plan, before any feature is built.
-1. **Plan** — the AI generates a plan from the questions above, with a summary at the top and bullet-point changes describing how each use case will be implemented. It checks the item's declared dependencies are already built, checks its **code map** and reuses existing methods rather than rebuilding them, and confirms the change doesn't need new infrastructure (which is its own approved plan, never a side effect of a feature).
+1. **Plan** — the AI generates a plan from the spec, opening with an **approval card**: ten plain-English lines saying what changes, which deliverable it advances, what it reuses, which rules it touches and the debt expected. People approve from the card; the plan beneath it is for the AI. It checks the item's declared dependencies are already built, checks its **code map** and reuses existing methods rather than rebuilding them, and confirms the change doesn't need new infrastructure (which is its own approved plan, never a side effect of a feature).
 2. **Review & execute** — the developer reviews and updates the plan, then executes it.
 3. **Report back** — once complete, the AI runs the solution's test/build commands and updates the plan document with what it did, how each use case was implemented, and what test scenarios it created. It also updates the **code map** (`ai-only/Code_map.md`): one row per method it created or changed — what it does in one line, and which other files and methods it uses.
 4. **Declare debt** — the AI lists any technical debt it created or anything it failed to implement.
@@ -114,6 +114,8 @@ The Project Brief names the **deliverables in order**, each with what makes it d
 ## Decisions taken deliberately
 
 Things this framework was asked for and chose not to do, recorded so they don't have to be re-argued:
+
+- **People can read anything the AI writes, and nobody has to.** What people want is the outputs. So the AI's own files in `ai-only/` are written for the AI: terse, one fact per line, as few tokens as clarity allows. They stay plain English, never a private shorthand, so anyone can open one and take over. The routine read-back is done by `tools/spec-lint.mjs`: every line must cite the brief answer it came from, and a line that cannot is invented scope. What people *do* read is kept short and plain: the `UNKNOWN` lines, the approval card, and the round reports. This cut what a translate-and-build reads from about 21,000 tokens to about 12,900, and a build alone from about 11,100 to about 3,600 (estimated, on the example project).
 
 - **"Item", not "page".** A page is one *kind* of item, alongside endpoints and database models. A backend-only project has no pages and loses nothing.
 - **A testing floor, not a list of tests.** The Project Brief states the level of cover expected of every change and what isn't worth testing; items list their own acceptance checks on top. A list of things to test reads to an AI as permission to skip everything not on it.
@@ -196,7 +198,7 @@ cd my-project
 coperativeai init
 ```
 
-That puts the project brief, the blank forms, the six commands and the three
+That puts the project brief, the blank forms, the six commands and the four
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
 to build. It never overwrites: a file that already exists
 is left alone and named in the report, so running it again is how you pick up

@@ -44,7 +44,7 @@ const LAYOUT = [
   { from: "template/AGENTS.template.md", to: "AGENTS.md" },
   { from: ".claude/commands", to: ".claude/commands" },
   { from: ".claude/skills", to: ".claude/skills" },
-  // All three checks, so a project can run them on its own briefs, code map and
+  // Every check, so a project can run them on its own briefs, code map and
   // round record rather than only inside this repository. The round record one
   // was published and never copied, which left every project with the two
   // checks that read what an agent wrote *while* working and none of the one
@@ -53,6 +53,10 @@ const LAYOUT = [
   { from: "tools/brief-lint.mjs", to: "tools/brief-lint.mjs" },
   { from: "tools/code-map-lint.mjs", to: "tools/code-map-lint.mjs" },
   { from: "tools/round-record-lint.mjs", to: "tools/round-record-lint.mjs" },
+  // The check that reads the AI's specs so people do not have to: every fact
+  // sourced, every gap marked. Without it in the project, the promise that
+  // nobody needs to read ai-only/ would rest on nothing.
+  { from: "tools/spec-lint.mjs", to: "tools/spec-lint.mjs" },
 ];
 
 const written = [];
@@ -117,8 +121,8 @@ Next, in that folder:
      asks you a handful of multiple-choice questions rather than twenty open
      ones. Its answers are marked as its own until you accept them.
   2. Start Claude Code there and run:  /translate Project_brief.md
-     It produces the spec, the digest and the skills list, and you read them
-     back to check nothing was invented.
+     It writes the digest and the spec, every line citing your answer, and
+     lists as UNKNOWN whatever it could not tell. Answer those.
   3. Add the first item:  /new-item page <solution> <name>
      (or endpoint, or model — a backend-only project has no pages at all.)
   4. Fill it in, /translate it, then /build it.
@@ -127,6 +131,7 @@ Next, in that folder:
   node tools/code-map-lint.mjs     checks the code map still matches the code
   node tools/round-record-lint.mjs checks a round record was written, and answers
                                    all three of its questions
+  node tools/spec-lint.mjs         checks every line of the AI's specs has a source
 `);
 }
 

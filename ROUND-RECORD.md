@@ -153,3 +153,98 @@
 
 - **The example's four open questions are real gaps in a worked example
   people copy.** Answering them is Product's job, not mine, so they stay open.
+
+## 2026-10-27 — Lean AI layer, steps 3–8 (Deliverable 1)
+
+### What I did
+- **A spec format for the AI, checked instead of read.**
+  `ai-only/2-ai-system.template.md` is now the format: front matter, then one
+  `key: value [source]` line per fact, from a fixed set of keys. Every line cites
+  the brief answer it came from. A gap is `UNKNOWN: <question> [source]`, never a
+  guess. Only a person turns it into `DEFERRED: … — owner: <name>`.
+- **`tools/spec-lint.mjs`, the fourth check**, does the read-back people no
+  longer do. It fails on:
+  - a line with no source;
+  - a source naming a question the brief doesn't have;
+  - a fact citing an answer nobody gave;
+  - a key the format doesn't list (read from the format's own table, so the two
+    cannot drift);
+  - prose where a line should be;
+  - a preset that doesn't exist;
+  - a deferral with no owner.
+
+  `--ready <spec>` also fails on any open `UNKNOWN`, and `/build` runs it before
+  planning. There are 15 tests, LF and CRLF. It is wired into `init`, the
+  package, `npm run check`, CI and the starter `AGENTS.md`.
+- **Items 1–3, as agreed:**
+  - `/translate` writes `ai-only/<solution>/_solution.md` with only the named
+    preset and baseline copied in, so builds never read `boilerplates.json`.
+  - `/build` no longer re-reads the Project Brief.
+  - The digest is its own file, `Project_digest.md`.
+- **Lean procedures.**
+  - Rewritten: `translate`, `build`, `pipeline`, `draft`, `emit-guardrails`, the
+    starter `AGENTS.md` and `1-translate-for-ai.md`.
+  - Every rule kept, each with a few words of reason. The longer *why* moved to
+    `procedures/README.md`, which only people read.
+  - A token budget per procedure in `commands.test.mjs`; it may only come down,
+    and was mutation-checked to fail.
+- **The approval card.** `/build`'s plan opens with ten plain-English lines for
+  a person, ending `Unknowns: 0`. `/translate` no longer writes a plan, so there
+  is one plan, not two.
+- **The promise changed, in the docs:** people can read anything in `ai-only/`
+  and nobody has to; the checks do the routine reading. Updated: README
+  (workflow, and the reasoning under *Decisions taken deliberately*),
+  `HOW-TO-USE.md`, `ai-only/README.md`, `template/README.md`, `tools/QA.md`
+  scenarios 3–4, the CLI's next steps, and the translate skill's description.
+- **Re-translated the example** in the new format: digest, system,
+  ClothingWebsite's `_solution.md`, and the login page. All pass `spec-lint`.
+  The login page is correctly not ready, with three open unknowns.
+- **Measured** (characters ÷ 4), the same chain as the baseline plus the new
+  solution translation:
+
+  | Step | Before | After |
+  |---|---|---|
+  | always loaded | 1,340 | 890 |
+  | translate project | 4,460 | 2,770 |
+  | translate solution | — | 3,000 |
+  | translate item | 4,050 | 2,640 |
+  | build to plan | 11,100 | 3,570 |
+  | **total** | **20,950** | **12,860** |
+
+  That is **39% less** across the chain, and 68% less on the build step.
+
+### What I could not do  (and what you would need to tell me)
+- **The target was 40%; this measures 39%.** The estimate is characters ÷ 4,
+  not a tokenizer, so one point is inside its error, but I won't call it met.
+  The remaining cut would come from trimming the format's worked example, which
+  helps a model follow it. I'd rather keep it. Whether 39% is done is your call.
+- **QA scenarios 1–4 have not been run by a person against a real agent.** I
+  followed the new translate procedure myself to produce the example, and
+  `--ready` refuses the login page as scenario 4 expects. An agent judging its
+  own output is a weak check, though.
+- **One commit, not one per step.** The steps touched the same files
+  (`commands.test.mjs`, the procedures), so they could not be split cleanly
+  without interactive staging.
+
+### Debt I left behind
+- **Existing projects keep the old format.** `init` never overwrites. A project
+  created earlier has `Project_system.md` with a digest inside, and the new
+  `build.md` will not reach it, because it never receives the new `build.md`
+  either. This is gap 7, and it is now sharper: the format changed underneath.
+
+- **Only the example's login page and one solution are translated.**
+  ClothingAPI, ClothingDatabase and their items have no specs yet. Translating
+  them was not needed to measure, and doing it would be scope I wasn't asked for.
+
+- **Build still reads a whole JSON brief to learn a dependency's status.** That
+  is about 560 tokens for `Login.json`. A status flag on `brief-lint` would
+  remove it.
+
+- **`translate.md` carries a `node -e` one-liner to read two preset entries.**
+  It works with any agent that can run Node, but it is a command inside a
+  procedure. A small script would be cleaner, at the cost of a fifth file in the
+  copy lists.
+
+- **The copy lists grew again.** `spec-lint.mjs` had to be added to
+  `bin/coperativeai.mjs`, `package.json`, `commands.test.mjs`, the starter
+  `AGENTS.md` and CI: five places for one file.

@@ -87,8 +87,9 @@ requirement, silently — this is the single most important scenario on this pag
 
 Now answer the questions, set `status: filled`, and run it again.
 
-**Pass:** `ai-only/Project_system.md` appears with a System Spec, a Project
-Digest of about a dozen lines, and a Skills list. The digest carries the testing
+**Pass:** `ai-only/Project_digest.md` and `ai-only/Project_system.md` appear,
+every line `key: value [source]`, and `node tools/spec-lint.mjs` is clean. Open
+three lines and check the cited answer really says that. The digest carries the testing
 floor and the deliverables.
 **Fail:** the digest omits either — an item build reads only the digest, so a
 rule missing there is a rule no build ever sees.
@@ -103,11 +104,18 @@ Fill in and translate one item, then:
 /build ai-only/Shop/cart.md
 ```
 
-**Pass:** a plan arrives **before any file is written**; it names the deliverable
-the change works towards, and it waits. After approval: the smallest change, the
+First leave one `UNKNOWN:` line open in the spec.
+
+**Pass:** it refuses to plan, and names the unknown. Answer it, re-translate, and
+run `/build` again.
+
+**Pass:** a plan arrives **before any file is written**. It opens with an
+approval card of ten lines or fewer, in plain English, naming the deliverable and
+saying `Unknowns: 0`, and it waits. After approval: the smallest change, the
 solution's test command run and its output shown, the code map updated with a row
 per method, and debt declared or "none" said explicitly.
-**Fail:** code written before approval; a deliverable invented that the brief
+**Fail:** a plan built on an open unknown; code written before approval; a card
+you would need the AI's plan to understand; a deliverable invented that the brief
 does not list; a code map left stale (run `node tools/code-map-lint.mjs` — it
 should still be clean).
 

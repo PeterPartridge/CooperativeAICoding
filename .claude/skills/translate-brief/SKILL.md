@@ -1,6 +1,6 @@
 ---
 name: translate-brief
-description: Translate a filled-in CooperativeAICoding brief (Markdown Project_brief.md or page brief, or a JSON endpoint/database-model/solution-spec form) into a structured AI System Spec, a reusable Project Digest, and a Skills List, then save it in the project root's AI workspace (ai-only/) mirroring the human folder layout. Use whenever the user hands over or points at a filled-in CooperativeAICoding form and wants it turned into instructions an AI can build from.
+description: Translate a filled-in CooperativeAICoding brief (Markdown Project_brief.md or page brief, or a JSON endpoint/database-model/solution-spec form) into terse specs in the project root's AI workspace (ai-only/) — a Project Digest, a solution spec, or an item spec — where every line cites the answer it came from and every gap is an UNKNOWN. Use whenever the user hands over or points at a filled-in CooperativeAICoding form and wants it turned into instructions an AI can build from.
 ---
 
 Read **`ai-only/procedures/translate.md`** under the project root you are working in,
