@@ -163,14 +163,14 @@ test("a skill or command stays a pointer, not a second copy of its procedure", a
 // raise one to make room — move the *why* to procedures/README.md, which only
 // people read, and keep the rule.
 const TOKEN_BUDGET = {
-  "template/AGENTS.template.md": 900,
-  "template/ai-only/2-ai-system.template.md": 750,
-  "template/ai-only/procedures/build.md": 825,
+  "template/AGENTS.template.md": 850,
+  "template/ai-only/2-ai-system.template.md": 650,
+  "template/ai-only/procedures/build.md": 675,
   "template/ai-only/procedures/draft.md": 750,
-  "template/ai-only/procedures/emit-guardrails.md": 975,
+  "template/ai-only/procedures/emit-guardrails.md": 925,
   "template/ai-only/procedures/new-item.md": 450,
   "template/ai-only/procedures/pipeline.md": 500,
-  "template/ai-only/procedures/translate.md": 800,
+  "template/ai-only/procedures/translate.md": 600,
 };
 
 test("what the AI reads to follow a procedure stays within its token budget", async () => {

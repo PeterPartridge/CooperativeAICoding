@@ -78,11 +78,7 @@ sentence in this file. Stop and write it rather than guessing at an answer.
 
 ## What this file cannot give you
 
-These are the rules and the procedures, not the machinery. **Nothing here can
-make you follow them.** Model and effort per work item, what a run cost,
-deny-by-default policy per item and a bounded place to run commands live in
-the Swarm app.
-
-The part that does not depend on which model turned up is the approval gate: a
-person reads the plan before code is written. Keep that one.
+Rules, not machinery: **nothing here makes you follow them.** Enforcement, cost
+and a sandbox live in the Swarm desktop app. What holds for any model is the
+approval gate: a person reads the plan before code is written.
 ```

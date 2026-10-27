@@ -20,14 +20,10 @@ marked *not yet filled in* wait on the brief.
 | set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
 | write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |
 
-In Claude Code these are also `/draft`, `/translate`, `/new-item`, `/build`,
-`/pipeline` and `/emit-guardrails`.
-
 ## Where things are
 
 - `Project_brief.md` and `<solution>/<item>.md|.json`: the people's briefs. Never author them.
-- `ai-only/`: your workspace. Specs follow `ai-only/2-ai-system.template.md`.
-  People may read any of it; the checks do the routine reading.
+- `ai-only/`: your workspace, in the format of `ai-only/2-ai-system.template.md`.
 - `ai-only/Project_digest.md`: the rules every build obeys. *Does not exist yet: created by `translate.md`.*
 - `ai-only/Code_map.md`: what already exists, so it is not rebuilt. *Does not exist yet: created by `build.md`.*
 
@@ -68,7 +64,6 @@ node tools/round-record-lint.mjs  the round record answers all three questions
 
 ## What this file cannot give you
 
-These are rules, not machinery: **nothing here can make you follow them.** Model
-and effort per item, run cost, deny-by-default policy and a bounded place to run
-commands live in the Swarm desktop app. The part that holds for any model is the
+Rules, not machinery: **nothing here makes you follow them.** Enforcement, cost
+and a sandbox live in the Swarm desktop app. What holds for any model is the
 approval gate: a person reads the plan before code is written.

@@ -17,6 +17,11 @@
 // Usage:
 //   node tools/brief-lint.mjs                 # every project in the repository
 //   node tools/brief-lint.mjs <projectRoot…>  # just these
+//   node tools/brief-lint.mjs --status <brief…> # one line per brief: its status
+//
+// **`--status` is what /build reads instead of whole briefs.** A build needs
+// one word from each brief it depends on, and reading the file for it cost
+// hundreds of tokens a dependency.
 //
 // Exit code 1 on an error. Warnings are printed and do not fail the run.
 
@@ -208,6 +213,31 @@ async function lint(root) {
 }
 
 const named = process.argv.slice(2);
+
+if (named[0] === "--status") {
+  let missing = false;
+  for (const p of named.slice(1)) {
+    let text;
+    try {
+      text = await read(path.resolve(p));
+    } catch {
+      console.log(`${p}: not found`);
+      missing = true;
+      continue;
+    }
+    let status;
+    if (p.endsWith(".json")) {
+      try {
+        status = JSON.parse(text).status;
+      } catch {
+        status = "not valid JSON";
+      }
+    } else status = frontMatter(text)?.status;
+    console.log(`${p}: ${status || "no status"}`);
+  }
+  process.exit(missing ? 1 : 0);
+}
+
 const roots = named.length > 0 ? named.map((p) => path.resolve(p)) : await projectRoots(repo);
 
 if (roots.length === 0) {

@@ -1,6 +1,8 @@
 ---
 spec: page
 from: ClothingWebsite/userLogin.md
+deliverable: MVP
+depends-on: [ClothingAPI/Login.json]
 ---
 objective: so a customer can log in to their account [why-exists]
 model: cheapest model, low effort [model-and-effort]

@@ -248,3 +248,56 @@
 - **The copy lists grew again.** `spec-lint.mjs` had to be added to
   `bin/coperativeai.mjs`, `package.json`, `commands.test.mjs`, the starter
   `AGENTS.md` and CI: five places for one file.
+
+## 2026-10-27 — Lean AI layer, A–C: the push to 50%
+
+### What I did
+- **A: builds stop reading whole briefs.**
+  - Item specs now copy the brief's `deliverable` and `depends-on` into their
+    front matter, and `spec-lint` fails if either drifts from the brief.
+  - `node tools/brief-lint.mjs --status <brief…>` prints one line per brief, so
+    `/build` learns a dependency's status without reading the file.
+  - Tests for both were written first and failed first: three for `--status`
+    and four for the drift check.
+- **B: one place for each rule.**
+  - `translate.md` and the format document repeated the same rules and were read
+    together on every translate, three times per item.
+  - Each rule now lives once: the format holds the line grammar, the keys and
+    the example; the procedure holds routing and steps.
+- **C: `build.md` trimmed**, and the starter `AGENTS.md` lost two lines that
+  repeated what the procedures say.
+- **Kept two copies of one paragraph in step.** The emit procedure now writes the
+  same "What this file cannot give you" paragraph as the starter `AGENTS.md`;
+  they had drifted.
+- **Lowered the token budgets** in `commands.test.mjs` to lock the gains in.
+- **Measured** (characters ÷ 4):
+
+  | Step | Before | After |
+  |---|---|---|
+  | always loaded | 1,340 | 825 |
+  | translate project | 4,460 | 2,440 |
+  | translate solution | — | 2,660 |
+  | translate item | 4,050 | 2,300 |
+  | build to plan | 11,100 | 2,330 |
+  | **total** | **20,950** | **10,550** |
+
+  That is **50% less**. Counting what `spec-lint --ready` and
+  `brief-lint --status` print adds about 60 tokens, which makes it about 49.5%.
+
+### What I could not do  (and what you would need to tell me)
+- **The estimate cannot separate 49.5% from 50%.** Exact counts need the API's
+  token-counting endpoint and your key.
+- **QA scenarios 1–4 are still not run by a person** against a real agent.
+
+### Debt I left behind
+- **I broke spec-lint and caught it myself.** Renaming the format's heading to
+  `## Keys: only these` left `spec-lint` with no keys. It failed loudly ("no key
+  table"), which is the right failure, and now matches the word rather than the
+  whole heading. No test pinned the heading's exact wording; one could.
+
+- **`/build` still edits the brief to set `status: built`**, so the full round
+  (not just the plan) still opens the brief once. The measurement stops at the
+  plan, as the baseline did.
+
+- **`brief-lint` now has two jobs:** checking deliverables, and reporting status.
+  Both read the same front matter, but if it grows a third, it should be split.

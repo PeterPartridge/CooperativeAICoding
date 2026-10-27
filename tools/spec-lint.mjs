@@ -53,7 +53,9 @@ async function allowedKeys(root) {
   const file = frameworkFile(root, "ai-only/2-ai-system.template.md");
   if (!file) return null;
   const text = await read(file);
-  const section = text.match(/^## Keys\n([\s\S]*?)(?=^## |(?![\s\S]))/m);
+  // Matched on the word, not the whole heading: a heading reworded to
+  // "## Keys: only these" once left the check with no keys at all.
+  const section = text.match(/^## Keys\b[^\n]*\n([\s\S]*?)(?=^## |(?![\s\S]))/m);
   const keys = new Set();
   for (const line of (section?.[1] ?? "").split("\n")) {
     if (!line.startsWith("|")) continue;
@@ -140,6 +142,28 @@ async function checkSource(src, ctx) {
 
 const LINE = /^([A-Za-z][A-Za-z-]*):\s+(.+?)\s*$/;
 
+const ITEM_SPECS = new Set(["page", "endpoint", "model"]);
+
+/** `[a, b]` → ["a", "b"], sorted so order is not a difference. */
+const listOf = (v) =>
+  String(v ?? "")
+    .replace(/^\[|\]$/g, "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean)
+    .sort();
+
+/** An item brief's deliverable and dependencies, Markdown or JSON. */
+async function briefHeader(file) {
+  const text = await read(file);
+  if (file.endsWith(".json")) {
+    const b = JSON.parse(text);
+    return { deliverable: b.deliverable ?? "", dependsOn: [...(b.dependsOn?.entries ?? [])].sort() };
+  }
+  const f = frontMatter(text)?.fields ?? {};
+  return { deliverable: f.deliverable ?? "", dependsOn: listOf(f["depends-on"]) };
+}
+
 async function lintSpec(file, root, keys) {
   const errors = [];
   const unknowns = [];
@@ -150,6 +174,26 @@ async function lintSpec(file, root, keys) {
   const from = fm.fields.from;
   if (!from) errors.push(`:1  no "from:" — nothing to check its sources against`);
   else if (!existsSync(path.join(root, from))) errors.push(`:1  from: ${from} does not exist`);
+
+  // **The copy /build reads instead of the brief.** An item spec carries its
+  // brief's deliverable and dependencies so a build need not open the brief.
+  // A copy that has drifted would build towards the wrong deliverable, or
+  // before what it depends on — so it is checked like any other source.
+  if (ITEM_SPECS.has(fm.fields.spec) && from && existsSync(path.join(root, from))) {
+    const brief = await briefHeader(path.join(root, from));
+    const list = (v) => `[${v.join(", ")}]`;
+    if (!("deliverable" in fm.fields)) errors.push(`:1  no "deliverable:" — copy it from ${from}`);
+    else if (fm.fields.deliverable !== brief.deliverable) {
+      errors.push(`:1  deliverable "${fm.fields.deliverable}" but the brief says "${brief.deliverable}" — re-translate`);
+    }
+    if (!("depends-on" in fm.fields)) errors.push(`:1  no "depends-on:" — copy it from ${from}`);
+    else {
+      const deps = listOf(fm.fields["depends-on"]);
+      if (list(deps) !== list(brief.dependsOn)) {
+        errors.push(`:1  depends-on ${list(deps)} but the brief says ${list(brief.dependsOn)} — re-translate`);
+      }
+    }
+  }
 
   const lines = text.split("\n");
   for (let i = fm.bodyStart; i < lines.length; i++) {

@@ -1,39 +1,32 @@
 # AI spec format
 
-> The shape of every spec the AI writes in `ai-only/`. People can read any of it,
-> but nobody has to: `node tools/spec-lint.mjs` does the routine reading — every
-> fact has a source, every key is a known one, every gap is marked.
+Checked by `node tools/spec-lint.mjs`. People may read any spec; none has to.
 
-Which brief becomes which file is in `procedures/translate.md`.
+## Front matter
 
-## Lines
+`spec:` digest, system, solution, page, endpoint or model; `from:` the brief,
+as a path from the project root. Page, endpoint and model specs also copy the
+brief's `deliverable:` and `depends-on: [a, b]` exactly.
 
-Front matter (`spec:` digest · system · solution · page · endpoint · model, and
-`from:` the human file, path from the project root), then one fact per line:
+## Lines: one fact each
 
 ```
 key: value [source]
 ```
 
-- **Every line has a source** — where the fact came from:
-  - `[id]` — a question in the `from:` file: the `### id —` heading of a Markdown
-    brief, or a dotted path in a JSON one (`[whatItDoes.purpose]`).
-  - `[path#id]` — the same in another file, path from the project root
-    (`[Project_brief.md#roles]`).
-  - `[preset:name]`, `[baseline:name]` — an entry in `_forms/boilerplates.json`.
-  - Several: `[actions, limits]`.
-- **No source means invented.** Leave it out.
-- **Terse plain English.** Short sentences, no invented abbreviations or symbols —
-  shorthand nobody else can read is the drift this format exists to stop.
-- **A gap is a line, never a guess:** `UNKNOWN: <question> [source]`. Build stops
-  while one is open. Only a person turns it into
-  `DEFERRED: <question> — owner: <name> [source]`.
-- `#` headings and `>` notes may appear; nothing is checked after the first
-  `## Round` heading, where build appends its reports.
+- **Source** is where the fact came from:
+  - `[id]`: a `### id —` question in the `from:` brief, or a dotted JSON path (`[whatItDoes.purpose]`)
+  - `[path#id]`: the same in another file (`[Project_brief.md#roles]`)
+  - `[preset:name]` or `[baseline:name]`: an entry in `_forms/boilerplates.json`
+  - several: `[actions, limits]`
+- **No source means invented.** Leave the line out.
+- **Never guess.** A gap or a contradiction is `UNKNOWN: <question> [source]`;
+  cite both sides. Only a person writes `DEFERRED: <question> — owner: <name> [source]`.
+- Use terse plain English with no invented abbreviations or symbols.
+- `#` headings and `>` notes are allowed. Nothing after the first `## Round`
+  heading is checked.
 
-## Keys
-
-Only these. A fact that fits none of them is a question for a person.
+## Keys: only these
 
 | File | Keys |
 |---|---|
@@ -42,10 +35,12 @@ Only these. A fact that fits none of them is a question for a person.
 | page, endpoint, model | `objective` `model` `action` `look` `info` `store` `must` `access` `check` `limit` `uses` `op` `request` `response` `status` `field` `rel` `index` `retention` `sensitive` `invariant` `skill` |
 | any | `UNKNOWN` `DEFERRED` |
 
-`rule` is a house rule *with* its meaning on this project, or a security rule.
-`floor` is the testing floor. `tier` is when to use a model and effort. `cmd` is
-`cmd: test = npm test`. `check` is an acceptance check. `skill` is
-`skill: name — why`.
+- `rule`: a house rule with its meaning here, or a security rule.
+- `floor`: the testing floor.
+- `tier`: when to use which model and effort.
+- `cmd`: a command, e.g. `cmd: test = npm test`.
+- `check`: an acceptance check.
+- `skill`: `skill: name — why`.
 
 ## Example
 
@@ -53,10 +48,11 @@ Only these. A fact that fits none of them is a question for a person.
 ---
 spec: page
 from: ClothingWebsite/userLogin.md
+deliverable: MVP
+depends-on: [ClothingAPI/Login.json]
 ---
-objective: So a customer can log in to their account. [why-exists]
-action: customer enters username and password and logs in [actions]
+objective: so a customer can log in to their account [why-exists]
 must: the typed password is never saved [in-memory]
 check: wrong password shows an error and does not log in [tests]
-UNKNOWN: how a logged-out customer starts a reset — ResetPassword needs a login [actions, ClothingAPI/Login.json#operations]
+UNKNOWN: how does a logged-out customer reset? ResetPassword needs a login [actions, ClothingAPI/Login.json#operations]
 ```
