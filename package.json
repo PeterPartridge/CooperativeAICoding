@@ -8,9 +8,16 @@
   },
   "files": [
     "bin",
-    "template",
-    "tools",
-    ".claude",
+    "template/Project_brief.md",
+    "template/_forms",
+    "template/ai-only",
+    "template/AGENTS.template.md",
+    "!template/README.md",
+    ".claude/commands",
+    ".claude/skills",
+    "tools/brief-lint.mjs",
+    "tools/code-map-lint.mjs",
+    "tools/round-record-lint.mjs",
     "README.md",
     "HOW-TO-USE.md",
     "INSTALL.md",
@@ -30,6 +37,9 @@
     "url": "git+https://github.com/PeterPartridge/CooperativeAICoding.git"
   },
   "homepage": "https://peterpartridge.github.io/CooperativeAICoding/",
+  "bugs": {
+    "url": "https://github.com/PeterPartridge/CooperativeAICoding/issues"
+  },
   "keywords": [
     "spec-driven-development",
     "ai-agents",

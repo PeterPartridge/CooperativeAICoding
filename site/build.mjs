@@ -308,10 +308,10 @@ function landing() {
 </section>
 
 <section class="ways">
-  <h2>Nothing to install</h2>
+  <h2>One npm install</h2>
   <div class="cards">
     <div class="card">
-      <p><code>npx github:PeterPartridge/CooperativeAICoding init</code></p>
+      <p><code>npm install -g coperativeai</code><br><code>coperativeai init</code></p>
       <p>Drops the project brief, the blank forms and the four commands into
       any project. You answer in plain English; the AI translates it into the
       spec it builds from, makes the smallest change, and declares the debt it

@@ -30,8 +30,19 @@
   folders, on purpose.** A command that still cited `application/…` would now
   fail that test, which is right; dropping it from the list would let the
   dead reference through unchecked.
+- **Ready to publish to npm as `coperativeai`.** The docs, the site, the CLI's
+  own help, the skills and `tools/QA.md` now say `npm install -g coperativeai`
+  then `coperativeai init`, instead of `npx github:…`. `package.json` publishes
+  exactly what `init` copies, plus the CLI and its four docs: it used to name
+  the whole `.claude/` folder, which would have shipped a working copy's
+  `settings.local.json`. A new test asks npm what it would publish and fails on
+  anything else. Verified by packing, installing the tarball globally into a
+  temporary prefix and running `coperativeai init` in an empty folder.
 
 ### What I could not do (and what you would need to tell me)
+- **I did not publish.** `npm publish` runs under the owner's npm account, so
+  it is theirs to run; until it has, every install instruction here points at
+  a package the registry does not have.
 - **The framework has no Project brief of its own,** so `AGENTS.md` and
   `GEMINI.md` are hand-written rather than generated. If you want them
   generated, the framework needs a brief first.
@@ -54,3 +65,13 @@
 - **The local `app/` folder survives on disk.** Its `node_modules` and Rust
   build cache are ignored by git, so removing the folder from the repository
   left them behind. Deleting them is a person's call.
+
+- **Every framework change now needs a publish to reach anybody.** Before,
+  `npx github:` read whatever was on `main`; now people get what was last
+  published, so a merged fix does nothing until `npm version` and
+  `npm publish` are run. Nothing automates that yet, and nothing notices when
+  `main` and the registry have drifted apart.
+
+- **`package.json`'s file list and `init`'s copy list are two lists.** The new
+  test keeps them in step, but adding a folder to `init` means adding it in
+  both places.

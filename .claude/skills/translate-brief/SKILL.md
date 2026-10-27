@@ -6,7 +6,7 @@ description: Translate a filled-in CooperativeAICoding brief (Markdown Project_b
 Read **`ai-only/procedures/translate.md`** under the project root you are working in,
 and follow it exactly. In this repository the canonical copy is
 `template/ai-only/procedures/translate.md`; a project created with
-`npx github:PeterPartridge/CooperativeAICoding init` has it at
+`coperativeai init` has it at
 `ai-only/procedures/translate.md`.
 
 **The procedure is the instruction, and it lives there rather than here** so that

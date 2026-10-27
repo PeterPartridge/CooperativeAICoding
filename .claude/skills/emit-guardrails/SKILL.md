@@ -6,7 +6,7 @@ description: Write a project's guardrails out in the native format of whichever 
 Read **`ai-only/procedures/emit-guardrails.md`** under the project root you are working in,
 and follow it exactly. In this repository the canonical copy is
 `template/ai-only/procedures/emit-guardrails.md`; a project created with
-`npx github:PeterPartridge/CooperativeAICoding init` has it at
+`coperativeai init` has it at
 `ai-only/procedures/emit-guardrails.md`.
 
 **The procedure is the instruction, and it lives there rather than here** so that

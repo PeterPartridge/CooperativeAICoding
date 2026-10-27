@@ -188,15 +188,17 @@ See [`template/README.md`](template/README.md) for the full layout and step-by-s
 
 ## Getting started
 
-**One command, into any project:**
+**Install it from npm, then run it in any project:**
 
 ```bash
-npx github:PeterPartridge/CooperativeAICoding init
+npm install -g coperativeai
+cd my-project
+coperativeai init
 ```
 
-That puts the project brief, the blank forms, the four commands and the two
+That puts the project brief, the blank forms, the four commands and the three
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
-installed and nothing to build. It never overwrites: a file that already exists
+to build. It never overwrites: a file that already exists
 is left alone and named in the report, so running it again is how you pick up
 forms added since. Add `--dry-run` to see it first.
 
