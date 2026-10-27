@@ -11,6 +11,7 @@
     "template/Project_brief.md",
     "template/_forms",
     "template/ai-only",
+    "template/qa",
     "template/AGENTS.template.md",
     "!template/README.md",
     ".claude/commands",

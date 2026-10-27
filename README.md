@@ -93,6 +93,24 @@ After the first build, each further iteration defines **what needs to change**:
 - Change in endpoints?
 - How should existing technical debt or earlier AI failures be addressed?
 
+### QA sign-off
+
+QA is the quality check and the sign-off. **It is a track of its own, owned by a person, and not part of how the AI builds.**
+
+- **Before work starts,** QA reviews each item in `qa/<solution>/<item>.md` and answers six questions:
+  1. Can I test this?
+  2. How should I test this?
+  3. What tests should I be doing?
+  4. Are they manual, or can I automate them?
+  5. What questions do I have for Product?
+  6. What problems do I see?
+- **Questions for Product** go to Product directly. Their answers reach the build the normal way, through the brief.
+- **QA keeps a regression suite,** `qa/regression.md`, that answers "does the application still work and do what is expected?" The automated tests run every time, through each solution's `regression` command in its pipeline. QA runs the manual ones.
+- **When QA is happy,** they ask the AI (`/qa`) for whatever they need to test: automated tests in the solution's repo, scripts for the manual ones, and any testability hooks in the app as their own approved plan. The AI never fixes a failing test or the app; a failure becomes a new development round.
+- **A deliverable is done when QA signs it off** in `qa/signoff.md`. When the AI builds a deliverable's last item it stops and waits. `brief-lint` reports which deliverables are built and waiting on QA.
+
+**Kept apart on purpose.** `/translate` and `/build` never read `qa/`. If the AI that builds an item can see QA's tests, it builds to pass them, and a passing run stops telling anyone anything. QA's tests come on top of the developers' testing floor, never instead of it.
+
 ### Deliverables
 
 Iterating needs something to iterate **towards**, or "smallest change" just means "smallest change forever".
@@ -198,7 +216,7 @@ cd my-project
 coperativeai init
 ```
 
-That puts the project brief, the blank forms, the six commands and the four
+That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the seven commands and the four
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
 to build. It never overwrites: a file that already exists
 is left alone and named in the report, so running it again is how you pick up
@@ -206,7 +224,7 @@ forms added since. Add `--dry-run` to see it first.
 
 **Looking for the desktop app?** [Swarm](https://github.com/PeterPartridge/Swarm) is built with this framework and lives in its own repository, with its installers and build steps. The framework itself needs no binary at all — [`INSTALL.md`](INSTALL.md) — and runs wherever Claude Code runs.
 
-New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses six Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
+New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses seven Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
 
 - **`/draft [folder]`** — for a codebase that already exists: fill the brief in from the code, sourced and marked, with a few multiple-choice questions at the end instead of a blank form. The AI's answers stay the AI's until you accept them.
 - **`/translate <brief>`** — turn a filled-in brief into a structured spec + skills.
@@ -214,3 +232,4 @@ New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish
 - **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.
 - **`/pipeline <solution>`** — create the solution's CI/CD pipeline and missing infrastructure from its spec, as its own approved plan. Secret values are never written into code — they're referenced by name from stores you control.
 - **`/emit-guardrails [targets]`** — write the project's rules out in other agents' native formats (`AGENTS.md`, `CLAUDE.md`, Kiro steering, Cursor rules) from the same spec. One brief, every agent's guardrails — see below.
+- **`/qa [automate|script|run]`**: help QA, only when QA asks. Writes the automation and manual scripts QA asked for, or runs the regression suite. It never fixes a failure and never signs off; see [QA sign-off](#qa-sign-off).

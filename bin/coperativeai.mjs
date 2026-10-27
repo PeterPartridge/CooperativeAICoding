@@ -36,6 +36,9 @@ const LAYOUT = [
   { from: "template/Project_brief.md", to: "Project_brief.md" },
   { from: "template/_forms", to: "_forms" },
   { from: "template/ai-only", to: "ai-only" },
+  // QA's track: the regression suite and the sign-off sheet. QA owns them; the
+  // AI that builds never reads them.
+  { from: "template/qa", to: "qa" },
   // The guardrails any agent reads, before one has been generated from the
   // brief. It carries the procedures and the working agreement, which are true
   // on day one, and marks the rules sections as not yet filled in rather than

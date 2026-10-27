@@ -33,7 +33,7 @@ const repo = path.resolve(
   "..",
 );
 
-const SKIP = new Set(["node_modules", "target", ".git", "dist", "ai-only", "_forms", ".github"]);
+const SKIP = new Set(["node_modules", "target", ".git", "dist", "ai-only", "_forms", ".github", "qa"]);
 
 /** Reads a document with its line endings normalised.
  *
@@ -142,6 +142,96 @@ async function itemBriefs(root) {
   return items;
 }
 
+/** The data rows of every Markdown table in a document, as trimmed cells.
+ *  Header rows (first cell `ID` or `Deliverable`), separators and the blank
+ *  form's `<…>` placeholder rows are not claims, so they are left out. */
+function tableRows(text) {
+  const rows = [];
+  text.split("\n").forEach((line, i) => {
+    if (!line.startsWith("|")) return;
+    const cells = line.split("|").slice(1, -1).map((c) => c.trim());
+    if (cells.length < 2 || /^[-: ]+$/.test(cells[0]) || /^(ID|Deliverable)$/i.test(cells[0])) return;
+    if (cells[0] === "" || /^<.*>$/.test(cells[0])) return;
+    rows.push({ line: i + 1, cells });
+  });
+  return rows;
+}
+
+/** **QA's track: the regression suite, the reviews and the sign-off.**
+ *
+ *  These are people's documents, so they are read the way the briefs are:
+ *  against what they claim. A regression test pointing at automation that is
+ *  not there, or a sign-off nobody signed, makes the sign-off mean less than it
+ *  says, which is the one thing it exists not to do. A project with no `qa/`
+ *  folder predates the track and is left alone. */
+async function lintQa(root, deliverables, items, { errors, warnings, notes }) {
+  const qa = path.join(root, "qa");
+  if (!(await fs.stat(qa).catch(() => null))?.isDirectory()) return;
+  const rel = (p) => path.relative(repo, p).split(path.sep).join("/");
+  const exists = (p) => fs.access(path.join(root, p)).then(() => true, () => false);
+
+  // QA reviews: one per item, each naming the brief it reviews.
+  for (const dir of await fs.readdir(qa, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+    for (const file of await fs.readdir(path.join(qa, dir.name))) {
+      if (!file.endsWith(".md")) continue;
+      const full = path.join(qa, dir.name, file);
+      const fields = frontMatter(await read(full));
+      if (fields?.form !== "qa-review") continue;
+      if (fields.item && !(await exists(fields.item))) {
+        errors.push(`${rel(full)}  reviews ${fields.item}, which does not exist`);
+      }
+      if (!["blank", "reviewing", "happy"].includes(fields.status ?? "blank")) {
+        errors.push(`${rel(full)}  status "${fields.status}" — one of: blank, reviewing, happy`);
+      }
+    }
+  }
+
+  // The regression suite: ID | Proves | Item | Kind | Steps | Expected | Automation
+  const suite = path.join(qa, "regression.md");
+  const tests = (await fs.stat(suite).catch(() => null)) ? tableRows(await read(suite)) : [];
+  const seen = new Set();
+  let waiting = 0;
+  for (const { line, cells } of tests) {
+    const [id, , item, kind, steps, expected, automation] = cells;
+    const at = `${rel(suite)}:${line}  ${id}`;
+    if (seen.has(id)) errors.push(`${at} is used twice — a sign-off naming it would not say which`);
+    seen.add(id);
+    if (item && !(await exists(item))) errors.push(`${at} tests ${item}, which does not exist`);
+    if (!["manual", "automated"].includes(kind)) errors.push(`${at} kind "${kind}" — manual or automated`);
+    if (!expected) warnings.push(`${at} has no expected result — nobody can say it passed`);
+    if (kind === "manual" && !steps) warnings.push(`${at} is manual with no steps yet`);
+    if (kind === "automated" && !automation) waiting++;
+    if (automation && !(await exists(automation))) errors.push(`${at} automation ${automation} does not exist`);
+  }
+  if (tests.length > 0) notes.push(`${tests.length} regression test(s)`);
+  if (waiting > 0) notes.push(`${waiting} automated test(s) not automated yet — /qa writes them when QA asks`);
+
+  // The sign-off: Deliverable | Date | Signed off by | Regression run | Accepted issues
+  const signoff = path.join(qa, "signoff.md");
+  const signed = new Map();
+  for (const { line, cells } of (await fs.stat(signoff).catch(() => null)) ? tableRows(await read(signoff)) : []) {
+    const [deliverable, date, by] = cells;
+    const at = `${rel(signoff)}:${line}`;
+    if (deliverables.length > 0 && !deliverables.includes(deliverable)) {
+      errors.push(`${at}  signs off "${deliverable}", which the Project Brief does not list`);
+    }
+    if (!by) errors.push(`${at}  ${deliverable} sign-off has no name — a sign-off is a person saying so`);
+    if (!date) errors.push(`${at}  ${deliverable} sign-off has no date`);
+    signed.set(deliverable, { date, by });
+  }
+
+  // Where each deliverable stands: built is the AI's stopping point; signed off
+  // is QA's, and only that one makes a deliverable done.
+  for (const d of deliverables) {
+    const mine = items.filter((i) => !i.broken && (i.fields.deliverable ?? "").trim() === d);
+    if (mine.length === 0) continue;
+    const s = signed.get(d);
+    if (s && s.by) notes.push(`${d} signed off ${s.date} by ${s.by}`);
+    else if (mine.every((i) => i.fields.status === "built")) notes.push(`${d} is built — waiting on QA sign-off`);
+  }
+}
+
 async function lint(root) {
   const rel = (p) => path.relative(repo, p).split(path.sep).join("/") || ".";
   const errors = [];
@@ -174,6 +264,8 @@ async function lint(root) {
         "/translate refuses a drafted brief until a person sets status: filled",
     );
   }
+
+  await lintQa(root, named, items, { errors, warnings, notes });
 
   if (named.length === 0) {
     notes.push(

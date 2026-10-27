@@ -170,6 +170,7 @@ const TOKEN_BUDGET = {
   "template/ai-only/procedures/emit-guardrails.md": 925,
   "template/ai-only/procedures/new-item.md": 450,
   "template/ai-only/procedures/pipeline.md": 500,
+  "template/ai-only/procedures/qa.md": 500,
   "template/ai-only/procedures/translate.md": 600,
 };
 
@@ -229,6 +230,10 @@ test("coperativeai init puts every command and skill into a new project", async 
     "AGENTS.md",
     "ai-only/procedures/build.md",
     "ai-only/procedures/translate.md",
+    "ai-only/procedures/qa.md",
+    "_forms/qa-review.md",
+    "qa/regression.md",
+    "qa/signoff.md",
   ]) {
     assert.ok(
       await fs.stat(path.join(target, needed)).then(() => true, () => false),

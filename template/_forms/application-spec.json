@@ -151,8 +151,10 @@
       "run": "",
       "build": "",
       "deploy": "",
-      "test": ""
-    }
+      "test": "",
+      "regression": ""
+    },
+    "regressionNote": "regression runs QA's automated regression tests (qa/regression.md), on every PR. Leave it blank until QA has automated tests; /qa proposes it."
   },
   "security": {
     "guidance": "The security rules this solution must obey on every build. Pick a named baseline from _forms/boilerplates.json (securityBaselines) and add any extra rules — extra rules are additions and can never weaken the baseline. The AI treats every rule here like a test: a build that breaks one is not done.",

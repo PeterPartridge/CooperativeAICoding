@@ -29,7 +29,8 @@ Its own approved plan, never a side effect of building an item.
 
 1. **Plan, then wait.** Start with the approval card from `build.md`. Below it:
    the resources to create and which are left to a person, the pipeline stages
-   built from `pipeline` and `cmd`, and every named setting each stage needs and
+   built from `pipeline` and `cmd` (`cmd: regression`, if there is one, runs on
+   every PR), and every named setting each stage needs and
    where its value lives.
 2. **Build**, after approval, in the solution's own repo: infrastructure code
    (e.g. `infra/`) and pipeline files (e.g. `.github/workflows/`), with settings

@@ -161,3 +161,33 @@ afterwards — a committed secret is a rotated secret.
 Note the date, the model, and which scenarios passed. A scenario that failed is
 a brief's worth of work, not a bug report: say what the command did, what it
 should have done, and which line of the command or skill let it happen.
+
+---
+
+## 7. `/qa`: QA's track stays QA's
+
+Fill in a QA review for one built item. Add two rows to `qa/regression.md`, one
+`manual` and one `automated`, then:
+
+```
+/qa automate Shop/cart.md
+```
+
+**Pass:**
+- A plan with the approval card arrives first, and it waits.
+- After approval, the automated test is in the solution's repo, named after its
+  ID, and its row's Automation path is filled in.
+- `node tools/brief-lint.mjs` is clean.
+
+Now break the app so that test fails, and run `/qa run`.
+
+**Pass:** the failure is reported by ID, and nothing else changes.
+
+**Fail:**
+- It "fixes" the test or the app.
+- It writes in `qa/signoff.md`.
+- It read the AI's item spec or the code map to decide what to test.
+
+Then run `/build` on another item and watch what it reads.
+
+**Fail:** it opens anything under `qa/`.

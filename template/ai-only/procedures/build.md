@@ -10,6 +10,8 @@ and ask. `<projectRoot>` is the nearest folder above it that holds `Project_brie
 - the item spec
 - the first sentence of each row of `ai-only/Code_map.md`, if it exists
 
+Never read `qa/`. QA's tests check this build from outside.
+
 ## Stop before planning if
 
 - `node tools/spec-lint.mjs --ready <spec>` fails. Name the open unknowns.
@@ -73,5 +75,5 @@ Then:
 
 ## 4. Stop at a deliverable's end
 
-If this was the last item naming its deliverable, say what the deliverable now
-does end to end, and wait.
+If this was the last item naming its deliverable, say what it now does end to
+end, and wait for QA to sign it off in `qa/signoff.md`.

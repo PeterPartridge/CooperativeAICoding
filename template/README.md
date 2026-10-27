@@ -7,6 +7,8 @@ This folder is the working layout for a project built with the CooperativeAICodi
 ```
 template/
 ├─ Project_brief.md              ← fill in once (the whole project)
+├─ qa/                           ← QA's: reviews per item, regression.md, signoff.md
+│                                 (the AI that builds never reads it)
 ├─ _forms/                       ← blank master forms — copy these, don't fill them in place
 │  ├─ application-spec.json      ← ONE solution spec for every type — set
 │  │                               solutionType: website | api | database | application
@@ -35,7 +37,7 @@ template/
                                    what it does + which files/methods it uses
 ```
 
-**A project is any folder laid out like this whose root holds a `Project_brief.md`** — this `template/` folder is the blank starting copy, `example/` (at the **repo root**, a sibling of `template/`) is a worked Clothing project to copy from. The `/translate`, `/build`, `/new-item`, and `/pipeline` commands resolve all paths from that project root. The blank master forms and `boilerplates.json` always come from this folder's `_forms/`, whichever project you're in.
+**A project is any folder laid out like this whose root holds a `Project_brief.md`** — this `template/` folder is the blank starting copy, `example/` (at the **repo root**, a sibling of `template/`) is a worked Clothing project to copy from. The `/translate`, `/build`, `/new-item`, and `/pipeline` commands resolve all paths from that project root. A project made by `coperativeai init` has its own copy of `_forms/` and `qa/`.
 
 **Solutions are typed, but the spec form is one file.** Each solution folder holds one `application-spec.json` describing the whole solution, plus its items. Set `solutionType` to pick which questions apply:
 

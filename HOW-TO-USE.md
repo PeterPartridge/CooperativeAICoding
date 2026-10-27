@@ -148,6 +148,30 @@ Claude will:
 
 ---
 
+## QA sign-off (QA's own track)
+
+QA checks the work from outside and signs it off. The AI that builds never reads `qa/`.
+
+1. **Review before work starts.** Copy `_forms/qa-review.md` to
+   `qa/<solution>/<item>.md` and answer its six questions. Send questions for
+   Product to Product.
+2. **Write your tests** into `qa/regression.md`, one row each, marked `manual`
+   or `automated`.
+3. **Ask for help when you want it:**
+
+   ```
+   /qa automate ClothingWebsite/userLogin.md
+   /qa run
+   ```
+
+   Claude plans first and waits for your approval. It writes the automation in
+   the solution's repo and fills in the row, and adds the `regression` command to
+   the pipeline. It reports failures; it never fixes them.
+4. **Sign off.** When a deliverable is built, run the suite and add a row to
+   `qa/signoff.md`. `node tools/brief-lint.mjs` shows what is waiting on you.
+
+---
+
 ## Iterating
 
 Don't rewrite the form. Add a bullet under the **changes-over-time** section of a
@@ -166,6 +190,7 @@ and `/build` again. Keep each change small.
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |
 | `/pipeline <solution>` | Create the solution's CI/CD pipeline and missing infrastructure from its spec's `infrastructure` block. Secrets are referenced by name only — never written into code. |
+| `/qa [automate|script|run]` | Help QA, only when QA asks: write the automation or manual scripts QA asked for, or run the regression suite. Never fixes a failure, never signs off. |
 | `/emit-guardrails [targets]` | Write the project's rules out for other agents — `AGENTS.md` (read by Kiro and Cursor too), `CLAUDE.md`, Kiro steering, Cursor rules, Copilot instructions — from the same spec. |
 
 `/translate` and `/build` also trigger automatically when you hand Claude a brief
@@ -186,7 +211,7 @@ against the list its Project Brief names, the **round record**, and every line
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
-running it is a model. That pass is [`tools/QA.md`](tools/QA.md): six scenarios a
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): seven scenarios a
 person runs against a real agent, each one naming the failure that would count as
 a fail rather than asking whether the output looked plausible.
 

@@ -301,3 +301,80 @@
 
 - **`brief-lint` now has two jobs:** checking deliverables, and reporting status.
   Both read the same front matter, but if it grows a third, it should be split.
+
+## 2026-10-27 — Deliverable 2: QA sign-off
+
+### What I did
+- **QA has a track of its own, owned by a person.**
+  - `_forms/qa-review.md` holds the six questions QA answers before work starts,
+    one review per item, at `qa/<solution>/<item>.md`, with `status: happy` when
+    QA is.
+  - `qa/regression.md` is QA's suite: ID, what it proves, the item, manual or
+    automated, steps, expected result, and where the automation lives.
+  - `qa/signoff.md` is where QA signs a deliverable off.
+  - `init` gives every new project the last two.
+- **`/qa`, the AI's only way in, and only when QA asks.** It writes the
+  automation (in the solution's repo, named after the test's ID, testing from
+  the outside) and the manual scripts QA asked for, and runs the suite. Rules:
+  - It plans first with the approval card.
+  - Any app change a test needs is listed separately.
+  - It never fixes a failure, in the test or the app.
+  - It never writes in `signoff.md`.
+  - It does not read the AI's item specs or the code map: it tests what the
+    brief promised, not what was built.
+- **Kept apart from the build.** `translate`, `build`, the starter `AGENTS.md`
+  and emitted guardrails all say not to read `qa/`. `/build` now stops at the
+  end of a deliverable *and waits for QA's sign-off*. `/pipeline` runs a
+  solution's `regression` command on every PR, and the solution form gained that
+  command.
+- **Checked, in `brief-lint`.** It reads people's documents against the Project
+  Brief, which these are, and putting the checks there avoided a fifth set of
+  copy-list edits. It fails on:
+  - two tests sharing an ID;
+  - a kind that is neither manual nor automated;
+  - a test of an item that does not exist;
+  - automation that does not exist;
+  - a review of a missing item;
+  - a sign-off for a deliverable the brief does not list, or that nobody signed.
+
+  It notes automated tests not automated yet, and says which deliverables are
+  built and waiting on QA, or signed off and when. It leaves a project with no
+  `qa/` alone. There are 12 tests, written first.
+- **Docs:** a QA sign-off section in the README and `HOW-TO-USE.md`, `/qa` in
+  every command list, seven commands where it said six, the layout in
+  `template/README.md`, the reasoning in `procedures/README.md`, and scenario 7
+  in `tools/QA.md`.
+- **The token budgets held.** The new table rows pushed the starter `AGENTS.md`
+  and `emit-guardrails.md` over. I trimmed them and moved two reasons to the
+  README rather than raising the ceilings.
+
+### What I could not do  (and what you would need to tell me)
+- **I used my defaults on two open questions:**
+  - QA signs off Product's deliverables rather than having deliverables of its
+    own;
+  - regression automation lives in each solution's repo, under
+    `tests/regression/`.
+
+  Either is a small change if you decide otherwise.
+- **QA scenarios 1–7 have not been run by a person** against a real agent.
+- **The example project has no QA review or regression rows.** Writing QA's
+  answers for it would be me answering as QA. A person should write them, or
+  tell me to draft them marked as drafted.
+
+### Debt I left behind
+- **The separation rule is written, not enforced.** Nothing stops an agent
+  reading `qa/`. Real enforcement is not giving the builder access to the
+  folder, which belongs in Swarm's per-agent permissions (already an open design
+  item there).
+
+- **`brief-lint` now does three jobs:** deliverables, status, and QA's documents.
+  I said it should be split at a third. It still reads one set of documents
+  against one brief, but the file is getting long. Splitting it would bring back
+  the five-place copy-list problem, which is worth fixing first.
+
+- **Regression tests are linked to items, not to the brief's acceptance checks.**
+  A suite can't yet show that every check QA cares about has a test. That is gap
+  6 (traceability) from the review.
+
+- **Swarm's Test area should read `qa/`**, not keep a second copy of the suite.
+  That work belongs in the Swarm repository.
