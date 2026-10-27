@@ -1,6 +1,6 @@
 ---
 description: Build the next iteration of an approved spec — smallest change first — then report back and log debt.
-argument-hint: [path to an approved spec in a project's ai-only/, e.g. application/ai-only/CoperativeAIdb/SolutionManagement-model.md]
+argument-hint: [path to an approved spec in a project's ai-only/, e.g. example/ai-only/ClothingDatabase/UserCredentials.md]
 ---
 
 Follow **`ai-only/procedures/build.md`** exactly, for: $ARGUMENTS

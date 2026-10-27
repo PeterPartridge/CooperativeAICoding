@@ -3,8 +3,8 @@
 //
 // **The documents are the source, and they are not touched.** Every page under
 // /docs is generated from a markdown file that already exists in this
-// repository for its own reasons — the README, the how-to, and the page briefs
-// the framework is actually run from. Nothing here asks those files to carry
+// repository for its own reasons — the README, the how-to and the install
+// guide. Nothing here asks those files to carry
 // front matter or a nav entry for the website's benefit: a doc that has to be
 // edited to be publishable is one that goes stale the first time somebody is in
 // a hurry.
@@ -29,50 +29,16 @@ const GITHUB = "https://github.com/PeterPartridge/CooperativeAICoding";
  *  for the things that genuinely require an absolute URL: canonical links, the
  *  share cards, and the sitemap. */
 const SITE = "https://peterpartridge.github.io/CooperativeAICoding";
-/** GitHub redirects this to whatever the newest release is, so the site never
- *  names a version it will be wrong about an hour later. */
-const LATEST = `${GITHUB}/releases/latest`;
-
-/** The screenshots, if they are there.
- *
- *  **Rendered only when the file exists.** A landing page arguing that the AI
- *  declares its own debt, above three broken image icons, argues the opposite.
- *  So the section appears once somebody has taken the shots and not before —
- *  site/screenshots/README.md says exactly what each one has to show. */
-const SHOTS = [
-  {
-    file: "debt-on-the-board.png",
-    alt: "Work items on the planning board that the AI filed itself, marked as debt it declared",
-    caption: "The AI finished, declared what it had cut — and the debt is a work item somebody owns, not a paragraph in a transcript.",
-  },
-  {
-    file: "plan-approval.png",
-    alt: "A build plan waiting for a person to approve it before any code is written",
-    caption: "Nothing is built until a person approves the plan: what will change, and what it will not touch.",
-  },
-  {
-    file: "sandbox-verdicts.png",
-    alt: "The where-agents-run table, showing which protections are enforced and which are only asked for",
-    caption: "Where agents run, and what that actually guarantees — enforced and asked-for are never blurred into one reassuring icon.",
-  },
-];
+/** The desktop app built with the framework. It lives in its own repository,
+ *  with its own releases; this site links to it and publishes none of it. */
+const SWARM = "https://github.com/PeterPartridge/Swarm";
 
 /** What gets published, in the order it should be read. */
 const DOCS = [
   { source: "README.md", slug: "index", title: "What this is" },
   { source: "HOW-TO-USE.md", slug: "how-to-use", title: "How to use it" },
   { source: "INSTALL.md", slug: "install", title: "Install it" },
-  {
-    source: path.posix.join("application", "Project_brief.md"),
-    slug: "project-brief",
-    title: "The app's own project brief",
-  },
 ];
-
-/** The page briefs — the framework being used on itself, which is the most
- *  useful documentation there is and the least likely to drift, since these are
- *  the files the work is actually done from. */
-const BRIEFS_DIR = path.join("application", "CoperativeAI");
 
 /** Reads a brief's front matter without a YAML parser.
  *
@@ -156,7 +122,7 @@ function page({ title, body, nav, depth, description, canonical }) {
     <a href="${GITHUB}">
       <span class="gh" aria-hidden="true">&#9670;</span> Repository
     </a>
-    <a class="cta" href="${LATEST}">Download</a>
+    <a class="cta" href="${root}/docs/how-to-use.html">Get started</a>
   </nav>
 </header>
 <div class="page">
@@ -167,12 +133,11 @@ ${body}
 </div>
 <footer>
   <div class="foot-in">
-    <p>CooperativeAICoding is the framework. <strong>CoperativeAI</strong> is the
-    desktop app built with it — the historical spelling is kept because the
-    folders and solution names use it.</p>
+    <p>CooperativeAICoding is the framework. <a href="${SWARM}"><strong>Swarm</strong></a>
+    is a desktop app built with it, in its own repository.</p>
     <p class="foot-links">
       <a href="${GITHUB}">Repository on GitHub</a>
-      <a href="${LATEST}">Latest release</a>
+      <a href="${SWARM}">Swarm</a>
       <a href="${GITHUB}/issues">Issues</a>
       <a href="${GITHUB}/blob/main/LICENSE">Licence</a>
     </p>
@@ -204,33 +169,7 @@ async function main() {
   await fs.rm(out, { recursive: true, force: true });
   await fs.mkdir(path.join(out, "docs"), { recursive: true });
 
-  // A `drafted` brief is the AI's draft that no person has accepted yet, and
-  // `/translate` refuses it for exactly that reason. Publishing one puts an
-  // unreviewed answer on the public docs site in the same styling as the briefs
-  // people actually wrote, where nothing marks it as a draft — the framework
-  // advertising the failure it exists to prevent.
-  //
-  // Excluded here rather than hidden from the sidebar: a page dropped from the
-  // nav is still served at its URL, still in the sitemap, and still indexable.
-  // Not building it is the only thing that actually unpublishes it.
-  const briefFiles = [];
-  for (const f of (await fs.readdir(path.join(repo, BRIEFS_DIR)))
-    .filter((f) => f.endsWith(".md"))
-    .sort()) {
-    const raw = await fs.readFile(path.join(repo, BRIEFS_DIR, f), "utf8");
-    if (frontMatter(raw).fields.status === "drafted") continue;
-    briefFiles.push(f);
-  }
-
-  const all = [
-    ...DOCS.map((d) => ({ ...d, from: "." })),
-    ...briefFiles.map((f) => ({
-      source: path.posix.join(BRIEFS_DIR.split(path.sep).join("/"), f),
-      slug: f.replace(/\.md$/, "").replace(/\s+/g, "-").toLowerCase(),
-      from: BRIEFS_DIR,
-      brief: true,
-    })),
-  ];
+  const all = DOCS.map((d) => ({ ...d, from: "." }));
 
   // Built first so links between documents can point at published pages.
   const published = new Map();
@@ -282,22 +221,7 @@ async function main() {
     );
   }
 
-  // Only the shots that exist are copied, and the same list decides what the
-  // landing page renders — so the two cannot disagree.
-  const shots = [];
-  for (const shot of SHOTS) {
-    const source = path.join(here, "screenshots", shot.file);
-    try {
-      await fs.access(source);
-    } catch {
-      continue;
-    }
-    await fs.mkdir(path.join(out, "screenshots"), { recursive: true });
-    await fs.copyFile(source, path.join(out, "screenshots", shot.file));
-    shots.push(shot);
-  }
-
-  await fs.writeFile(path.join(out, "index.html"), landing(entries, shots), "utf8");
+  await fs.writeFile(path.join(out, "index.html"), landing(), "utf8");
 
   // **A sitemap because the sidebar is the only route to most of these.** Half
   // the docs are reachable from one nav and nothing else, which is exactly the
@@ -353,8 +277,7 @@ function sidebar(entries, current) {
       .join("")}</ul>`;
   };
   return `<aside class="side">
-${group("The framework", (e) => !e.brief)}
-${group("Page briefs", (e) => e.brief)}
+${group("The framework", () => true)}
 </aside>`;
 }
 
@@ -363,22 +286,7 @@ ${group("Page briefs", (e) => e.brief)}
  *  **Says what this is before it says anything else.** A landing page that
  *  opens with a feature list assumes somebody already knows what they are
  *  looking at, and most people arriving here will not. */
-function landing(entries, shots = []) {
-  // Proof before argument. Empty until the images exist, and then it is the
-  // first thing under the claim it is evidence for.
-  const shotsSection =
-    shots.length === 0
-      ? ""
-      : '<section class="shots">' +
-        '<h2>What that actually looks like</h2><div class="shot-grid">' +
-        shots
-          .map(
-            (s) =>
-              '<figure><img src="screenshots/' + s.file + '" alt="' + escape(s.alt) + '" loading="lazy">' +
-              '<figcaption>' + escape(s.caption) + '</figcaption></figure>',
-          )
-          .join("") +
-        '</div></section>';
+function landing() {
   const body = `
 <section class="hero">
   <h1>Developers guide, the AI builds &mdash; and it stops when it doesn&rsquo;t know.</h1>
@@ -389,22 +297,20 @@ function landing(entries, shots = []) {
   answer. That is what keeps a guess from quietly becoming code.</p>
   <p class="lede">Feedback runs both ways, the way it does on any team worth
   being on: the technical debt it leaves and the questions it could not answer
-  come back to the developers as work on the board &mdash; surfaced, not buried
-  in a chat log that scrolls away.</p>
+  come back to the developers as work items somebody owns &mdash; surfaced, not
+  buried in a chat log that scrolls away.</p>
   <p class="actions">
-    <a class="cta big" href="${LATEST}">Download CoperativeAI</a>
+    <a class="cta big" href="docs/how-to-use.html">Get started</a>
     <a class="ghost big" href="docs/index.html">Read the docs</a>
   </p>
-  <p class="small">Free and open source · Windows and Linux builds, published
-  from the repository&rsquo;s own pipeline · no accounts, no server, your keys stay
-  on your machine</p>
+  <p class="small">Free and open source · Markdown, JSON and prompts &mdash;
+  nothing to run · works in any project</p>
 </section>
 
 <section class="ways">
-  <h2>Two ways in, and only one of them is a download</h2>
+  <h2>Nothing to install</h2>
   <div class="cards">
     <div class="card">
-      <h3>The framework &mdash; nothing to install</h3>
       <p><code>npx github:PeterPartridge/CooperativeAICoding init</code></p>
       <p>Drops the project brief, the blank forms and the four commands into
       any project. You answer in plain English; the AI translates it into the
@@ -416,22 +322,8 @@ function landing(entries, shots = []) {
       <p class="small">Windows, macOS and Linux alike &middot; needs Node 20+ and
       Claude Code &middot; free, and the whole way of working</p>
     </div>
-    <div class="card">
-      <h3>CoperativeAI &mdash; the desktop workspace</h3>
-      <p>The same framework with a product around it: a board where the AI&rsquo;s
-      declared debt lands as work, Product/Develop/Test/Admin as four
-      environments, several repositories at once, a policy per work item, what
-      each run cost, and a bounded place for agents to run.</p>
-      <p class="small">Windows and Linux builds &middot; no account, no server, your
-      keys stay on your machine &middot; also free</p>
-    </div>
   </div>
-  <p>The app is built <em>with</em> the framework, so the second is the first
-  plus a place to work. Start with whichever suits &mdash; a brief written by one
-  is read by the other.</p>
 </section>
-
-${shotsSection}
 
 <section class="problem">
   <h2>The problem</h2>
@@ -466,73 +358,13 @@ ${shotsSection}
 </section>
 
 <section>
-  <h2>One workflow, four environments</h2>
-  <p>The window has four tabs, each its own colour so you always know where you
-  are. A &ldquo;working as&rdquo; picker decides which you see.</p>
-  <div class="cards">
-    <div class="card">
-      <h3>Product</h3>
-      <p>Work items — features, bugs, tests, specs — plus a roadmap over time and
-      a drag-and-drop feature designer. Specifications here generate the API
-      endpoints, front-end changes and database designs.</p>
-    </div>
-    <div class="card">
-      <h3>Develop</h3>
-      <p>A code editor and a real OS terminal over the active repository, with
-      several repositories registered at once — the multi-repo case most AI
-      tooling skips.</p>
-    </div>
-    <div class="card">
-      <h3>Test</h3>
-      <p>QA writes scenarios in plain English against a work item; the AI
-      implements them as real tests, within whatever that item&rsquo;s policy
-      permits.</p>
-    </div>
-    <div class="card">
-      <h3>Admin</h3>
-      <p>Team members and roles, AI providers and models, and where agents are
-      allowed to run — on this machine, in a Linux distribution the app owns, or
-      in a container per run.</p>
-    </div>
-  </div>
-</section>
-
-<section class="feature">
-  <h2>Deny by default, and honest about the difference</h2>
-  <p>Every work item carries its own policy: whether the AI may read it, edit
-  code for it, or generate tests for it, which provider it may use, and at what
-  effort. Nothing is permitted unless the policy says so.</p>
-  <p>The harder rule is the one the app holds itself to. A protection is either
-  <strong>enforced</strong> — the operating system refuses the agent — or
-  <strong>asked</strong>, meaning the agent has been requested and could be told
-  otherwise. The two are never blurred into one reassuring icon, and where the
-  app cannot prove containment it says so plainly. A sandbox that is only
-  nominally one is worse than none, because it gets chosen by somebody who
-  believes it protects them.</p>
-  <p>Roles are the same story: they organise the workspace, and the app says
-  outright that they are not a security boundary. There are no logins.</p>
-</section>
-
-<section>
-  <h2>It is built with itself</h2>
-  <p><strong>CoperativeAI</strong> is the desktop app; <strong>CooperativeAICoding</strong>
-  is the framework it is built with — and increasingly the app designs its own
-  features, generating the briefs that its own build loop then works from.</p>
-  <p>Which is why the documentation here is not a summary written afterwards. It
-  is the same set of briefs the work is actually done from, published as they
-  stand, limitations and open questions included.</p>
-  <p class="small">Every release carries a Windows installer and portable
-  binary, and Linux packages — <code>.deb</code>, <code>.rpm</code> and an
-  AppImage — built from the same commit by the same pipeline.</p>
+  <h2>Built with it: Swarm</h2>
+  <p><a href="${SWARM}"><strong>Swarm</strong></a> is a desktop workspace built
+  with this framework &mdash; a place for Product, Developers and QA to plan,
+  build and test with AI, where the debt an agent declares lands as work. It
+  lives in its own repository, with its own releases.</p>
   <p class="actions">
-    <a class="cta" href="${LATEST}">Get the latest release</a>
-    <a class="ghost" href="docs/${
-      // The main window, which is where the app itself starts — not whichever
-      // brief happens to sort first alphabetically.
-      entries.find((e) => e.slug === "workspaceshell")?.slug ??
-      entries.find((e) => e.brief)?.slug ??
-      "index"
-    }.html">Browse the briefs</a>
+    <a class="ghost" href="${SWARM}">Swarm on GitHub</a>
   </p>
 </section>
 `;

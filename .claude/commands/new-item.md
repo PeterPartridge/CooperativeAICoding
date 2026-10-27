@@ -1,6 +1,6 @@
 ---
 description: Scaffold a new solution item (page / endpoint / database-model) by copying the right blank form.
-argument-hint: [type: page|endpoint|model] [solution folder] [item name] [project root, optional] — e.g. page CoperativeAI workspaceShell application
+argument-hint: [type: page|endpoint|model] [solution folder] [item name] [project root, optional] — e.g. page ClothingWebsite checkout example
 ---
 
 Follow **`ai-only/procedures/new-item.md`** exactly, for: $ARGUMENTS

@@ -28,8 +28,7 @@ Fill a form                 →   Translate to a spec   →   Review & approve  
 ```
 
 A **project** is any folder whose root holds a `Project_brief.md` — `template/`
-is the blank starting copy, `example/` is a worked project, and `application/`
-is this repo's own real project. Every command resolves paths from that project
+is the blank starting copy and `example/` is a worked project. Every command resolves paths from that project
 root; the blank forms and boilerplates always come from `template/_forms/`.
 
 Forms come in two shapes, matched to their content. Prose briefs (the project
@@ -66,12 +65,12 @@ mirroring your folders.
 2. **Translate it.** Run:
 
    ```
-   /translate application/Project_brief.md
+   /translate example/Project_brief.md
    ```
 
    Claude produces a **System Spec**, a compact **Project Digest**, and a
    **Project Skills** list, and saves them to `<projectRoot>/ai-only/Project_system.md`
-   (e.g. `application/ai-only/Project_system.md`).
+   (e.g. `example/ai-only/Project_system.md`).
 
 3. **Read it back.** Check nothing was invented or misunderstood. If the skills
    list looks surprisingly long, that's a signal the project is too big — split it.
@@ -97,7 +96,7 @@ endpoints and models, and every step below is identical for them.
    (pages are Markdown; endpoints and models are JSON, e.g.
    `<projectRoot>/ClothingAPI/Login.json`). Add the project root as a fourth
    argument if you have more than one project (e.g.
-   `/new-item page CoperativeAI workspaceShell application`). A brand-new solution folder also needs its
+   `/new-item page ClothingWebsite checkout example`). A brand-new solution folder also needs its
    spec — a copy of `application-spec.json` with `solutionType` set to `website`,
    `api`, or `database`; the command reminds you.
 
@@ -126,7 +125,7 @@ endpoints and models, and every step below is identical for them.
 Once a spec is approved:
 
 ```
-/build application/ai-only/CoperativeAI/workspaceShell.md
+/build example/ai-only/ClothingWebsite/userLogin.md
 ```
 
 Claude will:

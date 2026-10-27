@@ -17,7 +17,7 @@ requirement, silently.
 ## Resolving paths
 
 **Project root** = the nearest ancestor directory of the given brief/spec path that
-contains `Project_brief.md` (walk up from the argument). `template/`, `application/`,
+contains `Project_brief.md` (walk up from the argument). `template/`
 and `example/` each qualify. All project-relative paths resolve from there:
 - Solution specs: `<projectRoot>/<solution>/application-spec.json`
 - AI workspace outputs: `<projectRoot>/ai-only/Project_system.md`,
@@ -46,7 +46,7 @@ key (`blank | filled | approved | built`):
   content is the person's input.
 
 Routing:
-- A **Project Brief** (`<projectRoot>/Project_brief.md`, e.g. `template/`, `application/`, `example/`; `form: project-brief`) → run the *project* translation.
+- A **Project Brief** (`<projectRoot>/Project_brief.md`, e.g. `template/`, `example/`; `form: project-brief`) → run the *project* translation.
 - A **Page / endpoint / database-model brief** (e.g. `ClothingWebsite/userLogin.md`, `ClothingAPI/Login.json`) → run the *page* translation.
 
 If you can't tell which, ask once. Don't translate a blank master form from
@@ -78,7 +78,7 @@ the blank forms in `_forms/` (`status: blank`, or all answers empty).
    - **Page Skills** — table building on the project skills (don't repeat them); flag any skill new for this page.
    - **PLAN** — one-paragraph summary + bullet changes + an honest note of expected technical debt.
 4. Check the deliverable mechanically rather than by eye: `node tools/brief-lint.mjs <projectRoot>` answers it for every item at once, and names any that point at a deliverable the Project Brief does not list.
-5. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/ai-only/<solution>/<item>.md` (e.g. `application/CoperativeAIdb/WorkItem-model.json` → `application/ai-only/CoperativeAIdb/WorkItem-model.md`).
+5. Save to the mirrored path: `<solution>/<item>.md|.json` → `<projectRoot>/ai-only/<solution>/<item>.md` (e.g. `example/ClothingDatabase/UserCredentials.json` → `example/ai-only/ClothingDatabase/UserCredentials.md`).
 
 ## After translating
 

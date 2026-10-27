@@ -1,7 +1,5 @@
 # CooperativeAICoding
 
-> Note: the local repo folder and the `CoperativeAI` solution names use the historical spelling "Coperative"; the framework itself is "CooperativeAICoding".
-
 A framework that gives **Product, Developers, and AI** a single, shared way of working — so that software is built to clear objectives, within agreed technical guardrails, without the AI wandering off and burning tokens rebuilding things that already work.
 
 Development is a team game, and normally this would involve Product working with Developers and Quality Assurance to build a good product, with continuous feedback from Product to Developers, Developers to Product, and QA to Developers and Product — all about capabilities, general product functionality, and look and feel.
@@ -202,7 +200,7 @@ installed and nothing to build. It never overwrites: a file that already exists
 is left alone and named in the report, so running it again is how you pick up
 forms added since. Add `--dry-run` to see it first.
 
-**Just want the desktop app, or dev on Linux?** [`INSTALL.md`](INSTALL.md) has the installers and packages for both platforms, how to build from source, and the framework-only path — which needs no binary at all and runs wherever Claude Code runs.
+**Looking for the desktop app?** [Swarm](https://github.com/PeterPartridge/Swarm) is built with this framework and lives in its own repository, with its installers and build steps. The framework itself needs no binary at all — [`INSTALL.md`](INSTALL.md) — and runs wherever Claude Code runs.
 
 New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses six Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
 

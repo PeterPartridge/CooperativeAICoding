@@ -17,8 +17,6 @@ on:
       - "README.md"
       - "HOW-TO-USE.md"
       - "INSTALL.md"
-      - "application/Project_brief.md"
-      - "application/CoperativeAI/**.md"
       - ".github/workflows/pages.yml"
   # So the site can be republished without a commit, e.g. after enabling Pages.
   workflow_dispatch:

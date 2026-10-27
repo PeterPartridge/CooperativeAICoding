@@ -109,7 +109,7 @@ These are the rules and the procedures, not the machinery. **Nothing here can
 make you follow them.** A procedure is a document you are pointed at; whether
 you read it is not checked. Model and effort per item, what a run cost,
 deny-by-default policy and a bounded place to run commands live in the
-CoperativeAI desktop app.
+Swarm desktop app.
 
 The part that does not depend on which model turned up is the approval gate: a
 person reads the plan before code is written. Keep that one.

@@ -31,7 +31,7 @@ approved plan, separate from feature building.
 ## Procedure
 
 1. **Read the inputs.** Derive `<projectRoot>` = the nearest ancestor of the
-   solution folder containing `Project_brief.md` (`template/`, `application/`,
+   solution folder containing `Project_brief.md` (`template/` and
    `example/` each qualify; ask once if ambiguous). The solution's spec
    (`<projectRoot>/<solution>/application-spec.json`):
    its `infrastructure` block (resources, provisioning, environments, settings,
