@@ -59,7 +59,7 @@ It buys a cheap reuse check before code is written. Reading the first sentence
 of each row costs less than reading the code, and a method found there is one
 the AI does not rebuild. If keeping the rows up to date stops being worth what
 that check saves, change the rule where it is written (step 3 of
-`.claude/commands/build.md`, and the project's guardrails). Don't skip it
+[`procedures/build.md`](procedures/build.md), and the project's guardrails). Don't skip it
 quietly in a build.
 
 ---

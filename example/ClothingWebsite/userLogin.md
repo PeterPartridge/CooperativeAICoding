@@ -45,10 +45,10 @@ Everyone (logged-out visitors).
 ### data-stored — What information needs to be stored, and what does each bit look like?
 None on the website — credentials are verified by ClothingAPI against the `UserCredentials` model.
 
-### in-memory — Does anything need to be remembered while the page is open (not saved permanently)?
-The typed username/password until the login request is sent.
+### in-memory — Is there anything that **must not** be saved permanently, or must survive between screens?
+The typed password is never saved — not to disk, browser storage, logs, or URLs.
 
-### tests — How will we know it works? What should we test?
+### tests — How will we know it works? What must be true for this to be accepted?
 - Correct username + password logs the customer in.
 - Wrong password shows an error and does not log in.
 - "Forgot password" starts a reset.

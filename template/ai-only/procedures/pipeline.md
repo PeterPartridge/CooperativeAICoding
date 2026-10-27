@@ -36,8 +36,7 @@ approved plan, separate from feature building.
    (`<projectRoot>/<solution>/application-spec.json`):
    its `infrastructure` block (resources, provisioning, environments, settings,
    pipeline) and `scaffold` block (commands — resolve a named boilerplate from
-   the project's `_forms/boilerplates.json` (`template/_forms/` inside this repository), a framework asset that always lives at
-   the repo's `template/`). Get the repo location from the Project
+   the project's `_forms/boilerplates.json` (`template/_forms/` inside this repository)). Get the repo location from the Project
    Digest's Solutions & repos line (`<projectRoot>/ai-only/Project_system.md`).
 2. **Plan** — and wait for approval. State:
    - Resources to create (`existsAlready: false`), with the provisioning tool the
