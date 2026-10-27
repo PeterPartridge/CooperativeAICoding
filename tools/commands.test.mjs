@@ -22,6 +22,7 @@ import { existsSync, promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { layout } from "../bin/layout.mjs";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = async (p) => (await fs.readFile(path.join(repo, p), "utf8")).replace(/\r\n/g, "\n");
@@ -212,19 +213,19 @@ test("coperativeai init puts every command and skill into a new project", async 
       `the ${dir} skill did not travel`,
     );
   }
-  // Every check, named one by one rather than as "tools/". round-record-lint
-  // was in the published package and missing from the copy list, so projects
-  // got two of the three — and the one they lost is the one that exists
-  // because agents quietly skip writing the record.
+  // **Every check, found the way check.mjs finds them** — by name, from this
+  // repository's tools/ — rather than from a list here. round-record-lint was
+  // once published and missing from the copy list, so projects got two of the
+  // three checks; a check that ships but does not travel is that bug again.
+  const checks = (await fs.readdir(path.join(repo, "tools"))).filter((f) => f.endsWith("-lint.mjs"));
+  assert.ok(checks.length >= 4, `only ${checks.length} checks found`);
   for (const needed of [
+    ...checks.map((c) => `tools/${c}`),
+    "tools/check.mjs",
     "Project_brief.md",
     "_forms/page.md",
     "_forms/endpoint.json",
     "ai-only/1-translate-for-ai.md",
-    "tools/brief-lint.mjs",
-    "tools/code-map-lint.mjs",
-    "tools/round-record-lint.mjs",
-    "tools/spec-lint.mjs",
     // So an agent that is not Claude Code arrives to instructions addressed to
     // it, rather than to a .claude/ folder meant for somebody else.
     "AGENTS.md",
@@ -329,8 +330,9 @@ test("a fresh project's own checks run in it", async () => {
   execFileSync("node", [path.join(repo, "bin/coperativeai.mjs"), "init", target], { encoding: "utf8" });
   // The blank brief is not filled in, so this is the "nothing to check" path —
   // and it must exit zero, or every new project starts with a red check.
-  const out = execFileSync("node", [path.join(target, "tools/brief-lint.mjs")], { encoding: "utf8" });
+  const out = execFileSync("node", [path.join(target, "tools/check.mjs")], { encoding: "utf8" });
   assert.match(out, /not filled in yet/);
+  assert.match(out, /check\(s\) passed/);
 });
 
 // ---------------------------------------------------------------------------
@@ -342,9 +344,7 @@ test("a fresh project's own checks run in it", async () => {
 // permissions — to everybody. The list is now exact, and this asks npm itself
 // what it would publish rather than trusting the list to stay exact.
 
-const LAYOUT_SOURCES = [...(await read("bin/coperativeai.mjs")).matchAll(/\{ from: "([^"]+)"/g)].map(
-  (m) => m[1],
-);
+const LAYOUT_SOURCES = (await layout(repo)).map((l) => l.from);
 const ALSO_PUBLISHED = ["package.json", "README.md", "HOW-TO-USE.md", "INSTALL.md", "LICENSE"];
 
 test("the published package is what init copies, plus the CLI and its docs", () => {

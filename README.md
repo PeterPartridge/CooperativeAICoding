@@ -216,7 +216,7 @@ cd my-project
 coperativeai init
 ```
 
-That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the seven commands and the four
+That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the seven commands and the
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
 to build. It never overwrites: a file that already exists
 is left alone and named in the report, so running it again is how you pick up

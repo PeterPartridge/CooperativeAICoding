@@ -38,23 +38,20 @@ jobs:
       # there, and travels into a project `coperativeai init` creates.
       - name: Every command still points at something that exists
         run: node --test tools/commands.test.mjs
-      - name: The code map matches the code
-        run: node tools/code-map-lint.mjs
-      # **A misspelled deliverable is the quiet failure.** An item naming one
-      # the Project Brief does not list looks aimed at something, and the
-      # deliverable it was meant to finish never finishes — /build counts the
-      # last item and there isn't one. Nothing else would notice.
-      - name: Every brief's deliverable exists
-        run: node tools/brief-lint.mjs
-      # **The read-back people no longer do.** Every line of an AI spec names
-      # the brief answer it came from; a line that cannot is invented scope.
-      - name: Every line of every AI spec has a source
-        run: node tools/spec-lint.mjs
+      # **Every check, by one command.** tools/check.mjs runs each `*-lint.mjs`
+      # in tools/: the code map against the code, every brief's deliverable,
+      # QA's regression suite and sign-off, every line of every AI spec against
+      # the answer it cites, and the round record's shape. A new check runs here
+      # the moment its file exists, with no step to add.
+      - name: Every check passes
+        run: node tools/check.mjs
       # **The record is the only feedback that runs back from the AI, and by
       # its own account the rule it is least able to keep: adherence to
       # administrative rules degrades exactly when a task got long, which is
       # when the debt was worth having. This cannot check the record is true —
       # a step nobody noticed skipping is invisible to any reader — but a round
       # of work that brought no record at all is now loud rather than silent.
+      # The one check with a question the others cannot ask — did this change
+      # bring a record? — needs the base of the pull request, so it runs again.
       - name: A round of work brought a record with it
         run: node tools/round-record-lint.mjs --since ${{ github.event.pull_request.base.sha }}

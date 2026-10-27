@@ -22,45 +22,13 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { layout } from "./layout.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const framework = path.resolve(here, "..");
 
-/** What a project needs, and where each piece comes from.
- *
- *  `template/` is the blank starting copy, so a project is that folder's
- *  contents with the framework's own commands beside them. `_forms/` lands at
- *  the project root rather than under `template/`, because a project is not a
- *  copy of this repository — it is a folder with a Project Brief at its root. */
-const LAYOUT = [
-  { from: "template/Project_brief.md", to: "Project_brief.md" },
-  { from: "template/_forms", to: "_forms" },
-  { from: "template/ai-only", to: "ai-only" },
-  // QA's track: the regression suite and the sign-off sheet. QA owns them; the
-  // AI that builds never reads them.
-  { from: "template/qa", to: "qa" },
-  // The guardrails any agent reads, before one has been generated from the
-  // brief. It carries the procedures and the working agreement, which are true
-  // on day one, and marks the rules sections as not yet filled in rather than
-  // inventing them. Written with the generated-file header so /emit-guardrails
-  // replaces it once there is a spec to generate from.
-  { from: "template/AGENTS.template.md", to: "AGENTS.md" },
-  { from: ".claude/commands", to: ".claude/commands" },
-  { from: ".claude/skills", to: ".claude/skills" },
-  // Every check, so a project can run them on its own briefs, code map and
-  // round record rather than only inside this repository. The round record one
-  // was published and never copied, which left every project with the two
-  // checks that read what an agent wrote *while* working and none of the one
-  // that reads what it wrote afterwards — the only rule here that rests
-  // entirely on the agent remembering.
-  { from: "tools/brief-lint.mjs", to: "tools/brief-lint.mjs" },
-  { from: "tools/code-map-lint.mjs", to: "tools/code-map-lint.mjs" },
-  { from: "tools/round-record-lint.mjs", to: "tools/round-record-lint.mjs" },
-  // The check that reads the AI's specs so people do not have to: every fact
-  // sourced, every gap marked. Without it in the project, the promise that
-  // nobody needs to read ai-only/ would rest on nothing.
-  { from: "tools/spec-lint.mjs", to: "tools/spec-lint.mjs" },
-];
+// What a project receives is package.json's `files`; bin/layout.mjs says how
+// each entry lands.
 
 const written = [];
 const kept = [];
@@ -92,7 +60,7 @@ async function init(target, dryRun) {
   const rel = (p) => path.relative(root, p).split(path.sep).join("/");
 
   await fs.mkdir(root, { recursive: true });
-  for (const { from, to } of LAYOUT) {
+  for (const { from, to } of await layout(framework)) {
     await copy(path.join(framework, from), path.join(root, to), dryRun);
   }
 
@@ -130,11 +98,8 @@ Next, in that folder:
      (or endpoint, or model — a backend-only project has no pages at all.)
   4. Fill it in, /translate it, then /build it.
 
-  node tools/brief-lint.mjs        checks every item names a real deliverable
-  node tools/code-map-lint.mjs     checks the code map still matches the code
-  node tools/round-record-lint.mjs checks a round record was written, and answers
-                                   all three of its questions
-  node tools/spec-lint.mjs         checks every line of the AI's specs has a source
+  node tools/check.mjs   runs every check: briefs, specs, code map, QA's
+                         suite and the round record
 `);
 }
 

@@ -16,10 +16,8 @@
     "!template/README.md",
     ".claude/commands",
     ".claude/skills",
-    "tools/brief-lint.mjs",
-    "tools/code-map-lint.mjs",
-    "tools/round-record-lint.mjs",
-    "tools/spec-lint.mjs",
+    "tools/*-lint.mjs",
+    "tools/check.mjs",
     "README.md",
     "HOW-TO-USE.md",
     "INSTALL.md",
@@ -27,7 +25,7 @@
   ],
   "scripts": {
     "test": "node --test tools/lint.test.mjs tools/commands.test.mjs",
-    "check": "npm test && node tools/code-map-lint.mjs && node tools/brief-lint.mjs && node tools/round-record-lint.mjs && node tools/spec-lint.mjs"
+    "check": "npm test && node tools/check.mjs"
   },
   "engines": {
     "node": ">=20"

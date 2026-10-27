@@ -711,3 +711,44 @@ test("brief-lint leaves a project with no qa/ folder alone", async () => {
   assert.equal(code, 0, out);
   assert.doesNotMatch(out, /regression|sign-off/);
 });
+
+// ---------------------------------------------------------------------------
+// check.mjs: one command that runs every check.
+//
+// It exists so that adding a check is adding a file, not editing five lists.
+// Its faults would be the quiet kind: stopping at the first failure (so later
+// checks never run), passing when one failed, or missing a check because it
+// was not on a list. So the test gives it a check it has never heard of.
+
+async function fakeTools(results) {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "checks-"));
+  await fs.copyFile(path.join(tools, "check.mjs"), path.join(dir, "check.mjs"));
+  for (const [name, code] of Object.entries(results)) {
+    await fs.writeFile(path.join(dir, name), `console.log("ran ${name}"); process.exit(${code});\n`);
+  }
+  await fs.writeFile(path.join(dir, "helper.test.mjs"), `console.log("ran a test"); process.exit(1);\n`);
+  return dir;
+}
+
+const runCheck = (dir) => {
+  try {
+    return { code: 0, out: execFileSync("node", [path.join(dir, "check.mjs")], { encoding: "utf8" }) };
+  } catch (e) {
+    return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
+  }
+};
+
+test("check.mjs runs every *-lint.mjs beside it, including one no list names", async () => {
+  const { code, out } = runCheck(await fakeTools({ "a-lint.mjs": 0, "brand-new-lint.mjs": 0 }));
+  assert.equal(code, 0, out);
+  assert.match(out, /ran a-lint\.mjs/);
+  assert.match(out, /ran brand-new-lint\.mjs/);
+  assert.doesNotMatch(out, /ran a test/, "only checks run, not tests");
+});
+
+test("check.mjs runs them all and fails if any one fails", async () => {
+  const { code, out } = runCheck(await fakeTools({ "a-lint.mjs": 1, "b-lint.mjs": 0 }));
+  assert.equal(code, 1);
+  assert.match(out, /ran b-lint\.mjs/, "a failure stopped the later checks from running");
+  assert.match(out, /a-lint\.mjs failed/);
+});
