@@ -1,6 +1,6 @@
 # Install
 
-The framework is the forms and the six commands, and it installs from npm.
+The framework is the forms and the seven commands, and it installs from npm.
 You need Node 20 or later and [Claude Code](https://claude.com/claude-code):
 
 ```bash
@@ -18,7 +18,7 @@ forms added since.
 
 Then fill in `Project_brief.md` in plain English, and follow
 [`HOW-TO-USE.md`](HOW-TO-USE.md). `init` puts the slash commands (`/draft`,
-`/translate`, `/new-item`, `/build`, `/pipeline`, `/emit-guardrails`) into the
+`/translate`, `/new-item`, `/build`, `/pipeline`, `/emit-guardrails`, `/qa`) into the
 project's `.claude/commands/`, so they exist the moment Claude Code starts
 there. Each one points at a plain-Markdown procedure in
 `ai-only/procedures/`, which any other agent can be told to follow.

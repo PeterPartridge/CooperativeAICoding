@@ -38,7 +38,7 @@ repository, `template/`).
 - **Item:** only what the digest does not already say.
 
 Translate the person's answers only. `>` lines and `question`, `guidance` and
-`example` fields are part of the form. Write no plan; `/build` plans.
+`example` fields are part of the form. Write no plan; `/build` plans. Never read `qa/`.
 
 ## Then
 

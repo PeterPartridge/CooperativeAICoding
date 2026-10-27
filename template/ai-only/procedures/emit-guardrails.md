@@ -10,8 +10,7 @@ this order:
 
 1. **Purpose**, in one line.
 2. **Solutions:** name, type, repo and local path.
-3. **House rules, each with this project's meaning.** A rule's bare name tells an
-   agent nothing.
+3. **House rules, each with this project's meaning**, never a bare name.
 4. **The testing floor.**
 5. **Security model and baseline**, always including: secret values are
    referenced by name, never written into code, config or logs.
@@ -19,7 +18,7 @@ this order:
 7. **The AI workspace:** build from the approved spec at
    `ai-only/<solution>/<item>.md`, take project rules from
    `ai-only/Project_digest.md`, check `ai-only/Code_map.md` and reuse before
-   building anything new.
+   building anything new. Never read `qa/` while building: it is QA's.
 8. **The working agreement:** smallest change; existing code is production;
    never invent scope; **when you cannot understand something, stop and say so.**
 9. **The procedures table, verbatim.** It is how a tool other than Claude Code
@@ -31,6 +30,7 @@ this order:
    | turn a filled-in brief into a spec | `ai-only/procedures/translate.md` |
    | add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
    | build the next iteration of an approved spec | `ai-only/procedures/build.md` |
+   | help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |
    | set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
    | write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |
 
@@ -44,8 +44,7 @@ this order:
 | Cursor | `.cursor/rules/<name>.mdc` | `alwaysApply: true`, or `description` + `globs` |
 | Copilot | `.github/copilot-instructions.md` | none |
 
-Prefer `AGENTS.md`: Kiro always includes it and Cursor accepts it. Emit native
-files only for file-scoped rules, which one root file can't express. For Kiro's
+Prefer `AGENTS.md`. Emit native files only for file-scoped rules. For Kiro's
 foundation files: purpose and deliverable go in `product.md`; solutions and the
 testing floor in `tech.md`; house rules and reuse in `structure.md`.
 

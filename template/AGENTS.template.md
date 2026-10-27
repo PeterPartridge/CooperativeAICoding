@@ -17,6 +17,7 @@ marked *not yet filled in* wait on the brief.
 | turn a filled-in brief into a spec | `ai-only/procedures/translate.md` |
 | add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
 | build the next iteration of an approved spec | `ai-only/procedures/build.md` |
+| help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |
 | set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
 | write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |
 
@@ -25,15 +26,15 @@ marked *not yet filled in* wait on the brief.
 - `Project_brief.md` and `<solution>/<item>.md|.json`: the people's briefs. Never author them.
 - `ai-only/`: your workspace, in the format of `ai-only/2-ai-system.template.md`.
 - `ai-only/Project_digest.md`: the rules every build obeys. *Does not exist yet: created by `translate.md`.*
+- `qa/`: QA's. Read it only when following `qa.md`.
 - `ai-only/Code_map.md`: what already exists, so it is not rebuilt. *Does not exist yet: created by `build.md`.*
 
 ## House rules, security, testing, deliverable
 
 **Not yet filled in.** Until the brief says otherwise:
 - Secret values are never written into code, config, logs or documents. Use names.
-- Write a failing test first, then just enough code to pass it. Say what you
-  did not test. Don't invent a threshold.
-- With no deliverable named, keep changes small and start nothing adjacent.
+- Test first: a failing test, then just enough code. Say what you didn't test.
+- No deliverable named: keep changes small, start nothing adjacent.
 
 ## The working agreement
 

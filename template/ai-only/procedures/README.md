@@ -10,6 +10,7 @@ follow it.**
 | turn a filled-in brief into a spec | [`translate.md`](translate.md) |
 | add a new page, endpoint or database model | [`new-item.md`](new-item.md) |
 | build the next iteration of an approved spec | [`build.md`](build.md) |
+| help QA: automate tests, write scripts, run the regression suite | [`qa.md`](qa.md) |
 | set up a solution's pipeline and infrastructure | [`pipeline.md`](pipeline.md) |
 | write the rules out for another AI tool | [`emit-guardrails.md`](emit-guardrails.md) |
 
@@ -95,6 +96,19 @@ token budget per procedure; it may only come down.
 - **Debt, not retries.** Thrashing on something it cannot do burns tokens and
   produces worse code than a clear "I could not do this, here is why".
 
+### qa
+
+- **QA is a separate track, not part of building.** QA checks the work from
+  outside and signs it off. If the AI that builds an item can see QA's tests, it
+  builds to pass them, and a passing run stops telling anyone anything. So
+  `translate` and `build` never read `qa/`, and `qa` tests what the brief
+  promised, not what the spec or the code says.
+- **Only when QA asks.** The AI helps QA. It does not decide what QA tests.
+- **Never fix a failure.** A failing regression test is news for people. Changing
+  the test hides it, and changing the app is a development round nobody planned.
+- **Never sign off.** A sign-off is a person saying the work is done. The AI
+  stops at a built deliverable; QA's sign-off is what finishes it.
+
 ### pipeline
 
 - **Infrastructure is its own plan.** Created as a side effect of a feature,
@@ -118,6 +132,11 @@ token budget per procedure; it may only come down.
 
 ### emit-guardrails
 
+- **`AGENTS.md` first.** Kiro always includes it and Cursor accepts it, so one
+  file reaches several tools; native files earn their place only for file-scoped
+  rules, which a single root file can't express.
+- **Definitions, not names.** "DRY" alone tells an agent nothing; "code repeated
+  three times moves to a shared library" is a rule.
 - **A pointer table, not the procedures.** Guardrail files are loaded on every
   turn; inlining six procedures would spend most of a context window on five
   things the agent is not doing.

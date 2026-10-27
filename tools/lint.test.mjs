@@ -589,3 +589,125 @@ test("spec-lint catches an item spec that does not carry them at all", async () 
   assert.equal(code, 1);
   assert.match(out, /no "deliverable:"/);
 });
+
+// ---------------------------------------------------------------------------
+// brief-lint and QA: the sign-off track people own.
+//
+// QA's documents are people's documents, read against the Project Brief like
+// every other brief. The faults that matter are the ones that make a sign-off
+// mean less than it says: a regression test pointing at automation that is not
+// there, two tests sharing an ID, a test of an item that does not exist, and a
+// sign-off for a deliverable the brief does not list or that nobody signed.
+
+const REG_HEAD =
+  "# Regression suite\n\n| ID | Proves | Item | Kind | Steps | Expected | Automation |\n|---|---|---|---|---|---|---|\n";
+const SIGN_HEAD =
+  "# Sign-off\n\n| Deliverable | Date | Signed off by | Regression run | Accepted issues |\n|---|---|---|---|---|\n";
+
+async function qaProject(files, eol = "\n") {
+  return project(
+    {
+      "Project_brief.md": brief("filled", THREE),
+      "Shop/cart.md": item("built", "MVP"),
+      "qa/regression.md": REG_HEAD,
+      "qa/signoff.md": SIGN_HEAD,
+      ...files,
+    },
+    eol,
+  );
+}
+
+for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
+  test(`brief-lint passes a regression suite that is true (${name})`, async () => {
+    const root = await qaProject(
+      {
+        "qa/regression.md":
+          REG_HEAD +
+          "| R-001 | removing an item empties the basket | Shop/cart.md | automated | | basket shows 0 items | tests/regression/cart.test.js |\n" +
+          "| R-002 | the basket looks right on a phone | Shop/cart.md | manual | 1. open on a phone | nothing overlaps | |\n",
+        "tests/regression/cart.test.js": "// R-001\n",
+      },
+      eol,
+    );
+    const { code, out } = run("brief-lint.mjs", [root]);
+    assert.equal(code, 0, out);
+    assert.match(out, /2 regression test\(s\)/);
+  });
+
+  test(`brief-lint catches automation that is not there (${name})`, async () => {
+    const root = await qaProject(
+      { "qa/regression.md": REG_HEAD + "| R-001 | removing an item | Shop/cart.md | automated | | empty | tests/regression/gone.test.js |\n" },
+      eol,
+    );
+    const { code, out } = run("brief-lint.mjs", [root]);
+    assert.equal(code, 1);
+    assert.match(out, /R-001.*tests\/regression\/gone\.test\.js does not exist/);
+  });
+}
+
+test("brief-lint catches two regression tests with one ID", async () => {
+  const row = "| R-001 | a thing | Shop/cart.md | manual | 1. do it | it works | |\n";
+  const { code, out } = run("brief-lint.mjs", [await qaProject({ "qa/regression.md": REG_HEAD + row + row })]);
+  assert.equal(code, 1);
+  assert.match(out, /R-001 is used twice/);
+});
+
+test("brief-lint catches a regression test whose kind is neither manual nor automated", async () => {
+  const row = "| R-001 | a thing | Shop/cart.md | sometimes | 1. do it | it works | |\n";
+  const { code, out } = run("brief-lint.mjs", [await qaProject({ "qa/regression.md": REG_HEAD + row })]);
+  assert.equal(code, 1);
+  assert.match(out, /R-001 kind "sometimes"/);
+});
+
+test("brief-lint catches a regression test of an item that does not exist", async () => {
+  const row = "| R-001 | a thing | Shop/gone.md | manual | 1. do it | it works | |\n";
+  const { code, out } = run("brief-lint.mjs", [await qaProject({ "qa/regression.md": REG_HEAD + row })]);
+  assert.equal(code, 1);
+  assert.match(out, /R-001 tests Shop\/gone\.md, which does not exist/);
+});
+
+test("brief-lint notes automated tests nobody has automated yet, without failing", async () => {
+  const row = "| R-001 | a thing | Shop/cart.md | automated | | it works | |\n";
+  const { code, out } = run("brief-lint.mjs", [await qaProject({ "qa/regression.md": REG_HEAD + row })]);
+  assert.equal(code, 0, out);
+  assert.match(out, /1 automated test\(s\) not automated yet/);
+});
+
+test("brief-lint catches a sign-off for a deliverable the brief does not list", async () => {
+  const row = "| Payments | 2026-11-01 | Sam | 2/2 passed | none |\n";
+  const { code, out } = run("brief-lint.mjs", [await qaProject({ "qa/signoff.md": SIGN_HEAD + row })]);
+  assert.equal(code, 1);
+  assert.match(out, /signs off "Payments", which the Project Brief does not list/);
+});
+
+test("brief-lint catches a sign-off nobody signed", async () => {
+  const row = "| MVP | 2026-11-01 |  | 2/2 passed | none |\n";
+  const { code, out } = run("brief-lint.mjs", [await qaProject({ "qa/signoff.md": SIGN_HEAD + row })]);
+  assert.equal(code, 1);
+  assert.match(out, /MVP sign-off has no name/);
+});
+
+test("brief-lint says a built deliverable is waiting on QA, and when it is signed off", async () => {
+  const waiting = run("brief-lint.mjs", [await qaProject({})]);
+  assert.equal(waiting.code, 0, waiting.out);
+  assert.match(waiting.out, /MVP is built — waiting on QA sign-off/);
+
+  const row = "| MVP | 2026-11-01 | Sam | 2/2 passed | none |\n";
+  const signed = run("brief-lint.mjs", [await qaProject({ "qa/signoff.md": SIGN_HEAD + row })]);
+  assert.equal(signed.code, 0, signed.out);
+  assert.match(signed.out, /MVP signed off 2026-11-01 by Sam/);
+});
+
+test("brief-lint catches a QA review of an item that does not exist", async () => {
+  const review = "---\nform: qa-review\nitem: Shop/gone.md\nstatus: happy\n---\n";
+  const { code, out } = run("brief-lint.mjs", [await qaProject({ "qa/Shop/gone.md": review })]);
+  assert.equal(code, 1);
+  assert.match(out, /reviews Shop\/gone\.md, which does not exist/);
+});
+
+test("brief-lint leaves a project with no qa/ folder alone", async () => {
+  const root = await project({ "Project_brief.md": brief("filled", THREE), "Shop/cart.md": item("built", "MVP") });
+  const { code, out } = run("brief-lint.mjs", [root]);
+  assert.equal(code, 0, out);
+  assert.doesNotMatch(out, /regression|sign-off/);
+});
