@@ -46,6 +46,10 @@ jobs:
       # last item and there isn't one. Nothing else would notice.
       - name: Every brief's deliverable exists
         run: node tools/brief-lint.mjs
+      # **The read-back people no longer do.** Every line of an AI spec names
+      # the brief answer it came from; a line that cannot is invented scope.
+      - name: Every line of every AI spec has a source
+        run: node tools/spec-lint.mjs
       # **The record is the only feedback that runs back from the AI, and by
       # its own account the rule it is least able to keep: adherence to
       # administrative rules degrades exactly when a task got long, which is

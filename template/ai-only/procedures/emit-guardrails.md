@@ -1,51 +1,29 @@
 # Emit the guardrails for other agents
 
-**One brief, every agent's native guardrails.** The spec is already the single
-source of truth; this writes it out in the shape each tool actually reads, so a
-team standardised on Cursor or Kiro gets the same rules without retyping them
-and without a second place for them to drift.
+Write the project's rules into the file each AI tool reads, generated from one
+spec so there is no second copy to drift.
 
-**What this honestly does and does not buy.** The *guardrails* travel: the house
-rules, the testing floor, the security baseline, the deliverable in progress,
-and the working agreement. The *loop* does not travel automatically — plan
-approval, cost and effort per work item, the sandbox, and debt landing on a
-board are things the app and Claude Code do. Say so in the emitted file rather
-than letting somebody discover it. An overstated claim here is the one that
-costs trust, because it is discovered while somebody is relying on it.
+## Content: about one page, nothing else
 
+Take it from `ai-only/Project_digest.md`, which is already the compact form, in
+this order:
 
-## 1. Where the content comes from
-
-Read `<projectRoot>/ai-only/Project_system.md` — the **Project Digest** is
-exactly the compact form this needs, which is why it exists. Add from the spec
-and the solution specs only what the digest leaves out.
-
-**The invariant core**, in this order, and nothing else:
-
-1. **Purpose** — one line. What this software is for.
-2. **Solutions and where their code lives** — name, type, repo, local path. An
-   agent that builds in the wrong repository is the expensive failure.
-3. **House rules, with this project's own definition of each.** "DRY" alone is
-   decoration; "if code repeats three times, move it to a shared library" is a
-   rule. Copy the definitions, never a rule's name on its own.
-4. **The testing floor** — the cover expected of every change, and what is not
-   worth testing.
-5. **Security model and baseline** — including, always, that secret values are
-   referenced by name and never written into code, config or logs.
-6. **The deliverable being worked towards**, and that work stops when the last
-   item naming it is built.
-7. **The AI workspace, and reuse before building.** The agent builds from the
-   approved spec at `ai-only/<solution>/<item>.md`, takes project-wide
-   constraints from the Project Digest in `ai-only/Project_system.md`, and
-   appends its round report to the item's spec. Before writing anything new it
-   checks the code map at `ai-only/Code_map.md`, and a method that already does
-   the job is used rather than rebuilt.
-8. **The working agreement** — smallest change that answers the request; treat
-   existing code as production; never invent scope; **and when something cannot
-   be understood, stop and say so rather than guessing.** That last one is the
-   point of the whole framework and belongs in every file emitted.
-9. **The procedures table**, verbatim, because this is the part a tool other
-   than Claude Code has no other way of reaching:
+1. **Purpose**, in one line.
+2. **Solutions:** name, type, repo and local path.
+3. **House rules, each with this project's meaning.** A rule's bare name tells an
+   agent nothing.
+4. **The testing floor.**
+5. **Security model and baseline**, always including: secret values are
+   referenced by name, never written into code, config or logs.
+6. **The deliverable in progress.** Work stops when its last item is built.
+7. **The AI workspace:** build from the approved spec at
+   `ai-only/<solution>/<item>.md`, take project rules from
+   `ai-only/Project_digest.md`, check `ai-only/Code_map.md` and reuse before
+   building anything new.
+8. **The working agreement:** smallest change; existing code is production;
+   never invent scope; **when you cannot understand something, stop and say so.**
+9. **The procedures table, verbatim.** It is how a tool other than Claude Code
+   reaches them. Point at the files; never inline them.
 
    | When the request is | Follow |
    |---|---|
@@ -56,61 +34,35 @@ and the solution specs only what the digest leaves out.
    | set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
    | write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |
 
-   **The table, never the procedures themselves.** Each is three to seven
-   kilobytes and they are loaded on every turn; six of them inlined would be
-   most of a context window spent on instructions for the five things the agent
-   is not doing. Pointing at the file keeps the cost at one line per procedure
-   and keeps one copy, so a procedure fixed once is fixed for every tool.
-
-**Keep it to about a page.** These files are loaded into every interaction; a
-long one costs tokens on every turn and gets skimmed by the model the same way a
-long README gets skimmed by a person. If it does not change what the agent does,
-leave it out.
-
-
-## 2. The formats, as their own documentation states them
+## Formats
 
 | Target | Path | Front matter |
 |---|---|---|
-| **AGENTS.md** | `AGENTS.md` at the repo root | none — plain markdown |
-| **Claude Code** | `CLAUDE.md` at the repo root | none |
-| **Kiro** | `.kiro/steering/<name>.md` | `inclusion: always` (also `fileMatch` + `fileMatchPattern`, `manual`, or `auto` + `name`/`description`) |
-| **Cursor** | `.cursor/rules/<name>.mdc` | `alwaysApply: true`, plus `description` and `globs` when it should attach conditionally |
-| **Copilot** | `.github/copilot-instructions.md` | none |
+| AGENTS.md (the default) | `AGENTS.md` | none |
+| Claude Code | `CLAUDE.md` | none |
+| Kiro | `.kiro/steering/<name>.md` | `inclusion: always` (or `fileMatch` + `fileMatchPattern`, `manual`, `auto`) |
+| Cursor | `.cursor/rules/<name>.mdc` | `alwaysApply: true`, or `description` + `globs` |
+| Copilot | `.github/copilot-instructions.md` | none |
 
-**Prefer `AGENTS.md`, and say why.** Kiro reads `AGENTS.md` and always includes
-it; Cursor accepts it as a plain-markdown alternative to `.mdc` rules. So one
-file covers several tools, and the native formats are worth emitting only when a
-team wants file-scoped rules — Kiro's `fileMatch`, Cursor's `globs` — which a
-single root file cannot express.
+Prefer `AGENTS.md`: Kiro always includes it and Cursor accepts it. Emit native
+files only for file-scoped rules, which one root file can't express. For Kiro's
+foundation files: purpose and deliverable go in `product.md`; solutions and the
+testing floor in `tech.md`; house rules and reuse in `structure.md`.
 
-**Kiro's three foundation files** (`product.md`, `tech.md`, `structure.md`) map
-onto the core cleanly when a team wants the native layout: purpose and
-deliverable into `product.md`, solutions/repos and the testing floor into
-`tech.md`, house rules and reuse into `structure.md`.
+## Safety
 
-
-## 3. Generated files, and the rule that keeps them safe
-
-Every emitted file opens with exactly this, adjusted for the path:
+Start every emitted file with:
 
 ```markdown
-<!-- Generated by CooperativeAICoding from ai-only/Project_system.md.
+<!-- Generated by CooperativeAICoding from ai-only/Project_digest.md.
      Edit the brief, not this file — the next emit overwrites it. -->
 ```
 
-- **Overwrite freely — but only files carrying that header.** A file without it
-  was written by a person. Never clobber it: stop, say which file, and show what
-  would have been written.
-- Re-emit whenever the spec changes. A guardrail file describing last month's
-  rules is worse than none, for the same reason a stale code map is.
-- List every file written, and what each one covers.
+- **Overwrite only files that carry that header.** A file without it was written
+  by a person. Stop, name it, and show what you would have written.
+- Re-emit whenever the digest changes. List every file you wrote.
 
-
-## 4. The feedback that has to come back
-
-Guardrails travel; feedback has to be asked for. End every emitted file with
-this, so any agent's output can be read back the same way:
+## End every emitted file with these two sections
 
 ```markdown
 ## When you finish, write this down
@@ -123,33 +75,10 @@ Append to `ROUND-RECORD.md`, one heading each:
 
 A thing you could not do is not a failure to hide — it is the most useful
 sentence in this file. Stop and write it rather than guessing at an answer.
-```
 
-That shape is deliberate: it is what the Swarm app already splits into
-work items and questions, so a round record written by *any* agent can be read
-back into the board later.
-
-
-## 5. Say what did not travel
-
-Close every emitted file with the honest paragraph:
-
-```markdown
 ## What this file cannot give you
 
-These are the rules and the procedures, not the machinery. **Nothing here can
-make you follow them** — a procedure is a document you are pointed at, and
-whether you read it is not checked. Model and effort per work item, what a run
-cost, deny-by-default policy per item and a bounded place to run commands live
-in the Swarm app.
-
-The part that does not depend on which model turned up is the approval gate: a
-person reads the plan before code is written. Keep that one.
+Rules, not machinery: **nothing here makes you follow them.** Enforcement, cost
+and a sandbox live in the Swarm desktop app. What holds for any model is the
+approval gate: a person reads the plan before code is written.
 ```
-
-**This paragraph used to say the procedures did not travel.** They do now — they
-are plain Markdown under `ai-only/procedures/` and the table above reaches them
-from any tool. What still does not travel is enforcement, which is a narrower
-and more honest claim. Do not widen it back: telling a team that nothing carries
-over when the procedures do is the kind of inaccuracy that gets a whole file
-ignored.

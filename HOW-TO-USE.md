@@ -70,13 +70,15 @@ mirroring your folders.
    /translate example/Project_brief.md
    ```
 
-   Claude produces a **System Spec**, a compact **Project Digest**, and a
-   **Project Skills** list, and saves them to `<projectRoot>/ai-only/Project_system.md`
-   (e.g. `example/ai-only/Project_system.md`).
+   Claude writes `ai-only/Project_digest.md` (the few rules every build obeys)
+   and `ai-only/Project_system.md` (the rest: users, look and feel, skills), e.g.
+   `example/ai-only/`. Every line names the answer it came from, and
+   `node tools/spec-lint.mjs` checks that, so you don't have to read it all.
 
-3. **Read it back.** Check nothing was invented or misunderstood. If the skills
-   list looks surprisingly long, that's a signal the project is too big — split it.
-   Fix anything by telling Claude in plain English and re-running `/translate`.
+3. **Answer the `UNKNOWN`s.** Those lines are what Claude could not tell from
+   your brief. It doesn't guess. Answer them in the brief and re-run
+   `/translate`, or mark one `DEFERRED: … — owner: <name>`. If the skills list
+   looks surprisingly long, the project may be too big: split it.
 
 ---
 
@@ -100,7 +102,9 @@ endpoints and models, and every step below is identical for them.
    argument if you have more than one project (e.g.
    `/new-item page ClothingWebsite checkout example`). A brand-new solution folder also needs its
    spec — a copy of `application-spec.json` with `solutionType` set to `website`,
-   `api`, or `database`; the command reminds you.
+   `api`, or `database`; the command reminds you. Run `/translate` on that spec
+   too: it writes `ai-only/<solution>/_solution.md`, the solution's rules and
+   commands with its preset copied in.
 
 2. **Fill it in.** Answer in plain English — under the question headings in a
    Markdown form, or in the `answer` fields of a JSON one: what the page is for,
@@ -113,18 +117,16 @@ endpoints and models, and every step below is identical for them.
    /translate example/ClothingWebsite/userLogin.md
    ```
 
-   Claude reads only the **Project Digest** (not the whole project spec — that keeps
-   it token-efficient), then produces a **Page Spec**, **Page Skills**, and a short
-   **PLAN**, saved to the mirrored path in the project's own `ai-only/`
-   folder, e.g. `example/ai-only/ClothingWebsite/userLogin.md`.
+   Claude reads only `ai-only/Project_digest.md`, then writes the item's spec to the
+   mirrored path in `ai-only/`, e.g. `example/ai-only/ClothingWebsite/userLogin.md`.
 
-4. **Approve the plan.** Read it back and approve, or correct it in plain English.
+4. **Answer its `UNKNOWN`s**, as above. A build won't start while any is open.
 
 ---
 
 ## Building
 
-Once a spec is approved:
+Once a spec has no open `UNKNOWN`s:
 
 ```
 /build example/ai-only/ClothingWebsite/userLogin.md
@@ -132,11 +134,11 @@ Once a spec is approved:
 
 Claude will:
 0. **Scaffold** (first build in a solution only) — create the repo skeleton from
-   the solution spec's `scaffold` block: a named boilerplate from
-   the project's `_forms/boilerplates.json`, or the layout/tests/commands the
-   developers wrote, as its own approved plan.
-1. **Plan** — summary + bullet changes, reusing methods already listed in its
-   code map instead of rebuilding them, and wait for your go-ahead.
+   the layout, tests and commands in `_solution.md`, as its own approved plan.
+1. **Plan** — opening with an **approval card**: ten plain lines saying what
+   changes, which deliverable it advances, what it reuses, which rules it
+   touches, the debt expected, and `Unknowns: 0`. You approve from the card;
+   the plan under it is for the AI.
 2. **Execute** — smallest change first, treating existing code as production.
 3. **Report back** — record what it did and the tests it created in the spec, and
    update `ai-only/Code_map.md`: every method it created or changed, one line
@@ -160,7 +162,7 @@ and `/build` again. Keep each change small.
 | Command | What it does |
 |---------|--------------|
 | `/draft [folder]` | **Existing codebase?** Fill the project brief in from the code — every answer marked with where it came from and how sure it is, and at most five multiple-choice questions at the end. Saved as `status: drafted`; you accept it by reading it and setting `filled`. |
-| `/translate <brief>` | Turn a filled-in brief (project or item) into a structured spec + skills under `ai-only/`. |
+| `/translate <brief>` | Turn a filled-in brief (project, solution or item) into a spec under `ai-only/`: one sourced line per fact, gaps marked `UNKNOWN`. |
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |
 | `/pipeline <solution>` | Create the solution's CI/CD pipeline and missing infrastructure from its spec's `infrastructure` block. Secrets are referenced by name only — never written into code. |
@@ -177,10 +179,11 @@ or ask it to build an approved spec — the commands just give you explicit cont
 npm run check
 ```
 
-Runs three things: the tests for the two checks themselves (both have silently
-passed while reading nothing, so the faults they exist to catch are tested), the
-**code map** against the code, and every item brief's **deliverable** against the
-list its Project Brief names.
+Runs the tests for the checks themselves (two have silently passed while
+reading nothing, so the faults each exists to catch are tested), then the four
+checks: the **code map** against the code, every item brief's **deliverable**
+against the list its Project Brief names, the **round record**, and every line
+of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
 running it is a model. That pass is [`tools/QA.md`](tools/QA.md): six scenarios a
@@ -192,6 +195,7 @@ a fail rather than asking whether the output looked plausible.
 - Build the **smallest thing** that answers the request — no surprise extras.
 - Treat anything already built as **working in production**; don't break it.
 - If the AI can't finish something, it **says so and writes it down** — no endless retrying.
-- **A person reviews and approves** every plan before anything is built.
+- **A person reviews and approves** every plan before anything is built, from a short plain-English card.
+- **You can read anything the AI writes, and you don't have to.** Every line of a spec names where it came from, and a check reads them for you.
 - **Secret values never go into code** — settings are referenced by name; values live in secret stores you control.
 - **Infrastructure and pipelines are their own approved plans** — never a side effect of building a feature.

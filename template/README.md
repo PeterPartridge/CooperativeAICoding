@@ -26,9 +26,11 @@ template/
    ├─ 1-translate-for-ai.md      ← the bridge: turns a form into a structured spec + skills
    ├─ 2-ai-system.template.md    ← the shape the AI's specs come back in
    ├─ 3-code-map.template.md     ← the shape of the code map
-   ├─ Project_system.md          ← the project's spec, digest and skills (from Project_brief.md)
+   ├─ Project_digest.md          ← the rules every build obeys (from Project_brief.md)
+   ├─ Project_system.md          ← the rest of the brief: users, look, skills
+   ├─ <solution>/_solution.md    ← one per solution: its tech, commands and security rules
    ├─ <solution>/<item>.md       ← one spec per item, mirroring your solution folders:
-   │                               spec, skills, plan, and a report for every build round
+   │                               the spec, then a report for every build round
    └─ Code_map.md                ← the reuse index: one row per method the AI built,
                                    what it does + which files/methods it uses
 ```

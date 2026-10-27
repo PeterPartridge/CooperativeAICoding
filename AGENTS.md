@@ -44,7 +44,7 @@ From the repository root, these must pass:
 
 ```bash
 npm test          # the checks' own tests, and every command points at something real
-npm run check     # npm test, then the three checks over this repository
+npm run check     # npm test, then the four checks over this repository
 ```
 
 If you touched `site/`, build it: `cd site && npm ci && node build.mjs`.

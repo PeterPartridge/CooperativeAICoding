@@ -1,181 +1,58 @@
-# AI System Spec — <Project Name>
+# AI spec format
 
-> **What this is:** the structured version of your brief that the AI re-reads every time it builds. You don't write this from scratch. The AI produces it from your plain brief using [`1-translate-for-ai.md`](1-translate-for-ai.md). This file just shows the shape it should come back in, so every project looks the same.
->
-> **Where it's saved:** in the AI workspace, `ai-only/`, mirroring the human folder layout. The project-level spec is saved as `ai-only/Project_system.md`; each item spec is saved at `ai-only/<solution>/<item>.md` to match the human `<solution>/<item>.md` or `<solution>/<item>.json`.
->
-> Read it back against your brief to make sure nothing was changed or invented.
+Checked by `node tools/spec-lint.mjs`. People may read any spec; none has to.
 
+## Front matter
+
+`spec:` digest, system, solution, page, endpoint or model; `from:` the brief,
+as a path from the project root. Page, endpoint and model specs also copy the
+brief's `deliverable:` and `depends-on: [a, b]` exactly.
+
+## Lines: one fact each
+
+```
+key: value [source]
+```
+
+- **Source** is where the fact came from:
+  - `[id]`: a `### id —` question in the `from:` brief, or a dotted JSON path (`[whatItDoes.purpose]`)
+  - `[path#id]`: the same in another file (`[Project_brief.md#roles]`)
+  - `[preset:name]` or `[baseline:name]`: an entry in `_forms/boilerplates.json`
+  - several: `[actions, limits]`
+- **No source means invented.** Leave the line out.
+- **Never guess.** A gap or a contradiction is `UNKNOWN: <question> [source]`;
+  cite both sides. Only a person writes `DEFERRED: <question> — owner: <name> [source]`.
+- Use terse plain English with no invented abbreviations or symbols.
+- `#` headings and `>` notes are allowed. Nothing after the first `## Round`
+  heading is checked.
+
+## Keys: only these
+
+| File | Keys |
+|---|---|
+| digest, system | `purpose` `user` `deliverable` `platform` `solution` `infra` `env` `secrets` `rule` `floor` `role` `security` `look` `tier` `skill` |
+| solution | `purpose` `host` `lang` `framework` `auth` `talks-to` `look` `style` `log` `docs` `base-path` `layout` `test` `cmd` `rule` `resource` `provision` `env` `setting` `pipeline` `must-not` `limit` |
+| page, endpoint, model | `objective` `model` `action` `look` `info` `store` `must` `access` `check` `limit` `uses` `op` `request` `response` `status` `field` `rel` `index` `retention` `sensitive` `invariant` `skill` |
+| any | `UNKNOWN` `DEFERRED` |
+
+- `rule`: a house rule with its meaning here, or a security rule.
+- `floor`: the testing floor.
+- `tier`: when to use which model and effort.
+- `cmd`: a command, e.g. `cmd: test = npm test`.
+- `check`: an acceptance check.
+- `skill`: `skill: name — why`.
+
+## Example
+
+```
 ---
-
-## Project System Spec
-
-**Purpose**
-> One line.
-
-<...>
-
-**Users**
-
-| User | What they want to do |
-|------|----------------------|
-| <...> | <...> |
-
-**Deliverables** _(in order — the first is what everything is building towards)_
-> Each is a stopping point: when the last item naming it is built, the work stops there to be looked at.
-
-| # | Deliverable | Done when |
-|---|-------------|-----------|
-| 1 | <e.g. MVP> | <...> |
-
-**Platforms & technology constraints**
-
-<...>
-
-**Solutions & repositories**
-> Where each solution's code lives, so the AI builds in the right repo — including when solutions span multiple repositories.
-
-| Solution | Type | Repository | Local path |
-|----------|------|------------|------------|
-| <...> | website / API / database | <...> | <...> |
-
-**Infrastructure & environments**
-> Who provisions, with what tool, which environments the AI may deploy to — and where secrets live. Secret **values** never appear in code, committed config, or this spec; everything is referenced by name.
-
-<...>
-
-**Coding house rules**
-
-| Rule | What it means on this project |
-|------|-------------------------------|
-| <...> | <...> |
-
-**Testing floor**
-> The cover expected of every change, and what the project has said is not worth testing. A change that cannot reach it records that as debt rather than lowering it.
-
-<...>
-
-**Access & security**
-
-<...>
-
-**Look & feel / design references**
-
-<...>
-
-**Model & effort selection**
-> When to use each AI model, and how hard it should think, so the AI matches both model cost and reasoning effort to the difficulty of the task.
-
-| Model tier | Example | When to use it |
-|------------|---------|----------------|
-| Cheapest / fastest | <e.g. Claude Haiku, or your provider's smallest model> | <...> |
-| Mid-range | <e.g. Claude Sonnet, or your provider's middle tier> | <...> |
-| Most capable | <e.g. Claude Opus, or your provider's largest model> | <...> |
-
-| Effort level | When to use it |
-|--------------|----------------|
-| Low | <...> |
-| Medium | <...> |
-| High | <...> |
-
-**Open questions**
-> Anything missing from the brief that a person needs to answer.
-
-- <...>
-
+spec: page
+from: ClothingWebsite/userLogin.md
+deliverable: MVP
+depends-on: [ClothingAPI/Login.json]
 ---
-
-## Project Digest *(reused by page translations)*
-
-> A compact, self-contained extract of the constraints that bind every page. Page translations read **this** instead of the whole spec, so the full project document isn't re-sent per page. Keep it under ~12 lines.
-
-- **Platform / tech:** <...>
-- **Solutions & repos:** <name → repo, local path; one per solution>
-- **Infra & environments:** <who provisions + tool; envs the AI may deploy to; where secrets live — never values>
-- **House rules:** <names only, e.g. DRY, CamelCase page names>
-- **Testing floor:** <cover expected of every change; what isn't worth testing>
-- **Deliverables:** <in order, e.g. MVP → Checkout → Admin>
-- **Security model:** <how users log in, how endpoints are protected>
-- **Roles:** <...>
-- **Model & effort tiers:** <cheapest → … ; low/med/high effort → …>
-
----
-
-## Project Skills *(defined by the AI)*
-
-> The capabilities the AI needs for the project as a whole. A short list means a tidy scope; a long one is a signal to break the project down.
-
-| Skill | Why it's needed | How the AI will use it | Tools / approach |
-|-------|-----------------|------------------------|------------------|
-| <...> | <...>           | <...>                  | <...>            |
-
----
-
-## Per-Page Specs
-
-> The shape of each item spec (page, endpoint or model), produced from its brief. Each one is saved in its own file at `ai-only/<solution>/<item>.md`, not in this one. Item skills build on the project skills above; they don't repeat them. Each build round later appends its report (what was done, the tests, the debt) to the end of that file.
-
-### Page — <Page Name>
-
-**Objective** _(unchanging)_
-
-<...>
-
-**Model & effort** _(default for this page; override per change)_
-> e.g. "mid-range tier, medium effort."
-
-<...>
-
-**Deliverable** _(which one this item works towards)_
-
-<...>
-
-**Depends on** _(briefs that must be `built` before this one)_
-
-- <...>
-
-**Actions**
-
-| User | Can do |
-|------|--------|
-| <...> | <...> |
-
-**Information shown / collected**
-
-- <...>
-
-**Data to store**
-
-| Item | What it looks like |
-|------|--------------------|
-| <...> | <...> |
-
-**Access & security**
-
-<...>
-
-**Tests**
-
-- [ ] <...>
-
-**Open questions**
-
-- <...>
-
-#### Page Skills *(defined by the AI)*
-
-| Skill | Why it's needed | How the AI will use it | New for this page? |
-|-------|-----------------|------------------------|--------------------|
-| <...> | <...>           | <...>                  | <...>              |
-
----
-
-## Working Agreement *(the AI restates these and sticks to them)*
-
-- Build the **smallest change** that satisfies the request — no unrequested extras.
-- Treat existing code as **working in production**; avoid breaking it.
-- Record **technical debt** instead of retrying endlessly.
-- A **person reviews and approves** every plan before anything is built.
-- **Score each change** by how token-intensive it's likely to be.
-- **Never put secret values in code, config, or logs** — reference them by name from their stores.
-- **Infrastructure and pipelines are their own approved plans** — never a side effect of building a feature.
+objective: so a customer can log in to their account [why-exists]
+must: the typed password is never saved [in-memory]
+check: wrong password shows an error and does not log in [tests]
+UNKNOWN: how does a logged-out customer reset? ResetPassword needs a login [actions, ClothingAPI/Login.json#operations]
+```

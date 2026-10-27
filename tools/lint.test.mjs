@@ -404,3 +404,188 @@ test("round-record-lint checks nothing, rather than guessing, when git cannot an
   assert.equal(code, 0, out);
   assert.match(out, /git could not diff/);
 });
+
+// ---------------------------------------------------------------------------
+// spec-lint: the check that does the reading people no longer have to.
+//
+// **Its fault is invented scope** — a line in a spec that no brief asked for.
+// So every case is a line whose source is missing, wrong or empty, plus the
+// shapes that must pass: a sourced line, an unknown citing an empty answer,
+// and a deferral with an owner. The key list is the real one, read from
+// template/ai-only/2-ai-system.template.md, so these also prove it parses.
+
+const pageBrief =
+  "---\nform: page-brief\npage: cart\nsolution: Shop\ndeliverable: MVP\nstatus: filled\n---\n\n" +
+  "### why-exists — Why does this page exist?\n> guidance only\nSo a customer can see their basket.\n\n" +
+  "### actions — What can someone do?\n- Someone (who: a customer) can: remove an item.\n\n" +
+  "### limits — Any known limits?\n> e.g. slow with thousands of items\n";
+
+const specFile = (lines, head = "deliverable: MVP\ndepends-on: []") =>
+  `---\nspec: page\nfrom: Shop/cart.md\n${head}\n---\n${lines}\n`;
+
+async function specProject(lines, eol = "\n", head) {
+  return project(
+    {
+      "Project_brief.md": brief("filled", THREE),
+      "Shop/cart.md": pageBrief,
+      "Shop/api.json": JSON.stringify({ whatItDoes: { purpose: { question: "q", answer: "Manage baskets." }, basePath: { question: "q", answer: "" } } }),
+      "ai-only/Shop/cart.md": specFile(lines, head),
+    },
+    eol,
+  );
+}
+
+const lintSpecs = (root, ...extra) => run("spec-lint.mjs", [...extra, root]);
+
+for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
+  test(`spec-lint passes a spec whose every line has a real source (${name})`, async () => {
+    const root = await specProject(
+      "objective: So a customer can see their basket. [why-exists]\n" +
+        "action: customer removes an item [actions]\n" +
+        "uses: the basket API [Shop/api.json#whatItDoes.purpose]\n" +
+        "rule: HTTPS only [baseline:website-baseline]\n" +
+        "\n## Round 1\nfree prose here is not checked",
+      eol,
+    );
+    const { code, out } = lintSpecs(root);
+    assert.equal(code, 0, out);
+    assert.match(out, /every line sourced/);
+  });
+
+  test(`spec-lint catches a line with no source (${name})`, async () => {
+    const root = await specProject("action: customer shares the basket by email", eol);
+    const { code, out } = lintSpecs(root);
+    assert.equal(code, 1);
+    assert.match(out, /has no \[source\]/);
+  });
+}
+
+test("spec-lint catches a source that names a question the brief does not have", async () => {
+  const { code, out } = lintSpecs(await specProject("action: customer pays [checkout]"));
+  assert.equal(code, 1);
+  assert.match(out, /has no question "checkout"/);
+});
+
+test("spec-lint catches a fact citing an answer nobody gave", async () => {
+  const { code, out } = lintSpecs(await specProject("limit: slow past a thousand items [limits]"));
+  assert.equal(code, 1);
+  assert.match(out, /nobody has answered/);
+});
+
+test("spec-lint reads guidance as no answer, in JSON as in Markdown", async () => {
+  const { code, out } = lintSpecs(await specProject("uses: /baskets [Shop/api.json#whatItDoes.basePath]"));
+  assert.equal(code, 1);
+  assert.match(out, /nobody has answered/);
+});
+
+test("spec-lint catches a key the format does not have", async () => {
+  const { code, out } = lintSpecs(await specProject("vibe: friendly [why-exists]"));
+  assert.equal(code, 1);
+  assert.match(out, /"vibe" is not a key/);
+});
+
+test("spec-lint catches prose where a line should be", async () => {
+  const { code, out } = lintSpecs(await specProject("The cart lets a customer remove things."));
+  assert.equal(code, 1);
+  assert.match(out, /not a "key: value \[source\]" line/);
+});
+
+test("spec-lint catches a preset that does not exist", async () => {
+  const { code, out } = lintSpecs(await specProject("rule: HTTPS only [baseline:nope]"));
+  assert.equal(code, 1);
+  assert.match(out, /baseline:nope is not in/);
+});
+
+test("spec-lint lets an unknown cite the empty answer that made it unknown", async () => {
+  const { code, out } = lintSpecs(await specProject("UNKNOWN: how many items is too many? [limits]"));
+  assert.equal(code, 0, out);
+  assert.match(out, /open .*how many items is too many/);
+});
+
+test("spec-lint --ready refuses a spec with an open unknown", async () => {
+  const root = await specProject("UNKNOWN: how many items is too many? [limits]");
+  const { code, out } = run("spec-lint.mjs", ["--ready", path.join(root, "ai-only/Shop/cart.md")]);
+  assert.equal(code, 1);
+  assert.match(out, /not ready: 1 unknown/);
+});
+
+test("spec-lint --ready accepts a deferral a person owns", async () => {
+  const root = await specProject("DEFERRED: how many items is too many? — owner: Sam [limits]");
+  const { code, out } = run("spec-lint.mjs", ["--ready", path.join(root, "ai-only/Shop/cart.md")]);
+  assert.equal(code, 0, out);
+});
+
+test("spec-lint catches a deferral nobody owns", async () => {
+  const { code, out } = lintSpecs(await specProject("DEFERRED: how many items is too many? [limits]"));
+  assert.equal(code, 1);
+  assert.match(out, /needs "— owner: <name>"/);
+});
+
+test("spec-lint says so, and passes, when nothing has been translated yet", async () => {
+  const root = await project({ "Project_brief.md": brief("blank", "") });
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 0, out);
+  assert.match(out, /nothing to check/);
+});
+
+// ---------------------------------------------------------------------------
+// brief-lint --status: what /build reads instead of whole briefs.
+//
+// A build needs one word from each brief it depends on — its status — and was
+// reading the whole file for it, around 560 tokens a dependency. This prints
+// the word. Its fault would be a wrong or missing status, which would let a
+// build run before what it depends on exists, so that is what is tested.
+
+for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
+  test(`brief-lint --status reads Markdown and JSON briefs (${name})`, async () => {
+    const root = await project(
+      {
+        "Shop/cart.md": item("built", "MVP"),
+        "Shop/api.json": JSON.stringify({ form: "endpoint-brief", status: "filled", deliverable: "MVP" }, null, 2),
+      },
+      eol,
+    );
+    const { code, out } = run("brief-lint.mjs", ["--status", path.join(root, "Shop/cart.md"), path.join(root, "Shop/api.json")]);
+    assert.equal(code, 0, out);
+    assert.match(out, /cart\.md: built/);
+    assert.match(out, /api\.json: filled/);
+  });
+}
+
+test("brief-lint --status fails on a brief that is not there", async () => {
+  const root = await project({ "Shop/cart.md": item("built", "MVP") });
+  const { code, out } = run("brief-lint.mjs", ["--status", path.join(root, "Shop/gone.md")]);
+  assert.equal(code, 1);
+  assert.match(out, /gone\.md: not found/);
+});
+
+// **The copy /build reads instead of the brief must not go stale.** An item
+// spec carries its brief's `deliverable` and `depends-on` so a build need not
+// open the brief; a copy that drifted would build towards the wrong
+// deliverable, or before what it depends on. So drift fails, like a bad source.
+
+test("spec-lint passes an item spec whose front matter matches its brief", async () => {
+  const { code, out } = lintSpecs(await specProject("objective: a basket [why-exists]"));
+  assert.equal(code, 0, out);
+});
+
+test("spec-lint catches a deliverable that no longer matches the brief", async () => {
+  const root = await specProject("objective: a basket [why-exists]", "\n", "deliverable: Checkout\ndepends-on: []");
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 1);
+  assert.match(out, /deliverable "Checkout" but the brief says "MVP"/);
+});
+
+test("spec-lint catches dependencies that no longer match the brief", async () => {
+  const root = await specProject("objective: a basket [why-exists]", "\n", "deliverable: MVP\ndepends-on: [Shop/api.json]");
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 1);
+  assert.match(out, /depends-on \[Shop\/api\.json\] but the brief says \[\]/);
+});
+
+test("spec-lint catches an item spec that does not carry them at all", async () => {
+  const root = await specProject("objective: a basket [why-exists]", "\n", "owner: nobody");
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 1);
+  assert.match(out, /no "deliverable:"/);
+});

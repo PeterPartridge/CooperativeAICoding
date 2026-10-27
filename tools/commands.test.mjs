@@ -155,6 +155,37 @@ test("a skill or command stays a pointer, not a second copy of its procedure", a
   assert.deepEqual(fat, [], `a pointer grew past ${POINTER_MAX} B — move the behaviour into the procedure`);
 });
 
+// **A token budget for everything the AI reads to follow a procedure.** The
+// Lean AI layer cut what a translate-and-build reads by roughly two fifths, and
+// the way that is lost is the way it was gained: one helpful paragraph at a
+// time. Each file has a ceiling, in estimated tokens (characters ÷ 4), set at
+// its size when the budget landed. Lower a ceiling when a file shrinks. Never
+// raise one to make room — move the *why* to procedures/README.md, which only
+// people read, and keep the rule.
+const TOKEN_BUDGET = {
+  "template/AGENTS.template.md": 850,
+  "template/ai-only/2-ai-system.template.md": 650,
+  "template/ai-only/procedures/build.md": 675,
+  "template/ai-only/procedures/draft.md": 750,
+  "template/ai-only/procedures/emit-guardrails.md": 925,
+  "template/ai-only/procedures/new-item.md": 450,
+  "template/ai-only/procedures/pipeline.md": 500,
+  "template/ai-only/procedures/translate.md": 600,
+};
+
+test("what the AI reads to follow a procedure stays within its token budget", async () => {
+  const procedures = procedureFiles.map((f) => `template/ai-only/procedures/${f}`);
+  const unbudgeted = procedures.filter((p) => !(p in TOKEN_BUDGET));
+  assert.deepEqual(unbudgeted, [], "a procedure with no budget can grow without anyone noticing");
+
+  const over = [];
+  for (const [file, ceiling] of Object.entries(TOKEN_BUDGET)) {
+    const tokens = Math.round((await read(file)).length / 4);
+    if (tokens > ceiling) over.push(`${file}: ~${tokens} tokens, budget ${ceiling}`);
+  }
+  assert.deepEqual(over, [], "move the explanation to procedures/README.md rather than raising the budget");
+});
+
 test("the documentation lists exactly the commands that ship", async () => {
   const howTo = await read("HOW-TO-USE.md");
   const shipped = commandFiles.map((f) => f.replace(/\.md$/, "")).sort();
@@ -192,6 +223,7 @@ test("coperativeai init puts every command and skill into a new project", async 
     "tools/brief-lint.mjs",
     "tools/code-map-lint.mjs",
     "tools/round-record-lint.mjs",
+    "tools/spec-lint.mjs",
     // So an agent that is not Claude Code arrives to instructions addressed to
     // it, rather than to a .claude/ folder meant for somebody else.
     "AGENTS.md",

@@ -9,9 +9,12 @@ not build, and keeps track of what already exists so it does not rebuild it.
 tool. Claude, GPT, Gemini or a local model all read and write the same plain
 Markdown files, so work one model started can be picked up by another.
 
-**People do not write here, but they read everything.** "AI-only" means the AI
-writes these files, not that they are hidden. Every spec is read back against
-its brief, and a person approves every plan before any code is written.
+**People can read anything here, and nobody has to.** "AI-only" means the AI
+writes these files for the AI to read, as tersely as clarity allows. They are
+not hidden. Every line of a spec names the brief answer it came from, and
+`node tools/spec-lint.mjs` checks that, so the routine read-back is done by a
+check. What people do read is short and plain: the `UNKNOWN` lines, the approval
+card at the top of every plan, and the round reports.
 
 ---
 
@@ -20,12 +23,14 @@ its brief, and a person approves every plan before any code is written.
 | File | What it is | Who writes it |
 |---|---|---|
 | `README.md` | This page. | the framework |
-| [`1-translate-for-ai.md`](1-translate-for-ai.md) | The bridge: the prompts that turn a filled-in brief into a spec and a skills list. Paste them into any model, or let a command run them. | the framework |
-| [`2-ai-system.template.md`](2-ai-system.template.md) | The shape every spec comes back in, so every project's specs look the same. | the framework |
+| [`1-translate-for-ai.md`](1-translate-for-ai.md) | The bridge, for people: what translation gives back, and a prompt for a chat model with no file access. | the framework |
+| [`2-ai-system.template.md`](2-ai-system.template.md) | The spec format: one `key: value [source]` line per fact, and the keys allowed. | the framework |
 | [`3-code-map.template.md`](3-code-map.template.md) | The shape of the code map, and how it is checked. | the framework |
 | [`procedures/`](procedures/README.md) | One file per thing the framework asks an AI to do — draft, translate, new-item, build, pipeline, emit-guardrails. Plain Markdown; any model can be pointed at one and follow it. Each tool holds a pointer, never a copy. | the framework |
-| `Project_system.md` | The **System Spec**, the short **Project Digest**, and the **Project Skills**, translated from `Project_brief.md`. | the AI, from the brief |
-| `<solution>/<item>.md` | One **item spec** per page, endpoint or model, mirroring the human folders (`ClothingAPI/Login.json` → `ClothingAPI/Login.md`). Each holds the spec, the skills, the plan, and a report for every build round. | the AI, from the item's brief |
+| `Project_digest.md` | The rules every build obeys, from `Project_brief.md`. Every item translate and build reads this and nothing else at project level. | the AI, from the brief |
+| `Project_system.md` | The rest of the brief: users, look and feel, skills, open questions. Read only when the digest is not enough. | the AI, from the brief |
+| `<solution>/_solution.md` | One per solution: its tech, commands and security rules, with its named preset and baseline copied in, so no build reads all of `boilerplates.json`. | the AI, from `application-spec.json` |
+| `<solution>/<item>.md` | One **item spec** per page, endpoint or model, mirroring the human folders (`ClothingAPI/Login.json` → `ClothingAPI/Login.md`). The spec, then a report for every build round. | the AI, from the item's brief |
 | `Code_map.md` | The **reuse index**: one row per method the AI built, saying what it does and what it uses. | the AI, as it builds |
 
 The specs are what the AI builds from. The code map is a supporting index. It is
@@ -37,13 +42,14 @@ one file here, not the purpose of the folder.
 
 The reading order keeps each step cheap. No step re-reads the whole project.
 
-1. **Translate.** A filled-in brief becomes a spec here, using the bridge. The
-   Project Brief becomes `Project_system.md`; each item brief becomes
-   `<solution>/<item>.md`. Gaps go under **Open Questions**, never into guesses.
-2. **Plan.** To build an item, read the **Project Digest** in
-   `Project_system.md` (not the whole spec), then the item's spec, then the
-   first sentence of each `Code_map.md` row, looking for something to reuse.
-   Write the plan and wait for a person to approve it.
+1. **Translate.** A filled-in brief becomes a spec here. The Project Brief
+   becomes `Project_digest.md` and `Project_system.md`; a solution spec becomes
+   `<solution>/_solution.md`; each item brief becomes `<solution>/<item>.md`.
+   Gaps become `UNKNOWN` lines, never guesses.
+2. **Plan.** To build an item, read the digest, the solution's `_solution.md`,
+   the item's spec, and the first sentence of each `Code_map.md` row, looking for
+   something to reuse. Open the plan with the approval card and wait for a person
+   to approve it.
 3. **Build and report.** After approval, make the smallest change that answers
    the spec. Append a round report to the item's spec: what was done, the tests,
    and the debt left behind. Update the code-map rows for any method created or

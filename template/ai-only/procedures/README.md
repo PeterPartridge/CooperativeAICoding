@@ -48,3 +48,81 @@ depend on which model turned up.
 Edit the procedure here. Do not edit a tool's pointer to add behaviour — a rule
 that exists in `.claude/` and nowhere else is a rule only one model follows,
 which is the thing this folder exists to stop.
+
+**Keep them lean.** A procedure is read by the AI every time it runs, so each
+holds the rules and a few words of reason. The longer *why* lives below, where
+people read it and the AI does not pay for it. `tools/commands.test.mjs` holds a
+token budget per procedure; it may only come down.
+
+---
+
+## Why the rules are the way they are
+
+### translate
+
+- **A drafted brief is refused.** `/draft` writes answers from the code and marks
+  them as the AI's. Translating one would promote an AI guess to a requirement,
+  silently. They become the project's answers only when a person sets `filled`.
+- **Every line cites its source.** People no longer read specs line by line, so
+  the read-back that used to catch invented scope is done by
+  `tools/spec-lint.mjs`: a line with no source, or a source nobody answered, is
+  the invented line.
+- **`UNKNOWN`, never a guess.** A guess in a spec becomes a requirement the next
+  build honours. An unknown is the most useful line the AI can write, and the
+  build stops on it until a person answers or defers it with a named owner.
+- **The digest is its own file.** Every item translate and every build reads it,
+  so it holds only what binds every item. A rule left out of it is a rule no
+  build sees. The full project spec is read only when the digest is not enough.
+- **The solution spec carries its preset.** Copying the one named preset and
+  baseline into `_solution.md` at translate time means no build reads the whole
+  of `boilerplates.json`, which was a third of what a build read.
+- **No plan at translate time.** `/build` plans with the approval card, and two
+  plans for one change disagree.
+
+### build
+
+- **The approval card.** People approve from ten plain-English lines, not from
+  the AI's plan. "Unknowns: 0" is on it because a plan with an open unknown is
+  built on a guess.
+- **Smallest change; existing code is production.** Large changes at AI speed
+  overwhelm reviewers and destabilise production, and code that looks broken is
+  usually doing something somebody relies on.
+- **The code map.** A method already built is reused rather than rebuilt; the
+  map is read before code is written and fixed in the same build that changes a
+  method, because a stale row sends the next build looking in the wrong place.
+- **Stop at the end of a deliverable.** It is a point for people to evaluate
+  direction, which is worth nothing if the AI builds straight past it.
+- **Debt, not retries.** Thrashing on something it cannot do burns tokens and
+  produces worse code than a clear "I could not do this, here is why".
+
+### pipeline
+
+- **Infrastructure is its own plan.** Created as a side effect of a feature,
+  nobody approved it.
+- **A committed secret is a rotated secret.** It is the one failure that editing a
+  file afterwards does not undo, so values are never written or asked for.
+
+### draft
+
+- **The blank form is why people stop.** Twenty questions is a fair price for a
+  new project and an unreasonable one for code that already answers most of them.
+- **Read for intent.** Code shows mechanism; a brief drafted from it describes
+  how the thing is built and misses what it is for.
+- **"Could not tell" stays empty.** A plausible invented sentence reads exactly
+  like somebody's answer.
+- **Never draft deliverables, users, cost or models.** What a team works towards
+  next cannot be read out of code that exists, and a wrong guess corrupts the one
+  field that decides when a build stops.
+- **Five questions, multiple choice.** People do not read long question lists. A
+  person picking `b` has answered; a person facing a blank box has a task.
+
+### emit-guardrails
+
+- **A pointer table, not the procedures.** Guardrail files are loaded on every
+  turn; inlining six procedures would spend most of a context window on five
+  things the agent is not doing.
+- **Overwrite only generated files.** A file without the header was written by a
+  person, and losing it is discovered only in a diff nobody reads.
+- **"Nothing here can make you follow them".** The procedures do travel to every
+  tool; enforcement does not. Saying less than that, or more, gets the whole
+  file ignored once somebody finds out.
