@@ -378,8 +378,8 @@ async function committed(files) {
 }
 
 test("round-record-lint catches solution code that changed without a record", async () => {
-  const { root, git, base } = await committed({ "app/CoperativeAI/src/cart.rs": "fn total() {}\n" });
-  await fs.writeFile(path.join(root, "app/CoperativeAI/src/cart.rs"), "fn total() { let _ = 1; }\n");
+  const { root, git, base } = await committed({ "app/Shop/src/cart.rs": "fn total() {}\n" });
+  await fs.writeFile(path.join(root, "app/Shop/src/cart.rs"), "fn total() { let _ = 1; }\n");
   git("add", "-A");
   git("commit", "-q", "-m", "change");
   const { code, out } = run("round-record-lint.mjs", [root, "--since", base]);
@@ -388,8 +388,8 @@ test("round-record-lint catches solution code that changed without a record", as
 });
 
 test("round-record-lint passes when the record changed with the code", async () => {
-  const { root, git, base } = await committed({ "app/CoperativeAI/src/cart.rs": "fn total() {}\n" });
-  await fs.writeFile(path.join(root, "app/CoperativeAI/src/cart.rs"), "fn total() { let _ = 1; }\n");
+  const { root, git, base } = await committed({ "app/Shop/src/cart.rs": "fn total() {}\n" });
+  await fs.writeFile(path.join(root, "app/Shop/src/cart.rs"), "fn total() { let _ = 1; }\n");
   await fs.writeFile(path.join(root, "ROUND-RECORD.md"), FULL);
   git("add", "-A");
   git("commit", "-q", "-m", "change");
