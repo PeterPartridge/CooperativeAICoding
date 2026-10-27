@@ -3,7 +3,7 @@
 Create a new blank item form for the person to fill in, from the arguments in
 the request
 (order: type, solution folder, item name, optional project root — a folder whose
-root contains `Project_brief.md`, e.g. `template/`, `application/`, `example/`).
+root contains `Project_brief.md`, e.g. `template/`, `example/`).
 If type/solution/name are missing, ask once. If the project root was not given
 and more than one non-template project root exists, ask which one; default to
 the only non-template project root otherwise.

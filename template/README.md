@@ -33,7 +33,7 @@ template/
                                    what it does + which files/methods it uses
 ```
 
-**A project is any folder laid out like this whose root holds a `Project_brief.md`** — this `template/` folder is the blank starting copy, `example/` (at the **repo root**, a sibling of `template/`) is a worked Clothing project to copy from, and `application/` (also at the repo root) is a real project: the framework speccing its own desktop app. The `/translate`, `/build`, `/new-item`, and `/pipeline` commands resolve all paths from that project root. The blank master forms and `boilerplates.json` always come from this folder's `_forms/`, whichever project you're in.
+**A project is any folder laid out like this whose root holds a `Project_brief.md`** — this `template/` folder is the blank starting copy, `example/` (at the **repo root**, a sibling of `template/`) is a worked Clothing project to copy from. The `/translate`, `/build`, `/new-item`, and `/pipeline` commands resolve all paths from that project root. The blank master forms and `boilerplates.json` always come from this folder's `_forms/`, whichever project you're in.
 
 **Solutions are typed, but the spec form is one file.** Each solution folder holds one `application-spec.json` describing the whole solution, plus its items. Set `solutionType` to pick which questions apply:
 
@@ -42,7 +42,7 @@ template/
 | `website` — front-end | `page.md` | `ClothingWebsite/userLogin.md` |
 | `api` | `endpoint.json` | `ClothingAPI/Login.json` |
 | `database` | `database-model.json` | `ClothingDatabase/UserCredentials.json` |
-| `application` — CLI / TUI / desktop | `page.md` (one per screen, panel, or command group) | `CoperativeAI/mainScreen.md` |
+| `application` — CLI / TUI / desktop | `page.md` (one per screen, panel, or command group) | `Swarm/mainScreen.md` |
 
 The spec's `core`, `accessAndInterface`, and `conventions` blocks hold every type's questions together; each field's `guidance` says which `solutionType`(s) it applies to — leave the rest blank. The `scaffold`, `security`, and `infrastructure` blocks are identical for every type and pull from the same [`boilerplates.json`](_forms/boilerplates.json) presets.
 

@@ -3,7 +3,7 @@
 Build from the approved spec named in the request.
 If no path was given, ask which spec to build (or list specs under
 `<projectRoot>/ai-only/` for each project root — a folder whose root
-contains `Project_brief.md`, e.g. `template/`, `application/`, `example/`).
+contains `Project_brief.md`, e.g. `template/`, `example/`).
 
 Derive `<projectRoot>` by walking up from the spec path to the nearest folder
 containing `Project_brief.md` — the human briefs are its siblings via the

@@ -1,6 +1,6 @@
 ---
 description: Translate a filled-in CooperativeAICoding brief into a structured spec, digest, and skills.
-argument-hint: [path to the filled-in brief, e.g. application/Project_brief.md or application/CoperativeAI/workspaceShell.md]
+argument-hint: [path to the filled-in brief, e.g. example/Project_brief.md or example/ClothingWebsite/userLogin.md]
 ---
 
 Follow **`ai-only/procedures/translate.md`** exactly, for: $ARGUMENTS

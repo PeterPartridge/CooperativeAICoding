@@ -79,5 +79,5 @@ quietly in a build.
   save what it returns at the mirrored path here.
 
 The rules travel to every agent; the machinery does not. Plan approval, cost per
-change and the sandbox are enforced by the CoperativeAI app and its commands.
+change and the sandbox are enforced by the Swarm app and its commands.
 With any other agent, enforcing them is up to you.

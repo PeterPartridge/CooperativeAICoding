@@ -125,7 +125,7 @@ A thing you could not do is not a failure to hide — it is the most useful
 sentence in this file. Stop and write it rather than guessing at an answer.
 ```
 
-That shape is deliberate: it is what the CoperativeAI app already splits into
+That shape is deliberate: it is what the Swarm app already splits into
 work items and questions, so a round record written by *any* agent can be read
 back into the board later.
 
@@ -141,7 +141,7 @@ These are the rules and the procedures, not the machinery. **Nothing here can
 make you follow them** — a procedure is a document you are pointed at, and
 whether you read it is not checked. Model and effort per work item, what a run
 cost, deny-by-default policy per item and a bounded place to run commands live
-in the CoperativeAI app.
+in the Swarm app.
 
 The part that does not depend on which model turned up is the approval gate: a
 person reads the plan before code is written. Keep that one.

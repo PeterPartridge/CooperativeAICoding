@@ -46,9 +46,9 @@ says so.
 
 ## 2. `/draft` — a brief from code that already exists
 
-Run it against a repository with real code (this framework's own repository is
-the best first test, because `application/Project_brief.md` is the hand-written
-answer to compare against).
+Run it against a repository with real code. [Swarm](https://github.com/PeterPartridge/Swarm)
+is the best first test, because its `application/Project_brief.md` is the
+hand-written answer to compare against.
 
 ```
 /draft
