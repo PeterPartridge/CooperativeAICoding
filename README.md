@@ -95,6 +95,8 @@ For each item (and each iteration), the AI follows a defined loop. Before it, `/
 
 ## Iterations
 
+**A change says what it affects.** Every spec line cites the answer it came from, so when a brief changes, `node tools/spec-lint.mjs --impact` lists each spec, and each line in it, that now reads differently from its source. `/build` refuses a stale spec until it is re-translated, so nothing is built from an old reading of the brief.
+
 After the first build, each further iteration defines **what needs to change**:
 
 - Change in use case?

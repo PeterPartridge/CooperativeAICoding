@@ -24,6 +24,7 @@
 //
 // Exit code 1 on an error. Notes are printed and do not fail the run.
 
+import { execFileSync } from "node:child_process";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -168,6 +169,7 @@ async function lintSpec(file, root, keys) {
   const errors = [];
   const unknowns = [];
   const checks = [];
+  const cites = [];
   const text = await read(file);
   const fm = frontMatter(text);
   if (!fm?.fields.spec) return null; // not a spec — the framework's own documents live here too
@@ -233,10 +235,66 @@ async function lintSpec(file, root, keys) {
       for (const s of src[1].split(",").map((x) => x.trim()).filter(Boolean)) {
         const wrong = await checkSource(s, { root, from, unknown: key === "UNKNOWN" || key === "DEFERRED" });
         if (wrong) errors.push(`${at}  [${s}] — ${wrong}`);
+        else if (!/^(preset|baseline):/.test(s)) cites.push({ line: i + 1, src: s });
       }
     }
   }
-  return { errors, unknowns, checks, kind: fm.fields.spec, from, text };
+  return { errors, unknowns, checks, kind: fm.fields.spec, from, text, file, cites };
+}
+
+// ---------------------------------------------------------------------------
+// **Impact: what a brief change affects.** Every line cites the answer it came
+// from, and git holds that answer as it read when the spec was last written.
+// A line whose cited answer now reads differently is stale: the spec says
+// something the people no longer do. Noted on every run, listed by
+// `--impact`, and refused by `--ready`, so nothing is built from an old
+// reading of the brief. A spec changed since its last commit counts as freshly
+// written; a project not in git cannot tell, and says nothing.
+
+const git = (cwd, args) => {
+  try {
+    return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 });
+  } catch {
+    return null;
+  }
+};
+
+/** An answer as plain text, so a change in spacing is not a change. */
+function answerIn(text, rel, id) {
+  if (text === null) return null;
+  if (rel.endsWith(".json")) {
+    let v;
+    try {
+      v = JSON.parse(text);
+    } catch {
+      return null;
+    }
+    for (const part of id.split(".")) v = v && typeof v === "object" ? v[part] : undefined;
+    return v === undefined ? null : JSON.stringify(v);
+  }
+  const a = markdownAnswer(text, id);
+  return a === null ? null : a.replace(/\s+/g, " ").trim();
+}
+
+async function staleness({ file, from, cites }, root) {
+  const stale = [];
+  const top = git(root, ["rev-parse", "--show-toplevel"])?.trim();
+  if (!top || !from) return stale;
+  const relToTop = (p) => path.relative(top, p).split(path.sep).join("/");
+  const commit = git(root, ["log", "-1", "--format=%H", "--", relToTop(file)])?.trim();
+  if (!commit) return stale; // never committed: written just now
+  if (git(root, ["status", "--porcelain", "--", relToTop(file)])?.trim()) return stale; // rewritten since
+  const then = new Map();
+  for (const { line, src } of cites) {
+    const hash = src.lastIndexOf("#");
+    const rel = hash === -1 ? from : src.slice(0, hash);
+    const id = hash === -1 ? src : src.slice(hash + 1);
+    if (!then.has(rel)) then.set(rel, git(root, ["show", `${commit}:${relToTop(path.join(root, rel))}`]));
+    const before = answerIn(then.get(rel), rel, id);
+    const now = answerIn(await read(path.join(root, rel)), rel, id);
+    if (before !== now) stale.push({ line, src });
+  }
+  return stale;
 }
 
 // ---------------------------------------------------------------------------
@@ -413,7 +471,8 @@ function rootOf(file) {
 }
 
 const debtMode = process.argv.includes("--debt");
-const args = process.argv.slice(2).filter((a) => a !== "--debt");
+const impactMode = process.argv.includes("--impact");
+const args = process.argv.slice(2).filter((a) => a !== "--debt" && a !== "--impact");
 const readyAt = args.indexOf("--ready");
 let targets; // [{ root, files }]
 if (readyAt !== -1) {
@@ -432,8 +491,9 @@ if (readyAt !== -1) {
 let failed = false;
 let checked = 0;
 const openDebt = [];
-// In --debt mode the per-spec report is not wanted: just the open debt.
-const say = debtMode ? () => {} : (...a) => console.log(...a);
+const impact = [];
+// In --debt and --impact modes the per-spec report is not wanted: just the list.
+const say = debtMode || impactMode ? () => {} : (...a) => console.log(...a);
 for (const { root, files } of targets) {
   const keys = await allowedKeys(root);
   if (!keys || keys.size === 0) {
@@ -451,6 +511,11 @@ for (const { root, files } of targets) {
     const owed = await debt(result, root);
     openDebt.push(...owed.open);
     traced.notes.push(...owed.notes);
+    const stale = await staleness(result, root);
+    for (const { line, src } of stale) {
+      traced.notes.push(`stale: line ${line} cites [${src}], which changed since this spec was written — re-translate`);
+    }
+    if (stale.length > 0) impact.push(`${rel}: ${[...new Set(stale.map((x) => `[${x.src}]`))].join(", ")}`);
     const errors = [...result.errors, ...traced.errors, ...owed.errors];
     const { unknowns } = result;
     say(`\n${rel}`);
@@ -459,11 +524,20 @@ for (const { root, files } of targets) {
     for (const u of unknowns) say(`  open   ${rel}${u}`);
     if (errors.length === 0 && unknowns.length === 0) say("  every line sourced");
     if (errors.length > 0) failed = true;
+    if (readyAt !== -1 && stale.length > 0) {
+      console.log(`  not ready: ${stale.length} line(s) stale — the brief changed after this spec was written; re-translate it`);
+      failed = true;
+    }
     if (readyAt !== -1 && unknowns.length > 0) {
       console.log(`  not ready: ${unknowns.length} unknown(s) open — a person answers them, or marks them DEFERRED with an owner`);
       failed = true;
     }
   }
+}
+if (impactMode) {
+  console.log(impact.length === 0 ? "nothing to re-translate — every spec matches the answers it cites" : `${impact.length} spec(s) to re-translate:`);
+  for (const i of impact) console.log(`  ${i}`);
+  process.exit(0);
 }
 if (debtMode) {
   console.log(openDebt.length === 0 ? "no open debt" : `${openDebt.length} open debt item(s), nobody has decided on yet:`);

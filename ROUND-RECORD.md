@@ -727,3 +727,55 @@
 
 - **Opening a GitHub issue is the only tracker.** Jira, Linear and the rest would
   each need their own route. Swarm already maps to Jira.
+
+## 2026-10-29 — Gap 13: what a brief change affects
+
+### What I did
+- **A spec is stale when an answer it cites now reads differently from when the
+  spec was written.** Every spec line already names its source answer, and git
+  holds that answer as of the spec's last commit. So `spec-lint` compares the
+  two, ignoring spacing, for each line.
+  - **Each run** notes each stale line: "line 5 cites [roles], which changed
+    since this spec was written — re-translate".
+  - **`--impact`** lists every stale spec across the project, with the answers
+    that changed.
+  - **`--ready`**, the gate `/build` runs, refuses a stale spec. Nothing is
+    built from an old reading of the brief.
+- **What counts as current:**
+  - a spec changed since its last commit (just re-translated);
+  - a spec never committed;
+  - a project not in git, which cannot tell and says nothing.
+
+  A change to a question no spec cites affects nothing, and is not reported.
+  Edits not yet committed are seen.
+- **Tests:** 6, written first. Two were shapes that must keep passing: a spec
+  re-translated after the change, and a change to an uncited question. On this
+  repository, `--impact` finds the example current, because git shows each spec
+  was rewritten after the brief changes it cites.
+- **Procedures:** `/translate` points at `--impact` after a brief change.
+  `/build`'s `--ready` step now says "name what it reports", since it covers
+  more than unknowns. Both stay within budget by merging lines, not adding them.
+- **Docs:** the README (Iterations), `HOW-TO-USE.md` (Iterating), the reasons in
+  `procedures/README.md`, and QA scenario 13.
+
+### What I could not do  (and what you would need to tell me)
+- **Impact is per answer, not per meaning.** Rewording an answer without
+  changing what it says still flags the lines citing it. That is a false alarm
+  people clear by re-translating, which is cheap; I chose noise over a miss.
+- **Sign-offs are not reopened by a Project Brief change.** An item whose spec
+  went stale needs re-translating before `/build`, but its sign-offs still
+  stand. Whether a project-wide change should reopen them is a person's call.
+
+### Debt I left behind
+- **In a shallow clone, impact can see too little.** If a spec's last commit is
+  outside the clone's history, the spec counts as never committed, and so as
+  current. CI here fetches full history; projects' CI may not.
+
+- **Every spec runs a few git commands.** That is fine at tens of specs. At
+  hundreds it would want one `git log` for the whole project rather than one
+  per spec.
+
+- **Stale lines are found; missing ones are not.** A new answer that ought to
+  add a line to a spec (a new role, say) is invisible to a check that starts
+  from what the spec cites. `--impact` flags the digest when `roles` changes,
+  but cannot say which item should now mention the new role.

@@ -13,7 +13,7 @@ Never read `qa/`.
 
 ## Stop before planning if
 
-- `node tools/spec-lint.mjs --ready <spec>` fails. Name the open unknowns.
+- `node tools/spec-lint.mjs --ready <spec>` fails. Name what it reports.
 - `node tools/brief-lint.mjs --ready <its brief>` fails. Name what's missing; never sign for anyone.
 - `node tools/brief-lint.mjs --status <each depends-on brief>` shows one not `built`.
 - `node tools/brief-lint.mjs <projectRoot>` reports this item's deliverable.

@@ -219,6 +219,18 @@ Markdown brief (e.g. "Round 2: add 'remember me'"), or an entry to the
 **`changesOverTime.rounds`** list of a JSON brief. Then re-run `/translate` on it
 and `/build` again. Keep each change small.
 
+**Changed the Project Brief, or any answer a spec relies on?** Find out what it
+affected:
+
+```bash
+node tools/spec-lint.mjs --impact
+```
+
+It lists every spec, and the answers in it, that now say something your briefs
+no longer do. Every spec line names the answer it came from, and git remembers
+how that answer read when the spec was written. Re-translate what it lists.
+`/build` refuses a stale spec until you do.
+
 ---
 
 ## The commands at a glance
@@ -254,7 +266,7 @@ against the list its Project Brief names, QA's **regression suite and sign-off**
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
-running it is a model. That pass is [`tools/QA.md`](tools/QA.md): twelve scenarios a
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): thirteen scenarios a
 person runs against a real agent, each one naming the failure that would count as
 a fail rather than asking whether the output looked plausible.
 

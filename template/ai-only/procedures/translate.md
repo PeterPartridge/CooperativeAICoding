@@ -7,8 +7,8 @@ repository, `template/`).
 
 ## Stop if
 
-- The brief is `status: drafted`. Those are the AI's answers until a person sets
-  `filled`. Offer to go through the questions at its end.
+- The brief is `status: drafted`: the AI's answers until a person sets `filled`.
+  Offer to go through its questions.
 - The brief is `blank`, or its kind is unclear. Ask once.
 
 ## What to write
@@ -47,7 +47,6 @@ Translate the person's answers only. `>` lines and `question`, `guidance` and
 1. Run `node tools/spec-lint.mjs <projectRoot>` and fix every error.
 2. Show the person each open `UNKNOWN`. They answer it in the brief (and you
    re-translate), or they defer it with an owner.
-3. Say so if the `skill` list is long or surprising: the brief may be too big,
-   or misread.
-4. Re-translate whenever the brief changes. Keep everything from the first
-   `## Round` heading on.
+3. A long or surprising `skill` list? Say the brief may be too big, or misread.
+4. Re-translate when a brief changes; `spec-lint --impact` lists what went
+   stale. Keep everything from the first `## Round` heading on.
