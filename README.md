@@ -155,6 +155,20 @@ Things this framework was asked for and chose not to do, recorded so they don't 
 
 ## Working with agents other than Claude Code
 
+**The commands, in each agent's own format.** `coperativeai init --agents <list>` gives a project the commands for the agents its team uses:
+
+| Agent | Key | Where | Invoked as |
+|---|---|---|---|
+| Claude Code | `claude` (default) | `.claude/commands/` | `/build` |
+| Cursor | `cursor` | `.cursor/skills/<name>/SKILL.md` | `/build` |
+| Codex CLI | `codex` | `.agents/skills/<name>/SKILL.md` | `$build` |
+| Gemini CLI | `gemini` | `.gemini/commands/<name>.toml` | `/build` |
+| GitHub Copilot | `copilot` | `.github/prompts/<name>.prompt.md` | `/build` |
+| opencode | `opencode` | `.opencode/commands/<name>.md` | `/build` |
+| Kiro CLI | `kiro` | `.kiro/prompts/<name>.md` | its prompt menu |
+
+Every one is a pointer to the same procedure in `ai-only/procedures/`, generated from `.claude/commands/` by `tools/agent-commands.mjs`. A test fails if any drifts from its source. `coperativeai update` remembers which agents a project chose. The formats follow each agent's integration as GitHub's Spec Kit documents it. Where an agent passes no arguments (Cursor, Codex, Copilot, Kiro), the pointer takes them from the conversation.
+
 **One brief, every agent's native guardrails.** `/emit-guardrails` writes the project's rules out in the shape each tool actually reads: [`AGENTS.md`](AGENTS.md) at the root (which **Kiro always includes** and **Cursor accepts** as a plain-markdown alternative to `.mdc` rules), `CLAUDE.md`, Kiro steering files under `.kiro/steering/`, Cursor rules under `.cursor/rules/`, or Copilot instructions. Generated from the same spec, so there is one place to change a rule and no second copy to drift.
 
 Generated files carry a header saying so, and a file without that header is never overwritten — it was written by a person.
@@ -176,7 +190,7 @@ OpenSpec is a CLI you install with npm. It keeps living requirements in `openspe
 | Requirements are | SHALL + WHEN/THEN scenarios | plain English (see *Decisions taken deliberately*, above) |
 | A change is | a proposal folder, archived when applied | a round appended to the item's brief, which is permanent |
 | Repositories | the one you initialise it in | several, each solution naming its repo and local path |
-| Agents | thirty-plus, generated per tool | Claude Code; the app adds Ollama and Claude subscriptions |
+| Agents | thirty-plus, generated per tool | seven, generated per tool from one source; the app adds Ollama and Claude subscriptions |
 
 ### What OpenSpec does well
 

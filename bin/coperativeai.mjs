@@ -27,6 +27,7 @@
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { AGENTS } from "./agents.mjs";
 import { files, fingerprint } from "./layout.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -60,7 +61,7 @@ async function readRecord(root) {
 
 async function writeRecord(root, record) {
   const sorted = Object.fromEntries(Object.entries(record.files).sort(([a], [b]) => a.localeCompare(b)));
-  await fs.writeFile(path.join(root, RECORD), JSON.stringify({ framework: version, files: sorted }, null, 2) + "\n");
+  await fs.writeFile(path.join(root, RECORD), JSON.stringify({ framework: version, agents: record.agents, files: sorted }, null, 2) + "\n");
 }
 
 async function write(to, content) {
@@ -75,13 +76,14 @@ function list(label, items, max = 12) {
   if (items.length > max) console.log(`  … and ${items.length - max} more`);
 }
 
-async function init(target, dryRun) {
+async function init(target, dryRun, chosen) {
   const root = path.resolve(target ?? ".");
   const record = (await readRecord(root)) ?? { files: {} };
+  record.agents = chosen ?? record.agents ?? ["claude"];
   const written = [];
   const kept = [];
 
-  for (const { from, to } of await files(framework)) {
+  for (const { from, to } of await files(framework, record.agents)) {
     const src = await fs.readFile(path.join(framework, from));
     const dest = path.join(root, to);
     if (existsSync(dest)) {
@@ -134,14 +136,14 @@ Commit ${RECORD}: it is how \`coperativeai update\` tells your edits from ours.
 `);
 }
 
-async function update(target, dryRun) {
+async function update(target, dryRun, chosen) {
   const root = path.resolve(target ?? ".");
   if (!existsSync(path.join(root, "Project_brief.md"))) {
     console.log(`${root} has no Project_brief.md — run \`coperativeai init\` there first.`);
     process.exit(1);
   }
   const old = await readRecord(root);
-  const record = { files: { ...(old?.files ?? {}) } };
+  const record = { agents: chosen ?? old?.agents ?? ["claude"], files: { ...(old?.files ?? {}) } };
   const added = [];
   const updated = [];
   const besides = [];
@@ -149,7 +151,7 @@ async function update(target, dryRun) {
   let emitted = false;
   const shipped = new Set();
 
-  for (const { from, to, owner } of await files(framework)) {
+  for (const { from, to, owner } of await files(framework, record.agents)) {
     shipped.add(to);
     const src = await fs.readFile(path.join(framework, from));
     const fresh = fingerprint(src);
@@ -248,8 +250,8 @@ function usage() {
   console.log(`
 CooperativeAICoding — a way of working that Product, Developers, QA and AI share.
 
-  coperativeai init [folder] [--dry-run]
-  coperativeai update [folder] [--dry-run]
+  coperativeai init [folder] [--agents <list>] [--dry-run]
+  coperativeai update [folder] [--agents <list>] [--dry-run]
 
   Installed with: npm install -g coperativeai
 
@@ -258,18 +260,35 @@ CooperativeAICoding — a way of working that Product, Developers, QA and AI sha
   update      bring the framework's files up to date. Files nobody changed
               are replaced; files you edited are kept, with the new version
               beside them as <file>.update; your answers are never touched.
+  --agents    which AI coding agents get the commands, comma-separated:
+              ${Object.keys(AGENTS).join(", ")}. Default: claude.
+              update remembers the choice; pass it again to change it.
   --dry-run   say what it would do, and write nothing
 `);
 }
 
 const [command, ...rest] = process.argv.slice(2);
 const dryRun = rest.includes("--dry-run");
-const target = rest.find((a) => !a.startsWith("-"));
+const agentsAt = rest.indexOf("--agents");
+const chosen =
+  agentsAt === -1 ? undefined : (rest[agentsAt + 1] ?? "").split(",").map((a) => a.trim()).filter(Boolean);
+const target = rest.find((a, i) => !a.startsWith("-") && (agentsAt === -1 || i !== agentsAt + 1));
+
+if (chosen && chosen.length === 0) {
+  console.error(`--agents needs a list — one or more of: ${Object.keys(AGENTS).join(", ")}`);
+  process.exit(1);
+}
+for (const a of chosen ?? []) {
+  if (!AGENTS[a]) {
+    console.error(`unknown agent "${a}" — one of: ${Object.keys(AGENTS).join(", ")}`);
+    process.exit(1);
+  }
+}
 
 if (command === "init") {
-  await init(target, dryRun);
+  await init(target, dryRun, chosen);
 } else if (command === "update") {
-  await update(target, dryRun);
+  await update(target, dryRun, chosen);
 } else if (command === undefined || command === "--help" || command === "-h" || command === "help") {
   usage();
 } else {

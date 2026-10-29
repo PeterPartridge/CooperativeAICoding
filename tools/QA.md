@@ -262,3 +262,24 @@ Build one item. Then:
 - The hollow test is called *proves*.
 - A verdict cites no file.
 - `/verify` edits code or tests.
+
+---
+
+## 11. Another agent: the same commands, the same procedure
+
+```bash
+coperativeai init --agents cursor,gemini
+```
+
+Open the project in each agent and run `/new-item page Shop cart`.
+
+**Pass:**
+- The command is offered by name.
+- It follows `ai-only/procedures/new-item.md`: it creates a blank form and
+  doesn't overwrite one.
+- The project has no `.claude/` folder, because you didn't ask for one.
+
+**Fail:**
+- The agent can't find the command.
+- It improvises instead of reading the procedure.
+- Files arrive for an agent you didn't choose.

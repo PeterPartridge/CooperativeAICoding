@@ -19,14 +19,18 @@
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { AGENTS, agentOf } from "./agents.mjs";
 
-const COPIED = /^(template|\.claude|tools)\//;
+/** What lands in a project: the template, the checks, and every agent's
+ *  command folder (each project then keeps only the agents it chose). */
+const COPIED = (entry) =>
+  /^(template|tools)\//.test(entry) || Object.values(AGENTS).some(({ dir }) => entry === dir || entry.startsWith(`${dir}/`));
 
 export async function layout(framework) {
   const { files } = JSON.parse(await fs.readFile(path.join(framework, "package.json"), "utf8"));
   const out = [];
   for (const entry of files) {
-    if (entry.startsWith("!") || !COPIED.test(entry)) continue;
+    if (entry.startsWith("!") || !COPIED(entry)) continue;
     for (const from of await expand(framework, entry)) {
       const to = from
         .replace(/^template\/([^/]+)\.template\.md$/, "$1.md")
@@ -58,12 +62,17 @@ export function ownerOf(from) {
   return /^template\//.test(from) && !/^template\/(_forms|ai-only)\//.test(from) ? "people" : "framework";
 }
 
-/** Every file a project receives, one entry per file, with its owner. */
-export async function files(framework) {
+/** Every file a project receives, one entry per file, with its owner. With
+ *  `agents`, an agent's command files arrive only if it is one of them. */
+export async function files(framework, agents) {
   const out = [];
   const walk = async (from, to) => {
     const full = path.join(framework, from);
-    if ((await fs.stat(full)).isFile()) return void out.push({ from, to, owner: ownerOf(from) });
+    if ((await fs.stat(full)).isFile()) {
+      const agent = agentOf(from);
+      if (agents && agent && !agents.includes(agent)) return;
+      return void out.push({ from, to, owner: ownerOf(from) });
+    }
     for (const e of (await fs.readdir(full)).sort()) await walk(`${from}/${e}`, `${to}/${e}`);
   };
   for (const { from, to } of await layout(framework)) await walk(from, to);

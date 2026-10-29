@@ -20,6 +20,7 @@ there, not here.
 | `template/` | The blank copy `init` hands to a project: the brief, the forms in `_forms/`, and the procedures in `ai-only/procedures/` |
 | `example/` | A worked Clothing project to read before writing your own |
 | `.claude/` | The slash commands and skills — thin pointers to the procedures, never copies of them |
+| `.cursor/`, `.agents/`, `.gemini/`, `.opencode/`, `.github/prompts/`, `.kiro/` | The same commands for other agents, generated from `.claude/commands/` by `tools/agent-commands.mjs`. Change a command there, then run it. |
 | `tools/` | The checks (every `*-lint.mjs`, run together by `check.mjs`) and their tests |
 | `bin/` | The `coperativeai` CLI: `init` copies the template into a project, `update` brings it up to date |
 | `site/` | The GitHub Pages site, built from `README.md`, `HOW-TO-USE.md` and `INSTALL.md` |

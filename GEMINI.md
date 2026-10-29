@@ -5,7 +5,7 @@
 To halt execution and get plan approval before changing files, I must use my file-editing tools to create or update an `implementation_plan.md` artifact, explicitly setting `request_feedback = true` in the API call. A plain text request in chat does not suspend my execution loop. If the user does not respond, I remain suspended and take no further action. (Note: Artifacts are stored globally in my local app data directory outside your repository, so they will never accidentally be committed to version control).
 
 ## Workflows & Commands
-Because I do not automatically route slash commands (like `/build`) to `.claude/commands/`, you must instruct me in plain text. Each command file is a pointer; the procedure it names under `template/ai-only/procedures/` is what I follow.
+In Gemini CLI the commands are in `.gemini/commands/` (`/build`, `/translate`, …), generated from `.claude/commands/`. Elsewhere, instruct me in plain text. Either way each command is a pointer; the procedure it names under `template/ai-only/procedures/` is what I follow.
 - **Translating a brief**: Say "translate this brief [path]". I will read `.claude/commands/translate.md` and the procedure it points to.
 - **Building a spec**: Say "build this spec [path]". I will read `.claude/commands/build.md`, produce an `implementation_plan.md` artifact, and wait for your approval via the artifact mechanism before writing code.
 - **Drafting a brief from code**: Say "draft a brief from the codebase". I will read `.claude/commands/draft.md`.

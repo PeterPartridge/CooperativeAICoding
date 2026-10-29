@@ -557,3 +557,72 @@ test("update leaves an AGENTS.md written from the project's own spec", async () 
   assert.equal(await readIn(t, "AGENTS.md"), emitted);
   assert.match(out, /\/emit-guardrails/);
 });
+
+// ---------------------------------------------------------------------------
+// Commands for agents other than Claude Code.
+//
+// Each agent's command files are generated from .claude/commands by
+// tools/agent-commands.mjs, and a project gets only the agents it asks for.
+// The faults: generated files drifting from their source, a pointer to a
+// procedure that is not there, an agent's files landing in a project that did
+// not ask for them, and `update` forgetting which agents a project chose.
+
+test("every agent's commands match what tools/agent-commands.mjs generates", () => {
+  const out = execFileSync("node", [path.join(repo, "tools/agent-commands.mjs"), "--check"], { cwd: repo, encoding: "utf8" });
+  assert.match(out, /up to date/);
+});
+
+test("every agent's command points at a procedure that exists", async () => {
+  const { AGENTS } = await import("../bin/agents.mjs");
+  let checked = 0;
+  for (const { dir, kind } of Object.values(AGENTS)) {
+    if (!kind) continue;
+    const walk = async (d) => {
+      for (const e of await fs.readdir(d, { withFileTypes: true })) {
+        const full = path.join(d, e.name);
+        if (e.isDirectory()) await walk(full);
+        else {
+          const name = (await fs.readFile(full, "utf8")).match(/ai-only\/procedures\/([a-z-]+\.md)/)?.[1];
+          assert.ok(name, `${full} names no procedure`);
+          assert.ok(existsSync(path.join(repo, "template/ai-only/procedures", name)), `${full} → ${name}, which does not exist`);
+          checked++;
+        }
+      }
+    };
+    await walk(path.join(repo, dir));
+  }
+  assert.ok(checked >= 40, `only ${checked} agent commands found`);
+});
+
+test("init gives a project only the agents it asks for", async () => {
+  const plain = await freshProject();
+  assert.ok(existsSync(inProject(plain, ".claude/commands/build.md")));
+  assert.equal(existsSync(inProject(plain, ".cursor")), false, "an agent nobody asked for arrived");
+  assert.deepEqual((await manifestOf(plain)).agents, ["claude"]);
+
+  const t = await fs.mkdtemp(path.join(os.tmpdir(), "cai-agents-"));
+  const { code, out } = cli("init", t, "--agents", "cursor,gemini");
+  assert.equal(code, 0, out);
+  assert.ok(existsSync(inProject(t, ".cursor/skills/build/SKILL.md")));
+  assert.match(await readIn(t, ".gemini/commands/build.toml"), /\{\{args\}\}/);
+  assert.equal(existsSync(inProject(t, ".claude/commands")), false);
+  assert.ok(existsSync(inProject(t, "ai-only/procedures/build.md")), "the procedures are for every agent");
+  assert.deepEqual((await manifestOf(t)).agents, ["cursor", "gemini"]);
+});
+
+test("init refuses an agent it does not know, and names the ones it does", async () => {
+  const t = await fs.mkdtemp(path.join(os.tmpdir(), "cai-agents-"));
+  const { code, out } = cli("init", t, "--agents", "notepad");
+  assert.equal(code, 1);
+  assert.match(out, /unknown agent "notepad".*claude.*cursor/s);
+});
+
+test("update remembers which agents a project chose", async () => {
+  const t = await fs.mkdtemp(path.join(os.tmpdir(), "cai-agents-"));
+  cli("init", t, "--agents", "gemini");
+  await fs.rm(inProject(t, ".gemini/commands/qa.toml"));
+  const { code, out } = cli("update", t);
+  assert.equal(code, 0, out);
+  assert.ok(existsSync(inProject(t, ".gemini/commands/qa.toml")), "the chosen agent's command was not restored");
+  assert.equal(existsSync(inProject(t, ".claude")), false, "update added an agent nobody chose");
+});
