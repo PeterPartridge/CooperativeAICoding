@@ -172,6 +172,7 @@ const TOKEN_BUDGET = {
   "template/ai-only/procedures/emit-guardrails.md": 925,
   "template/ai-only/procedures/new-item.md": 450,
   "template/ai-only/procedures/pipeline.md": 500,
+  "template/ai-only/procedures/product.md": 525,
   "template/ai-only/procedures/qa.md": 500,
   "template/ai-only/procedures/translate.md": 600,
 };

@@ -21,13 +21,13 @@ this order:
    building anything new. Never read `qa/` while building: it is QA's.
 8. **The working agreement:** smallest change; existing code is production;
    never invent scope; **when you cannot understand something, stop and say so.**
-9. **The procedures table, verbatim.** It is how a tool other than Claude Code
-   reaches them. Point at the files; never inline them.
+9. **The procedures table, verbatim.** Point at the files; never inline them.
 
    | When the request is | Follow |
    |---|---|
    | fill a brief in from an existing codebase | `ai-only/procedures/draft.md` |
    | turn a filled-in brief into a spec | `ai-only/procedures/translate.md` |
+   | plan an idea with Product | `ai-only/procedures/product.md` |
    | add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
    | build the next iteration of an approved spec | `ai-only/procedures/build.md` |
    | help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |

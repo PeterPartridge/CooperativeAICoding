@@ -15,6 +15,7 @@ marked *not yet filled in* wait on the brief.
 |---|---|
 | fill a brief in from an existing codebase | `ai-only/procedures/draft.md` |
 | turn a filled-in brief into a spec | `ai-only/procedures/translate.md` |
+| plan an idea with Product | `ai-only/procedures/product.md` |
 | add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
 | build the next iteration of an approved spec | `ai-only/procedures/build.md` |
 | help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |

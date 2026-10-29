@@ -63,11 +63,23 @@ Each item is defined **once** by Product, then built up **iteratively** by Devel
 - What are the use cases? Who uses this item, and how do they use it under different conditions?
 - Who should be able to use it? (This sets the security expectations for developers.)
 
+**Product — and why it matters:**
+- What does this do for customers, and for the business?
+
+Product plans these, with the AI if they like (`/product`), and signs them: **sign-off 1**.
+
 **Developers — questions:**
+- How can we do this? Can we build this, or is there a better way?
+- What happens with errors, and with scenarios that could occur?
+- What technical challenges are there?
+- What tests should the AI create?
+- What questions do we have for Product?
 - What should the data model look like?
 - Is there anything that must **not** be saved permanently, or must survive between screens? (A constraint if there is one — not a design to impose.)
 - How will we know it works? What must be true for this to be accepted?
 - What endpoints should be used?
+
+Developers talk their answers through with Product, which refines the idea. When both are happy, and QA has reviewed the item and planned how to test it, they sign together: **sign-off 2**. `/build` checks both (and QA's verdict, never QA's tests) before it plans. A sign-off names the change round it covers, so a new round needs new sign-offs.
 
 ## The AI Workflow
 
@@ -216,7 +228,7 @@ cd my-project
 coperativeai init
 ```
 
-That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the seven commands and the
+That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the eight commands and the
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
 to build. It never overwrites: a file that already exists
 is left alone and named in the report. Add `--dry-run` to see it first.
@@ -231,7 +243,7 @@ It tells the difference from `.coperativeai.json`, a record of what was installe
 
 **Looking for the desktop app?** [Swarm](https://github.com/PeterPartridge/Swarm) is built with this framework and lives in its own repository, with its installers and build steps. The framework itself needs no binary at all — [`INSTALL.md`](INSTALL.md) — and runs wherever Claude Code runs.
 
-New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses seven Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
+New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses eight Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
 
 - **`/draft [folder]`** — for a codebase that already exists: fill the brief in from the code, sourced and marked, with a few multiple-choice questions at the end instead of a blank form. The AI's answers stay the AI's until you accept them.
 - **`/translate <brief>`** — turn a filled-in brief into a structured spec + skills.
@@ -239,4 +251,5 @@ New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish
 - **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.
 - **`/pipeline <solution>`** — create the solution's CI/CD pipeline and missing infrastructure from its spec, as its own approved plan. Secret values are never written into code — they're referenced by name from stores you control.
 - **`/emit-guardrails [targets]`** — write the project's rules out in other agents' native formats (`AGENTS.md`, `CLAUDE.md`, Kiro steering, Cursor rules) from the same spec. One brief, every agent's guardrails — see below.
+- **`/product [idea or brief]`**: plan an idea with Product. A few multiple-choice questions, then Parts 1–2 of a page brief in Product's words, marked drafted until Product accepts and signs. The AI never signs.
 - **`/qa [automate|script|run]`**: help QA, only when QA asks. Writes the automation and manual scripts QA asked for, or runs the regression suite. It never fixes a failure and never signs off; see [QA sign-off](#qa-sign-off).

@@ -492,3 +492,68 @@
   exists because they did, unnoticed, for two days. A CI step comparing
   `package.json`'s version with `npm view coperativeai version` after a merge
   would say so.
+
+## 2026-10-29 — Deliverable 3: two sign-offs
+
+### What I did
+- **Product and Developers each have their part, and each signs.**
+  - `page.md` gains Product's `value` question ("What does this do for
+    customers, and for the business?").
+  - It also gains the Developers' questions: how can we do this, is there a
+    better way, errors and scenarios, technical challenges, the tests the AI
+    should create, and questions for Product.
+  - Two front-matter fields hold the sign-offs: `product-signoff` (sign-off 1,
+    the idea and use case) and `build-signoff` (sign-off 2, Dev and Product
+    together).
+  - The endpoint and model forms gain the same Developer questions and
+    `buildSignoff`. They have no Product part, so Dev signs alone (the default I
+    proposed).
+- **A sign-off names its round:** `Sam 2026-10-30 round 1`. A brief changes by
+  gaining change rounds, so a new round shows its missing sign-offs instead of
+  carrying an old approval forward. People can read and write that by hand; no
+  tooling is needed to sign.
+- **`brief-lint --ready <brief>`, the gate `/build` asks before planning:** both
+  sign-offs for the current round and QA's review `happy`. The builder gets
+  QA's verdict, never QA's tests.
+  - `brief-lint` also fails on a sign-off that is not a name, a date and a round,
+    and on one for a round the brief does not have yet.
+  - It notes what each item is waiting on, or that it is ready to build. A
+    project with no `qa/` folder predates the track and is not nagged; the gate
+    still holds there.
+  - There are 11 tests, written first.
+- **`/product`, the AI planning with Product.** At most five questions, multiple
+  choice from the project's own users, roles and deliverables, and never about
+  architecture. It drafts Parts 1–2 in Product's words, marked as drafted. Only
+  Product accepts it and signs; the AI never signs. `/draft` now refuses to
+  draft a sign-off too.
+- **Docs:**
+  - README: the item layout, the commands, and the reasons in
+    `procedures/README.md`.
+  - `HOW-TO-USE.md`: the item steps now go plan, sign, agree, sign, translate.
+  - INSTALL, the site and the counts: eight commands.
+  - `tools/QA.md`: scenario 9.
+- **The token budgets held** by trimming `build.md`, `emit-guardrails.md` and
+  `new-item.md` rather than raising them.
+
+### What I could not do  (and what you would need to tell me)
+- **The example briefs don't have the new questions or sign-offs.** Answering
+  them would be me speaking as Product and as Developers. The example still
+  passes every check, because it has no `qa/` folder.
+- **No person has run QA scenario 9** (or 1–8) against a real agent.
+- **This sits on the release branch (#24),** so #24 merges first. Deliverable 3
+  is not in 0.2.0 unless #24 waits for it.
+
+### Debt I left behind
+- **A brief edited without adding a round keeps its sign-offs.** The round is
+  the signal, and an edit that skips the change-round convention is invisible to
+  it. A fingerprint of the signed parts would catch it, at the cost of a
+  sign-off people cannot write by hand.
+
+- **`brief-lint` now has four jobs:** deliverables, status, QA's documents and
+  sign-offs. With one copy list, splitting it is cheap: a `signoff-lint.mjs`
+  would run everywhere with no other edits. The pieces share item parsing,
+  which would need a shared module first.
+
+- **"Dev and Product" is not checked to be two people.** `build-signoff` needs
+  only a name, a date and a round. That two names are there, and that one of
+  them is Product, is trusted.

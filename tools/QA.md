@@ -214,3 +214,31 @@ coperativeai update
 - Run it again: nothing changes.
 
 **Fail:** any file somebody wrote, or edited, is different afterwards.
+
+---
+
+## 9. `/product` and the two sign-offs: nobody signs but a person
+
+```
+/product a customer can see where their order is
+```
+
+**Pass:**
+- At most five questions arrive, multiple choice where the project offers
+  options.
+- None of them asks about architecture.
+- A page brief appears with Parts 1–2 in your words, each marked
+  `> drafted`, `status: drafted`, and both sign-offs empty.
+
+Now accept it and sign `product-signoff`. Leave `build-signoff` empty, translate
+it, and run `/build`.
+
+**Pass:** it refuses before planning and names the missing sign-off. Sign
+`build-signoff`, leave QA's review unhappy, and run it again.
+
+**Pass:** it refuses again, naming QA's review.
+
+**Fail:**
+- the AI fills in a sign-off;
+- `/build` plans with one missing;
+- `/build` opens anything under `qa/` to decide.

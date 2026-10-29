@@ -123,8 +123,9 @@ async function itemBriefs(root) {
       if (file === "application-spec.json") continue; // the solution, not an item
       const full = path.join(dir, file);
       if (file.endsWith(".md")) {
-        const fields = frontMatter(await read(full));
-        if (fields?.form === "page-brief") items.push({ file: full, fields });
+        const text = await read(full);
+        const fields = frontMatter(text);
+        if (fields?.form === "page-brief") items.push({ file: full, fields, text });
       } else if (file.endsWith(".json")) {
         let parsed;
         try {
@@ -140,6 +141,78 @@ async function itemBriefs(root) {
     }
   }
   return items;
+}
+
+// ---------------------------------------------------------------------------
+// **The two sign-offs.** Product signs the idea and its use case; Dev and
+// Product sign how it will be built, after QA has reviewed it. Each names the
+// change round it covers — `Sam 2026-10-30 round 1` — so when a brief gains a
+// round, the sign-offs it needs are visibly missing rather than silently
+// stale. Endpoints and models have no Product part, so they need Dev's alone.
+
+const SIGNOFF = /^(.+?)\s+(\d{4}-\d{2}-\d{2})\s+round\s+(\d+)$/;
+
+/** The round a brief is at: 1, plus one for every change it has had. The
+ *  form's own `- Round 2: …` placeholder is not a change. */
+function roundOf(item) {
+  if (!item.text) return 1 + (item.fields.changesOverTime?.rounds ?? []).filter((r) => r && (r.change ?? r)).length;
+  const section = item.text.match(/^##[^\n]*changes-over-time[^\n]*\n([\s\S]*?)(?=^## |(?![\s\S]))/im);
+  const changes = (section?.[1] ?? "").split("\n").filter((l) => {
+    const bullet = l.match(/^\s*[-*]\s+(.*)$/);
+    if (!bullet) return false;
+    const what = bullet[1].replace(/^round\s+\d+\s*:\s*/i, "").trim();
+    return what !== "" && !/^(…|\.\.\.)$/.test(what);
+  });
+  return 1 + changes.length;
+}
+
+/** The sign-offs an item needs, by the name its brief writes them under. */
+const signoffsFor = (item) =>
+  item.text
+    ? [
+        ["product-signoff", "Product's sign-off"],
+        ["build-signoff", "Dev and Product's sign-off"],
+      ]
+    : [["buildSignoff", "Dev's sign-off"]];
+
+/** QA's verdict on each item it has reviewed, by the item's path. */
+async function qaVerdicts(root) {
+  const out = new Map();
+  const qa = path.join(root, "qa");
+  for (const dir of await fs.readdir(qa, { withFileTypes: true }).catch(() => [])) {
+    if (!dir.isDirectory()) continue;
+    for (const file of await fs.readdir(path.join(qa, dir.name))) {
+      if (!file.endsWith(".md")) continue;
+      const fields = frontMatter(await read(path.join(qa, dir.name, file)));
+      if (fields?.form === "qa-review" && fields.item) out.set(fields.item, fields.status ?? "blank");
+    }
+  }
+  return out;
+}
+
+/** What an item still waits on before it may be built, and what is wrong
+ *  with the sign-offs it has. */
+function readiness(item, itemPath, verdicts) {
+  const round = roundOf(item);
+  const waiting = [];
+  const wrong = [];
+  for (const [field, who] of signoffsFor(item)) {
+    const value = String(item.fields[field] ?? "").trim();
+    if (value === "") {
+      waiting.push(`${who} for round ${round}`);
+      continue;
+    }
+    const m = value.match(SIGNOFF);
+    if (!m) {
+      wrong.push(`${field} "${value}" — write it as <name> <YYYY-MM-DD> round <n>`);
+      continue;
+    }
+    const signed = Number(m[3]);
+    if (signed > round) wrong.push(`${field} signs round ${signed}, and the brief is at round ${round}`);
+    else if (signed < round) waiting.push(`${who} for round ${round} (signed for round ${signed})`);
+  }
+  if (verdicts.get(itemPath) !== "happy") waiting.push(`QA's review (qa/…, status: happy)`);
+  return { round, waiting, wrong };
 }
 
 /** The data rows of every Markdown table in a document, as trimmed cells.
@@ -267,6 +340,22 @@ async function lint(root) {
 
   await lintQa(root, named, items, { errors, warnings, notes });
 
+  // Where each accepted item stands on its sign-offs. Waiting is not a fault —
+  // it is where work is — so it is a note; a malformed sign-off is an error.
+  // A project with no qa/ folder predates the sign-offs and is not nagged;
+  // `--ready`, the gate /build asks, holds everywhere.
+  const verdicts = await qaVerdicts(root);
+  const onTrack = !!(await fs.stat(path.join(root, "qa")).catch(() => null));
+  for (const item of onTrack ? live : []) {
+    if (item.broken) continue;
+    const itemPath = path.relative(root, item.file).split(path.sep).join("/");
+    const { waiting, wrong } = readiness(item, itemPath, verdicts);
+    for (const w of wrong) errors.push(`${rel(item.file)}  ${w}`);
+    if (wrong.length > 0) continue;
+    if (waiting.length > 0) notes.push(`${itemPath} waiting on ${waiting.join("; ")}`);
+    else if (item.fields.status !== "built") notes.push(`${itemPath} ready to build`);
+  }
+
   if (named.length === 0) {
     notes.push(
       `no deliverables answered in ${rel(briefPath)} — ${live.length} item brief(s) unchecked`,
@@ -328,6 +417,32 @@ if (named[0] === "--status") {
     console.log(`${p}: ${status || "no status"}`);
   }
   process.exit(missing ? 1 : 0);
+}
+
+// **`--ready <brief>` is the gate /build asks before it plans.** Both
+// sign-offs for the brief's current round, and QA's review happy. The builder
+// gets the verdict, never QA's tests.
+if (named[0] === "--ready") {
+  const file = path.resolve(named[1] ?? "");
+  let root = path.dirname(file);
+  while (root !== path.dirname(root) && !(await fs.stat(path.join(root, "Project_brief.md")).catch(() => null))) {
+    root = path.dirname(root);
+  }
+  const itemPath = path.relative(root, file).split(path.sep).join("/");
+  const item = (await itemBriefs(root)).find((i) => path.resolve(i.file) === file);
+  if (!item || item.broken) {
+    console.log(`${named[1] ?? "nothing"}: not an item brief in a project`);
+    process.exit(1);
+  }
+  const { round, waiting, wrong } = readiness(item, itemPath, await qaVerdicts(root));
+  for (const w of wrong) console.log(`  ERROR  ${w}`);
+  if (waiting.length === 0 && wrong.length === 0) {
+    console.log(`${itemPath}: ready to build (round ${round})`);
+    process.exit(0);
+  }
+  console.log(`${itemPath}: not ready (round ${round}) — waiting on:`);
+  for (const w of waiting) console.log(`  ${w}`);
+  process.exit(1);
 }
 
 const roots = named.length > 0 ? named.map((p) => path.resolve(p)) : await projectRoots(repo);

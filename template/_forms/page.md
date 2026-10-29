@@ -5,6 +5,8 @@ solution: ""
 deliverable: ""          # which deliverable from the Project Brief this works towards, e.g. MVP
 depends-on: []           # briefs that must be built first, e.g. [ClothingAPI/Login.json]
 status: blank            # blank | drafted | filled | approved | built
+product-signoff: ""      # sign-off 1, Product: the idea and use case — <name> <YYYY-MM-DD> round <n>
+build-signoff: ""        # sign-off 2, Dev and Product: how it will be built — <names> <YYYY-MM-DD> round <n>
 ---
 
 # Page Brief — <Page Name>
@@ -15,6 +17,16 @@ status: blank            # blank | drafted | filled | approved | built
 >
 > **`deliverable`** is which of the Project Brief's deliverables this page works towards. It is not decoration: builds say which deliverable each change advances, and when the last item for a deliverable is built the work stops there for people to evaluate direction. An item that serves no named deliverable is a question worth asking out loud.
 >
+> **Two sign-offs before anything is built.**
+> 1. **Product** plans the idea and its use case (Parts 1–2), with the AI if
+>    they like (`/product`), and signs `product-signoff`.
+> 2. **Developers** answer Part 3 and talk it through with Product until both
+>    are happy, then sign `build-signoff` with both names. QA reviews the page
+>    in `qa/` at the same time.
+>
+> `/build` will not start until both are signed for the page's current round
+> and QA's review says `happy`. A new change round needs new sign-offs.
+>
 > **How:** answer each question in plain English directly under its heading, same as the Project Brief. Lines starting with `>` are guidance — anything else you write under a heading is your answer. When you're done, set `status: filled` and hand it to your AI using the bridge in [`ai-only/1-translate-for-ai.md`](../ai-only/1-translate-for-ai.md).
 
 ---
@@ -24,6 +36,12 @@ status: blank            # blank | drafted | filled | approved | built
 ### why-exists — Why does this page exist?
 > The one main job of this page. This shouldn't change much over time.
 > Example: "So a customer can see their past orders."
+
+### value — What does this do for customers, and for the business?
+> The problem it solves and why it is worth building now — what makes the
+> product more useful, marketable or competitive.
+> Example: "Customers keep emailing to ask where their order is; this answers
+> it without them waiting for us."
 
 ---
 
@@ -44,7 +62,21 @@ status: blank            # blank | drafted | filled | approved | built
 
 ---
 
-## Part 3 — Building Details *(Developers answer)*
+## Part 3 — Building Details *(Developers answer, then talk it through with Product)*
+
+### approach — How can we do this?
+> The way you intend to build it, in a few sentences.
+
+### better-way — Can we build this, or is there a better way?
+> If there is a simpler or safer way to get Product what they need, say so —
+> that conversation is what this part is for.
+
+### errors — What happens with errors, and with scenarios that could occur?
+> What can go wrong, and what the page should do then. e.g. "The API is down:
+> show a retry message, keep what the customer typed."
+
+### challenges — What technical challenges are there?
+> Anything hard, risky or unknown.
 
 > For each endpoint this page needs, copy [`_forms/endpoint.json`](../_forms/endpoint.json) into this solution folder. For each data model it stores, copy [`_forms/database-model.json`](../_forms/database-model.json). Link them from here.
 
@@ -75,8 +107,16 @@ status: blank            # blank | drafted | filled | approved | built
 > question and applies to every item. So a short list here is not a short list
 > of tests.
 
+### ai-tests — What tests should the AI create?
+> The tests you want written as the page is built, on top of the project's
+> testing floor. (QA's regression tests are separate, and QA's own.)
+
 ### limits — Any known limits or things to watch out for?
 > e.g. "This page can get slow if there are thousands of orders."
+
+### questions-for-product — What questions do we have for Product?
+> Ask them; Product's answers go into Part 2. When both of you are happy, sign
+> `build-signoff`.
 
 ### model-and-effort — Which AI model and effort level should this page use by default?
 > Pick from the project's tiers (see the Project Brief): a simple page might be "cheapest model, low effort"; a tricky one "most capable, high effort." You can override this for individual changes later.

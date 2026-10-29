@@ -107,12 +107,33 @@ endpoints and models, and every step below is identical for them.
    too: it writes `ai-only/<solution>/_solution.md`, the solution's rules and
    commands with its preset copied in.
 
-2. **Fill it in.** Answer in plain English — under the question headings in a
-   Markdown form, or in the `answer` fields of a JSON one: what the page is for,
-   who uses it, what it shows/stores, how you'll know it works, and its default
-   model/effort.
+2. **Product plans it, and signs.** Product answers Parts 1–2: why it exists,
+   what it does for customers and the business, what people do on it, and who may
+   use it. They can plan it with Claude:
 
-3. **Translate it.**
+   ```
+   /product a customer can see where their order is
+   ```
+
+   Claude asks a few multiple-choice questions and drafts Product's words, marked
+   as drafted. Product fixes it, sets `status: filled`, and signs
+   `product-signoff: Sam 2026-10-30 round 1`. **That is sign-off 1.**
+
+3. **Developers and Product agree how, and sign.** Developers answer Part 3:
+   - How can we do this?
+   - Is there a better way?
+   - What happens with errors, and with other scenarios?
+   - What technical challenges are there?
+   - What tests should the AI create?
+   - What questions do we have for Product?
+
+   They talk it through with Product, who updates Part 2. QA reviews the item in
+   `qa/` at the same time. When Dev and Product are both happy, they sign
+   `build-signoff: Alex and Sam 2026-10-31 round 1`. **That is sign-off 2.**
+   Endpoints and models are the Developers' own, so they sign `buildSignoff`
+   alone.
+
+4. **Translate it.**
 
    ```
    /translate example/ClothingWebsite/userLogin.md
@@ -121,7 +142,10 @@ endpoints and models, and every step below is identical for them.
    Claude reads only `ai-only/Project_digest.md`, then writes the item's spec to the
    mirrored path in `ai-only/`, e.g. `example/ai-only/ClothingWebsite/userLogin.md`.
 
-4. **Answer its `UNKNOWN`s**, as above. A build won't start while any is open.
+5. **Answer its `UNKNOWN`s**, as above. A build won't start while any is open,
+   nor until both sign-offs cover the item's current round and QA's review says
+   `happy`. `node tools/brief-lint.mjs --ready <brief>` says what is missing. A
+   new change round needs new sign-offs.
 
 ---
 
@@ -188,6 +212,7 @@ and `/build` again. Keep each change small.
 |---------|--------------|
 | `/draft [folder]` | **Existing codebase?** Fill the project brief in from the code — every answer marked with where it came from and how sure it is, and at most five multiple-choice questions at the end. Saved as `status: drafted`; you accept it by reading it and setting `filled`. |
 | `/translate <brief>` | Turn a filled-in brief (project, solution or item) into a spec under `ai-only/`: one sourced line per fact, gaps marked `UNKNOWN`. |
+| `/product [idea or brief]` | Plan an idea with Product: a few multiple-choice questions, then Parts 1–2 of a page brief drafted in their words. Product accepts it and signs; the AI never signs. |
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |
 | `/pipeline <solution>` | Create the solution's CI/CD pipeline and missing infrastructure from its spec's `infrastructure` block. Secrets are referenced by name only — never written into code. |
@@ -212,7 +237,7 @@ against the list its Project Brief names, QA's **regression suite and sign-off**
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
-running it is a model. That pass is [`tools/QA.md`](tools/QA.md): eight scenarios a
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): nine scenarios a
 person runs against a real agent, each one naming the failure that would count as
 a fail rather than asking whether the output looked plausible.
 

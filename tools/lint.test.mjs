@@ -752,3 +752,97 @@ test("check.mjs runs them all and fails if any one fails", async () => {
   assert.match(out, /ran b-lint\.mjs/, "a failure stopped the later checks from running");
   assert.match(out, /a-lint\.mjs failed/);
 });
+
+// ---------------------------------------------------------------------------
+// The two sign-offs: Product signs the idea; Dev and Product sign how to build
+// it, once QA has reviewed. /build asks `brief-lint --ready` before planning.
+//
+// **Its fault would be a build nobody agreed to** — so every case is a brief
+// missing one of the three, or signed for an earlier round than it now has.
+// A sign-off names the change round it covers, so a new round needs new ones.
+
+const signedPage = ({ product = "Sam 2026-10-30 round 1", build = "Alex and Sam 2026-10-31 round 1", rounds = "- Round 2: …" } = {}) =>
+  `---\nform: page-brief\npage: cart\nsolution: Shop\ndeliverable: MVP\nstatus: filled\n` +
+  `product-signoff: ${product}\nbuild-signoff: ${build}\n---\n\n# Page Brief — cart\n\n## Part 4 — changes-over-time\n\n${rounds}\n`;
+
+const qaReview = (status = "happy") => `---\nform: qa-review\nitem: Shop/cart.md\nstatus: ${status}\n---\n`;
+
+async function signProject(files) {
+  return project({ "Project_brief.md": brief("filled", THREE), "qa/regression.md": "", ...files });
+}
+
+const ready = (root, brief = "Shop/cart.md") => run("brief-lint.mjs", ["--ready", path.join(root, brief)]);
+
+for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
+  test(`brief-lint --ready passes a page both sign-offs and QA have cleared (${name})`, async () => {
+    const root = await project(
+      { "Project_brief.md": brief("filled", THREE), "qa/regression.md": "", "Shop/cart.md": signedPage(), "qa/Shop/cart.md": qaReview() },
+      eol,
+    );
+    const { code, out } = ready(root);
+    assert.equal(code, 0, out);
+    assert.match(out, /ready to build/);
+  });
+}
+
+test("brief-lint --ready refuses a page Product has not signed", async () => {
+  const root = await signProject({ "Shop/cart.md": signedPage({ product: "" }), "qa/Shop/cart.md": qaReview() });
+  const { code, out } = ready(root);
+  assert.equal(code, 1);
+  assert.match(out, /Product's sign-off for round 1/);
+});
+
+test("brief-lint --ready refuses a page Dev and Product have not agreed", async () => {
+  const root = await signProject({ "Shop/cart.md": signedPage({ build: "" }), "qa/Shop/cart.md": qaReview() });
+  const { code, out } = ready(root);
+  assert.equal(code, 1);
+  assert.match(out, /Dev and Product's sign-off for round 1/);
+});
+
+test("brief-lint --ready refuses until QA's review is happy", async () => {
+  const missing = ready(await signProject({ "Shop/cart.md": signedPage() }));
+  assert.equal(missing.code, 1);
+  assert.match(missing.out, /QA's review/);
+  const unhappy = ready(await signProject({ "Shop/cart.md": signedPage(), "qa/Shop/cart.md": qaReview("reviewing") }));
+  assert.equal(unhappy.code, 1);
+  assert.match(unhappy.out, /QA's review/);
+});
+
+test("brief-lint --ready asks for new sign-offs when a change round is added", async () => {
+  const root = await signProject({
+    "Shop/cart.md": signedPage({ rounds: "- Round 2: let a customer save the basket for later." }),
+    "qa/Shop/cart.md": qaReview(),
+  });
+  const { code, out } = ready(root);
+  assert.equal(code, 1);
+  assert.match(out, /round 2/);
+});
+
+test("brief-lint does not count the form's placeholder round as a change", async () => {
+  const root = await signProject({ "Shop/cart.md": signedPage({ rounds: "- Round 2: …" }), "qa/Shop/cart.md": qaReview() });
+  assert.equal(ready(root).code, 0);
+});
+
+test("brief-lint catches a sign-off that is not a name, a date and a round", async () => {
+  const root = await signProject({ "Shop/cart.md": signedPage({ product: "yes" }), "qa/Shop/cart.md": qaReview() });
+  const { code, out } = run("brief-lint.mjs", [root]);
+  assert.equal(code, 1);
+  assert.match(out, /product-signoff "yes" — write it as <name> <YYYY-MM-DD> round <n>/);
+});
+
+test("brief-lint catches a sign-off for a round the brief does not have yet", async () => {
+  const root = await signProject({ "Shop/cart.md": signedPage({ build: "Alex and Sam 2026-10-31 round 3" }), "qa/Shop/cart.md": qaReview() });
+  const { code, out } = run("brief-lint.mjs", [root]);
+  assert.equal(code, 1);
+  assert.match(out, /signs round 3, and the brief is at round 1/);
+});
+
+test("brief-lint --ready needs only Dev's sign-off and QA for an endpoint", async () => {
+  const endpoint = (signoff) =>
+    JSON.stringify({ form: "endpoint-brief", status: "filled", deliverable: "MVP", buildSignoff: signoff, changesOverTime: { rounds: [] } });
+  const qa = "---\nform: qa-review\nitem: Shop/api.json\nstatus: happy\n---\n";
+  const ok = await signProject({ "Shop/api.json": endpoint("Alex 2026-10-31 round 1"), "qa/Shop/api.md": qa });
+  assert.equal(ready(ok, "Shop/api.json").code, 0, ready(ok, "Shop/api.json").out);
+  const no = await signProject({ "Shop/api.json": endpoint(""), "qa/Shop/api.md": qa });
+  assert.equal(ready(no, "Shop/api.json").code, 1);
+});
