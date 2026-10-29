@@ -11,12 +11,12 @@ Nothing here needs the desktop app, or any download: the framework is this
 repository's `template/` folder plus Claude Code, on any operating system. If
 you do want the app — or you build on Linux — that is [`INSTALL.md`](INSTALL.md).
 
-**Not using Claude Code?** The steps below are written as Claude Code slash
-commands, but each command is a plain Markdown file in
-[`.claude/commands/`](.claude/commands/). Any coding agent can follow one if you
-tell it to read the file ("read `.claude/commands/build.md` and build this
-spec"). `/emit-guardrails` writes the project's rules into the file your agent
-reads, such as `AGENTS.md`. See [`template/ai-only/README.md`](template/ai-only/README.md).
+**Not using Claude Code?** Run `coperativeai init --agents cursor` (or `codex`,
+`gemini`, `copilot`, `opencode`, `kiro`, several at once) and the same commands
+arrive in that agent's own format. The steps below read the same there. Any
+other agent can follow a procedure if you point it at the file, e.g. "follow
+`ai-only/procedures/build.md` for this spec". `/emit-guardrails` writes the
+project's rules into the file your agent reads, such as `AGENTS.md`.
 
 ---
 
@@ -252,7 +252,7 @@ against the list its Project Brief names, QA's **regression suite and sign-off**
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
-running it is a model. That pass is [`tools/QA.md`](tools/QA.md): ten scenarios a
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): eleven scenarios a
 person runs against a real agent, each one naming the failure that would count as
 a fail rather than asking whether the output looked plausible.
 

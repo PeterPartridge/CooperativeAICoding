@@ -72,13 +72,12 @@ quietly in a build.
 
 ## Using it with your agent
 
-- **Claude Code** runs the steps as slash commands (`/translate`, `/build`,
-  `/new-item`, `/pipeline`, `/draft`, `/emit-guardrails`), defined in
-  `.claude/commands/`.
-- **Any other agent** can follow the same steps. The command files are plain
-  Markdown, so tell the agent to read the one for the step you want, e.g. "read
-  `.claude/commands/build.md` and build this spec". `/emit-guardrails` writes
-  the project's rules into the file each tool reads, such as `AGENTS.md`,
+- **Claude Code, Cursor, Codex, Gemini CLI, Copilot, opencode and Kiro** run the
+  steps as their own commands. `coperativeai init --agents <list>` installs
+  them; each points at a procedure in `procedures/`.
+- **Any other agent** can follow the same steps: point it at the procedure, e.g.
+  "follow `ai-only/procedures/build.md` for this spec". `/emit-guardrails`
+  writes the project's rules into the file each tool reads, such as `AGENTS.md`,
   Cursor rules or Kiro steering.
 - **A chat model with no file access** can still translate: paste a prompt from
   [`1-translate-for-ai.md`](1-translate-for-ai.md) along with the brief, and

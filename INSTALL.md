@@ -20,6 +20,10 @@ To bring a project up to date, run `npm update -g coperativeai`, then
 - edited ones are kept, with the new version beside them as `<file>.update`;
 - your answers are never touched.
 
+Using another agent as well as, or instead of, Claude Code? Add `--agents`, e.g.
+`coperativeai init --agents claude,cursor`. The choices are `claude`, `cursor`,
+`codex`, `gemini`, `copilot`, `opencode` and `kiro`.
+
 Then fill in `Project_brief.md` in plain English, and follow
 [`HOW-TO-USE.md`](HOW-TO-USE.md). `init` puts the slash commands (`/draft`,
 `/translate`, `/new-item`, `/build`, `/pipeline`, `/emit-guardrails`, `/qa`, `/product`, `/verify`) into the
