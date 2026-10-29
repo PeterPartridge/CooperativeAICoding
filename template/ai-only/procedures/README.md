@@ -118,6 +118,10 @@ token budget per procedure; it may only come down.
 - **Sign-offs name a round.** A brief changes by gaining change rounds, so a
   sign-off says which round it covers. A new round shows its missing sign-offs
   instead of carrying an old approval forward silently.
+- **Three changes reopen sign-off 2:** the project's roles, its testing floor, and
+  the solution's security. Those are what Dev and Product agreed against; a
+  change to anything else is a re-translation, not a new agreement. git tells
+  them apart: each answer as of the sign-off's day, against now.
 - **The AI plans with Product, but never signs.** Its words stay `drafted`
   until Product accepts them. A sign-off is a person saying so, the same as
   QA's.

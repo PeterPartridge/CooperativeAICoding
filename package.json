@@ -24,6 +24,7 @@
     ".kiro/prompts",
     "tools/*-lint.mjs",
     "tools/check.mjs",
+    "tools/lib",
     "README.md",
     "HOW-TO-USE.md",
     "INSTALL.md",

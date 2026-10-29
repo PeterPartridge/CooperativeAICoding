@@ -1079,3 +1079,77 @@ test("spec-lint --impact lists what a change touched, across the project", async
   assert.match(out, /1 spec\(s\) to re-translate/);
   assert.match(out, /ai-only\/Project_digest\.md: \[roles\]/);
 });
+
+// ---------------------------------------------------------------------------
+// Which changes reopen a sign-off: roles, the testing floor, or the solution's
+// security, changed after an item's build sign-off. Anything else is a
+// re-translation, not a new agreement. Commit dates are set, so "after the
+// sign-off" means a day after, not a race with the clock.
+
+const reopenBrief = (roles, testing = "90% cover.") =>
+  `---\nform: project-brief\nproject: "Shop"\nstatus: filled\n---\n\n` +
+  `### deliverables — Towards?\n${THREE}\n\n### roles — Roles?\n${roles}\n\n### testing — Tested?\n${testing}\n\n### designs — Designs?\nPlain.\n`;
+
+const reopenSpec = (security) =>
+  JSON.stringify({ form: "application-spec", solutionName: "Shop", security: { baseline: { answer: "website-baseline" }, rules: { entries: security } } });
+
+async function reopenProject() {
+  const root = await project({
+    "Project_brief.md": reopenBrief("Admin, Customer."),
+    "Shop/application-spec.json": reopenSpec(["No tokens in URLs."]),
+    "Shop/cart.md": signedPage({ product: "Sam 2026-01-02 round 1", build: "Alex and Sam 2026-01-02 round 1" }),
+    "qa/regression.md": "",
+    "qa/Shop/cart.md": qaReview(),
+  });
+  const git = (date, ...args) =>
+    execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", ...args], {
+      cwd: root,
+      encoding: "utf8",
+      env: { ...process.env, GIT_AUTHOR_DATE: `${date}T12:00:00`, GIT_COMMITTER_DATE: `${date}T12:00:00` },
+    });
+  git("2026-01-01", "init", "-q");
+  git("2026-01-01", "add", "-A");
+  git("2026-01-01", "commit", "-q", "-m", "signed");
+  const change = async (file, text, date = "2026-01-05") => {
+    await fs.writeFile(path.join(root, file), text);
+    git(date, "add", "-A");
+    git(date, "commit", "-q", "-m", `change ${file}`);
+  };
+  return { root, change };
+}
+
+test("brief-lint --ready reopens the build sign-off when roles change after it", async () => {
+  const { root, change } = await reopenProject();
+  assert.equal(ready(root).code, 0, ready(root).out);
+  await change("Project_brief.md", reopenBrief("Admin, Manager, Customer."));
+  const { code, out } = ready(root);
+  assert.equal(code, 1);
+  assert.match(out, /Dev and Product's sign-off again — Project_brief\.md#roles changed after 2026-01-02/);
+});
+
+test("brief-lint --ready reopens it when the testing floor changes", async () => {
+  const { root, change } = await reopenProject();
+  await change("Project_brief.md", reopenBrief("Admin, Customer.", "100% cover."));
+  assert.match(ready(root).out, /Project_brief\.md#testing changed after/);
+});
+
+test("brief-lint --ready reopens it when the solution's security changes", async () => {
+  const { root, change } = await reopenProject();
+  await change("Shop/application-spec.json", reopenSpec(["No tokens in URLs.", "Lock accounts after five tries."]));
+  assert.match(ready(root).out, /Shop\/application-spec\.json#security changed after/);
+});
+
+test("brief-lint --ready does not reopen a sign-off for any other change", async () => {
+  const { root, change } = await reopenProject();
+  await change("Project_brief.md", reopenBrief("Admin, Customer.").replace("Plain.", "Bold."));
+  const { code, out } = ready(root);
+  assert.equal(code, 0, out);
+});
+
+test("brief-lint --ready keeps a sign-off made after the change", async () => {
+  const { root, change } = await reopenProject();
+  await change("Project_brief.md", reopenBrief("Admin, Manager, Customer."), "2026-01-03");
+  await change("Shop/cart.md", signedPage({ product: "Sam 2026-01-02 round 1", build: "Alex and Sam 2026-01-04 round 1" }), "2026-01-04");
+  const { code, out } = ready(root);
+  assert.equal(code, 0, out);
+});

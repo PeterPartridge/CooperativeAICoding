@@ -24,10 +24,10 @@
 //
 // Exit code 1 on an error. Notes are printed and do not fail the run.
 
-import { execFileSync } from "node:child_process";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { answerIn, git, markdownAnswer } from "./lib/answers.mjs";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKIP = new Set(["node_modules", "target", ".git", "dist", "ai-only", "_forms", ".github"]);
@@ -89,19 +89,6 @@ function hasContent(v) {
   return Object.entries(v).some(
     ([k, x]) => !["question", "guidance", "example", "exampleEntry", "note"].includes(k) && hasContent(x),
   );
-}
-
-/** The answer under `### id —` in a Markdown brief, without its guidance. */
-function markdownAnswer(text, id) {
-  const lines = text.split("\n");
-  const start = lines.findIndex((l) => new RegExp(`^###\\s+${id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(l));
-  if (start === -1) return null;
-  const out = [];
-  for (const l of lines.slice(start + 1)) {
-    if (/^#{1,3}\s|^---\s*$/.test(l)) break;
-    if (l.trim() !== "" && !l.trimStart().startsWith(">")) out.push(l);
-  }
-  return out.join("\n");
 }
 
 /** Resolves one source. Returns null when it is good, or what is wrong. */
@@ -250,31 +237,6 @@ async function lintSpec(file, root, keys) {
 // `--impact`, and refused by `--ready`, so nothing is built from an old
 // reading of the brief. A spec changed since its last commit counts as freshly
 // written; a project not in git cannot tell, and says nothing.
-
-const git = (cwd, args) => {
-  try {
-    return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 });
-  } catch {
-    return null;
-  }
-};
-
-/** An answer as plain text, so a change in spacing is not a change. */
-function answerIn(text, rel, id) {
-  if (text === null) return null;
-  if (rel.endsWith(".json")) {
-    let v;
-    try {
-      v = JSON.parse(text);
-    } catch {
-      return null;
-    }
-    for (const part of id.split(".")) v = v && typeof v === "object" ? v[part] : undefined;
-    return v === undefined ? null : JSON.stringify(v);
-  }
-  const a = markdownAnswer(text, id);
-  return a === null ? null : a.replace(/\s+/g, " ").trim();
-}
 
 async function staleness({ file, from, cites }, root) {
   const stale = [];

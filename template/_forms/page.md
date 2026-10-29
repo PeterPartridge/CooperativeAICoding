@@ -25,7 +25,9 @@ build-signoff: ""        # sign-off 2, Dev and Product: how it will be built —
 >    in `qa/` at the same time.
 >
 > `/build` will not start until both are signed for the page's current round
-> and QA's review says `happy`. A new change round needs new sign-offs.
+> and QA's review says `happy`. A new change round needs new sign-offs, and so
+> does `build-signoff` if the project's roles or testing floor, or this
+> solution's security, change after it was signed.
 >
 > **How:** answer each question in plain English directly under its heading, same as the Project Brief. Lines starting with `>` are guidance — anything else you write under a heading is your answer. When you're done, set `status: filled` and hand it to your AI using the bridge in [`ai-only/1-translate-for-ai.md`](../ai-only/1-translate-for-ai.md).
 
