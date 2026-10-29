@@ -310,3 +310,26 @@ Now run `/debt`. Choose "pay it down next" for D1 and "accept it" for D2.
 - It signs.
 - It opens an issue you didn't ask for.
 - An accepted debt counts as a change round.
+
+---
+
+## 13. Impact: a brief change says what it touched
+
+In a translated project, commit, then change the Project Brief's `roles`
+answer and run:
+
+```bash
+node tools/spec-lint.mjs --impact
+```
+
+**Pass:**
+- It lists the digest, and any item spec citing `[roles]` or
+  `[Project_brief.md#roles]`, with the line.
+- A spec citing only unchanged answers is not listed.
+- `/build` on a listed item refuses and says to re-translate.
+- After `/translate`, `--impact` lists nothing.
+
+**Fail:**
+- A spec citing the changed answer is missed.
+- An unrelated spec is listed.
+- `/build` plans from a stale spec.

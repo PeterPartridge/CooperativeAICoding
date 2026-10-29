@@ -1006,3 +1006,76 @@ test("brief-lint does not count accepted debt as a change round", async () => {
   const { code, out } = run("brief-lint.mjs", ["--ready", path.join(root, "Shop/cart.md")]);
   assert.equal(code, 0, out);
 });
+
+// ---------------------------------------------------------------------------
+// Impact: what a brief change affects.
+//
+// Every spec line cites the answer it came from, and git holds the brief as it
+// was when the spec was last written. A spec is stale when an answer it cites
+// now reads differently. The faults: a stale spec that looks current (a build
+// from an old reading of the brief), and noise — a change to a question no
+// spec cites flagged as if it mattered.
+
+const impactBrief = (roles) =>
+  `---\nform: project-brief\nproject: "Shop"\nstatus: filled\n---\n\n` +
+  `### deliverables — What are we working towards?\n${THREE}\n\n### roles — Roles?\n${roles}\n\n### designs — Designs?\nPlain.\n`;
+
+const impactSpec =
+  "---\nspec: digest\nfrom: Project_brief.md\n---\nrole: Admin, Customer [roles]\nlook: plain [designs]\n";
+
+async function impactProject() {
+  const made = await committed({ "Project_brief.md": impactBrief("Admin, Customer."), "ai-only/Project_digest.md": impactSpec });
+  const change = async (file, text) => {
+    await fs.writeFile(path.join(made.root, file), text);
+    made.git("add", "-A");
+    made.git("commit", "-q", "-m", `change ${file}`);
+  };
+  return { ...made, change };
+}
+
+test("spec-lint names the spec lines an answer change made stale", async () => {
+  const { root, change } = await impactProject();
+  await change("Project_brief.md", impactBrief("Admin, Manager, Customer."));
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 0, out);
+  assert.match(out, /stale: line 5 cites \[roles\], which changed since this spec was written/);
+  assert.doesNotMatch(out, /\[designs\], which changed/);
+});
+
+test("spec-lint --ready refuses a stale spec", async () => {
+  const { root, change } = await impactProject();
+  await change("Project_brief.md", impactBrief("Admin, Manager, Customer."));
+  const { code, out } = run("spec-lint.mjs", ["--ready", path.join(root, "ai-only/Project_digest.md")]);
+  assert.equal(code, 1);
+  assert.match(out, /not ready: 1 line\(s\) stale/);
+});
+
+test("spec-lint counts a spec re-translated after the change as current", async () => {
+  const { root, change } = await impactProject();
+  await change("Project_brief.md", impactBrief("Admin, Manager, Customer."));
+  await change("ai-only/Project_digest.md", impactSpec.replace("Admin, Customer", "Admin, Manager, Customer"));
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 0, out);
+  assert.doesNotMatch(out, /stale/);
+});
+
+test("spec-lint sees an answer edited and not yet committed", async () => {
+  const { root } = await impactProject();
+  await fs.writeFile(path.join(root, "Project_brief.md"), impactBrief("Admin, Manager, Customer."));
+  assert.match(lintSpecs(root).out, /cites \[roles\], which changed/);
+});
+
+test("spec-lint ignores a change to a question no spec cites", async () => {
+  const { root, change } = await impactProject();
+  await change("Project_brief.md", impactBrief("Admin, Customer.") + "\n### anything-else — Else?\nNew thought.\n");
+  assert.doesNotMatch(lintSpecs(root).out, /stale/);
+});
+
+test("spec-lint --impact lists what a change touched, across the project", async () => {
+  const { root, change } = await impactProject();
+  await change("Project_brief.md", impactBrief("Admin, Manager, Customer."));
+  const { code, out } = run("spec-lint.mjs", ["--impact", root]);
+  assert.equal(code, 0, out);
+  assert.match(out, /1 spec\(s\) to re-translate/);
+  assert.match(out, /ai-only\/Project_digest\.md: \[roles\]/);
+});

@@ -80,6 +80,11 @@ token budget per procedure; it may only come down.
 - **The solution spec carries its preset.** Copying the one named preset and
   baseline into `_solution.md` at translate time means no build reads the whole
   of `boilerplates.json`, which was a third of what a build read.
+- **A change says what it affects.** Because every line cites its answer, and
+  git holds that answer as it read when the spec was written, `spec-lint` can
+  tell which lines a brief change made stale. `--impact` lists them across the
+  project; `--ready` refuses to build from them. A change to a question no spec
+  cites affects nothing, and is not reported.
 - **No plan at translate time.** `/build` plans with the approval card, and two
   plans for one change disagree.
 
