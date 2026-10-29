@@ -168,8 +168,9 @@ const TOKEN_BUDGET = {
   "template/AGENTS.template.md": 850,
   "template/ai-only/2-ai-system.template.md": 650,
   "template/ai-only/procedures/build.md": 675,
+  "template/ai-only/procedures/debt.md": 500,
   "template/ai-only/procedures/draft.md": 750,
-  "template/ai-only/procedures/emit-guardrails.md": 925,
+  "template/ai-only/procedures/emit-guardrails.md": 825,
   "template/ai-only/procedures/new-item.md": 450,
   "template/ai-only/procedures/pipeline.md": 500,
   "template/ai-only/procedures/product.md": 525,
@@ -625,4 +626,19 @@ test("update remembers which agents a project chose", async () => {
   assert.equal(code, 0, out);
   assert.ok(existsSync(inProject(t, ".gemini/commands/qa.toml")), "the chosen agent's command was not restored");
   assert.equal(existsSync(inProject(t, ".claude")), false, "update added an agent nobody chose");
+});
+
+// **Two tables of the procedures, kept in step.** The starter AGENTS.md lists
+// them for an agent; procedures/README.md lists them for people, and is what
+// /emit-guardrails copies into a project's own guardrails. A procedure missing
+// from either is one that some reader never hears of.
+test("the starter AGENTS.md and procedures/README.md each list every procedure", async () => {
+  const agents = await read("template/AGENTS.template.md");
+  const readme = await read("template/ai-only/procedures/README.md");
+  const missing = [];
+  for (const p of procedureFiles) {
+    if (!agents.includes(`ai-only/procedures/${p}`)) missing.push(`AGENTS.template.md lacks ${p}`);
+    if (!readme.includes(`(${p})`)) missing.push(`procedures/README.md lacks ${p}`);
+  }
+  assert.deepEqual(missing, []);
 });

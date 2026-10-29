@@ -127,3 +127,15 @@ build-signoff: ""        # sign-off 2, Dev and Product: how it will be built —
 
 > You don't fill this in at the start. Each time you come back to improve the page, add a bullet describing **what you want to change** — a new action, a design tweak, a fix. Keep changes small.
 > - Round 2: …
+>
+> **Paying down debt.** A build lists the debt it leaves as `D1`, `D2`, … in its
+> report. To schedule one, name it in a round: `- Round 3: pay down D2 — add a
+> retry when the API is down.` That round needs the two sign-offs like any other.
+
+---
+
+## Part 5 — accepted-debt
+
+> Debt the team has decided to live with, for now, and why. One bullet each,
+> named as the build named it. Accepted debt is not a change round.
+> - D3: baskets stay under fifty items for now, so the slow path never runs.

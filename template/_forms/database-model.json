@@ -62,6 +62,11 @@
     "aiTests": { "question": "What tests should the AI create, on top of the project's testing floor?", "answer": "" },
     "questionsForProduct": { "question": "What questions do we have for Product?", "answer": "" }
   },
+  "acceptedDebt": {
+    "guidance": "Debt the team has decided to live with, for now, and why — named as the build named it (D1, D2, …). To pay a debt down instead, name it in a changesOverTime round: \"pay down D2 — …\".",
+    "exampleEntry": { "debt": "D3", "why": "Only one caller today; worth fixing when there is a second." },
+    "entries": []
+  },
   "changesOverTime": {
     "guidance": "You don't fill this in at the start. Each time you come back to change this model, add an entry describing what should change. Keep changes small.",
     "exampleEntry": { "round": 2, "change": "Add a lastLogin date field, nullable." },

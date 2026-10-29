@@ -89,7 +89,7 @@ For each item (and each iteration), the AI follows a defined loop. Before it, `/
 1. **Plan** — the AI generates a plan from the spec, opening with an **approval card**: ten plain-English lines saying what changes, which deliverable it advances, what it reuses, which rules it touches and the debt expected. People approve from the card; the plan beneath it is for the AI. It checks the item's declared dependencies are already built, checks its **code map** and reuses existing methods rather than rebuilding them, and confirms the change doesn't need new infrastructure (which is its own approved plan, never a side effect of a feature).
 2. **Review & execute** — the developer reviews and updates the plan, then executes it.
 3. **Report back** — once complete, the AI runs the solution's test/build commands and updates the plan document with what it did, how each use case was implemented, and what test scenarios it created. It also updates the **code map** (`ai-only/Code_map.md`): one row per method it created or changed — what it does in one line, and which other files and methods it uses.
-4. **Declare debt** — the AI lists any technical debt it created or anything it failed to implement.
+4. **Declare debt** — the AI lists any technical debt it created or anything it failed to implement, each with an ID (`D1`, `D2`, …). People then decide on each, in the brief: pay it down in a change round, or accept it with a reason. `/debt` walks them through it, and `spec-lint` notes any nobody has decided on.
 
 > The AI should **not** spend ages trying to fix or reimagine something. It builds the item simply and clearly records where it fell short and what debt it introduced.
 
@@ -242,7 +242,7 @@ cd my-project
 coperativeai init
 ```
 
-That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the nine commands and the
+That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the ten commands and the
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
 to build. It never overwrites: a file that already exists
 is left alone and named in the report. Add `--dry-run` to see it first.
@@ -257,13 +257,14 @@ It tells the difference from `.coperativeai.json`, a record of what was installe
 
 **Looking for the desktop app?** [Swarm](https://github.com/PeterPartridge/Swarm) is built with this framework and lives in its own repository, with its installers and build steps. The framework itself needs no binary at all — [`INSTALL.md`](INSTALL.md) — and runs wherever Claude Code runs.
 
-New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses nine Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
+New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses ten Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
 
 - **`/draft [folder]`** — for a codebase that already exists: fill the brief in from the code, sourced and marked, with a few multiple-choice questions at the end instead of a blank form. The AI's answers stay the AI's until you accept them.
 - **`/translate <brief>`** — turn a filled-in brief into a structured spec + skills.
 - **`/new-item <type> <solution> <name>`** — copy a blank page/endpoint/model form into a solution folder.
 - **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.
 - **`/verify <spec>`**: a second opinion after a build, ideally from a fresh session or another model. Each acceptance check gets a verdict (proves, weak, missing, failing) citing a file and line. It reports and never fixes.
+- **`/debt [project]`**: walk a person through the debt builds declared. For each: pay it down next as a change round, accept it with a reason, or leave it. It drafts the decision into the brief for them to accept, and never decides or signs.
 - **`/pipeline <solution>`** — create the solution's CI/CD pipeline and missing infrastructure from its spec, as its own approved plan. Secret values are never written into code — they're referenced by name from stores you control.
 - **`/emit-guardrails [targets]`** — write the project's rules out in other agents' native formats (`AGENTS.md`, `CLAUDE.md`, Kiro steering, Cursor rules) from the same spec. One brief, every agent's guardrails — see below.
 - **`/product [idea or brief]`**: plan an idea with Product. A few multiple-choice questions, then Parts 1–2 of a page brief in Product's words, marked drafted until Product accepts and signs. The AI never signs.

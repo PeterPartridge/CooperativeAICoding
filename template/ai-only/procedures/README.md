@@ -12,6 +12,7 @@ follow it.**
 | add a new page, endpoint or database model | [`new-item.md`](new-item.md) |
 | build the next iteration of an approved spec | [`build.md`](build.md) |
 | verify a build against its spec | [`verify.md`](verify.md) |
+| decide on the debt builds declared | [`debt.md`](debt.md) |
 | help QA: automate tests, write scripts, run the regression suite | [`qa.md`](qa.md) |
 | set up a solution's pipeline and infrastructure | [`pipeline.md`](pipeline.md) |
 | write the rules out for another AI tool | [`emit-guardrails.md`](emit-guardrails.md) |
@@ -130,6 +131,19 @@ token budget per procedure; it may only come down.
   the test hides it, and changing the app is a development round nobody planned.
 - **Never sign off.** A sign-off is a person saying the work is done. The AI
   stops at a built deliverable; QA's sign-off is what finishes it.
+
+### debt
+
+- **Debt that is not decided on goes nowhere.** A round record is written and
+  then nobody reads it. So each debt gets an ID (`D<n>`), and `spec-lint` keeps
+  the books: open (nobody has decided), scheduled (a change round names it),
+  accepted (the brief says why it is fine for now), or paid (a round says so).
+- **Decisions live in the brief, as people's words.** Paying down debt is a change
+  round like any other, so it needs the two sign-offs. Accepting it is a line with
+  a reason. The AI drafts either; a person accepts it.
+- **Never decides, never signs, and opens an issue only when asked.** Writing to
+  a tracker is outward-facing, so it needs the person's yes to the title and the
+  text.
 
 ### verify
 

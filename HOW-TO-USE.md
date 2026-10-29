@@ -169,7 +169,8 @@ Claude will:
    update `ai-only/Code_map.md`: every method it created or changed, one line
    on what it does, and which other files/methods it uses.
 4. **Declare debt** — list anything unfinished or any technical debt, instead of
-   thrashing on it.
+   thrashing on it, each as `D1`, `D2`, … Run `/debt` to decide on it: pay it down
+   in the next change round, or accept it in the brief's accepted-debt part.
 
 Every acceptance check in the spec has an ID (`C1`, `C2`, …), and each test names
 the check it proves, as `userLogin#C2`. `node tools/check.mjs` fails a built item
@@ -230,6 +231,7 @@ and `/build` again. Keep each change small.
 | `/new-item <type> <solution> <name>` | Copy a blank `page` / `endpoint` / `model` form into a solution folder, ready to fill in. |
 | `/build <spec>` | Build the next iteration of an approved spec — plan, execute, report, log debt. |
 | `/verify <spec>` | A second opinion after a build, best from a fresh session or another model: every check gets a verdict (proves, weak, missing, failing) with a file and line. Reports, never fixes. |
+| `/debt [project]` | Walk through the open debt builds declared: for each, pay it down next (a change round), accept it (with a reason), or leave it. Drafts your decision into the brief; never decides, never signs. |
 | `/pipeline <solution>` | Create the solution's CI/CD pipeline and missing infrastructure from its spec's `infrastructure` block. Secrets are referenced by name only — never written into code. |
 | `/qa [automate|script|run]` | Help QA, only when QA asks: write the automation or manual scripts QA asked for, or run the regression suite. Never fixes a failure, never signs off. |
 | `/emit-guardrails [targets]` | Write the project's rules out for other agents — `AGENTS.md` (read by Kiro and Cursor too), `CLAUDE.md`, Kiro steering, Cursor rules, Copilot instructions — from the same spec. |
@@ -252,7 +254,7 @@ against the list its Project Brief names, QA's **regression suite and sign-off**
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
-running it is a model. That pass is [`tools/QA.md`](tools/QA.md): eleven scenarios a
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): twelve scenarios a
 person runs against a real agent, each one naming the failure that would count as
 a fail rather than asking whether the output looked plausible.
 
