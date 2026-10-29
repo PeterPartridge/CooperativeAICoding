@@ -9,7 +9,7 @@ Build from `ai-only/<solution>/<item>.md`; with none named, list them and ask. `
 - the item spec
 - the first sentence of each row of `ai-only/Code_map.md`, if it exists
 
-Never read `qa/`. QA's tests check this build from outside.
+Never read `qa/`.
 
 ## Stop before planning if
 
@@ -22,7 +22,7 @@ Never read `qa/`. QA's tests check this build from outside.
 
 ## 1. Plan, then wait
 
-Open with the approval card: ten plain-English lines or fewer.
+Open with the approval card: at most ten plain lines.
 
 ```
 Change:      <one sentence>
@@ -47,8 +47,9 @@ pinned versions; record the exact version of anything unpinned.
 - Existing code is production, even if it looks wrong.
 - Every `rule` binds. Breaking one means the build is not done.
 - Write no secret values; use setting names.
+- Name each test after the check it proves: `<item>#C<n>`.
 - If the floor or the `test` line asks for TDD: failing test, pass, tidy.
-- If you are stuck, record debt and stop. Don't loop.
+- Stuck? Record debt and stop. Don't loop.
 
 ## 3. Report
 
@@ -61,8 +62,8 @@ Run `cmd: test` and `cmd: build`. Append to the spec:
 ### Debt I left behind
 ```
 
-Include the command results, each check with the test that proves it, and a
-token estimate.
+Include the command results and a token estimate. `spec-lint` fails a built
+item with a check no test names.
 
 Then:
 - **Code map:** add or fix one row in `ai-only/Code_map.md` per method you
@@ -72,5 +73,5 @@ Then:
 
 ## 4. Stop at a deliverable's end
 
-If this was the last item naming its deliverable, say what it now does end to
-end, and wait for QA to sign it off in `qa/signoff.md`.
+Last item of its deliverable? Say what it now does end to end, and wait for QA
+to sign it off in `qa/signoff.md`.

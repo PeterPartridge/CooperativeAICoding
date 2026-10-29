@@ -167,6 +167,7 @@ async function briefHeader(file) {
 async function lintSpec(file, root, keys) {
   const errors = [];
   const unknowns = [];
+  const checks = [];
   const text = await read(file);
   const fm = frontMatter(text);
   if (!fm?.fields.spec) return null; // not a spec — the framework's own documents live here too
@@ -220,6 +221,12 @@ async function lintSpec(file, root, keys) {
     if (key === "DEFERRED" && !/—\s*owner:\s*\S/.test(rest)) {
       errors.push(`${at}  DEFERRED needs "— owner: <name>" — a deferral nobody owns is an unknown`);
     }
+    if (key === "check") {
+      const id = rest.match(/^(C\d+)\s+\S/)?.[1];
+      if (!id) errors.push(`${at}  check needs an ID: check: C<n> <what must be true> [source]`);
+      else if (checks.includes(id)) errors.push(`${at}  ${id} is used twice — a test naming it would not say which`);
+      else checks.push(id);
+    }
     if (key === "UNKNOWN") unknowns.push(`${at}  ${rest.replace(/\s*\[[^\]]+\]\s*$/, "")}`);
 
     if (from && existsSync(path.join(root, from))) {
@@ -229,7 +236,73 @@ async function lintSpec(file, root, keys) {
       }
     }
   }
-  return { errors, unknowns };
+  return { errors, unknowns, checks, kind: fm.fields.spec, from };
+}
+
+// ---------------------------------------------------------------------------
+// **Tracing: every check has a test, and every test names a real check.**
+//
+// A test proves a check by naming it as `<item>#C<n>` (`userLogin#C2`) in its
+// name or beside it. This searches the solution's code for those names. A
+// built item with a check no test names is "done" with nothing behind it, so
+// it fails; one not built yet is only noted. A name for a check the spec does
+// not have is a test of something nobody asked for, or of a check since
+// removed, so it fails too. It proves a test *names* a check, not that it
+// tests it: that is /verify's question, and a person's.
+
+const SKIP_CODE = new Set(["node_modules", ".git", "dist", "build", "target", "ai-only", "qa", ".next", "coverage"]);
+
+/** Each solution's local path, from the digest's `solution:` lines. */
+async function solutionPaths(root) {
+  const out = new Map();
+  const digest = path.join(root, "ai-only/Project_digest.md");
+  if (!existsSync(digest)) return out;
+  for (const line of (await read(digest)).split("\n")) {
+    const m = line.match(/^solution:\s+(.+?)\s*\[[^\]]+\]\s*$/);
+    if (!m) continue;
+    const parts = m[1].split(/\s+—\s+/);
+    if (parts.length >= 4) out.set(parts[0].trim(), parts[parts.length - 1].trim());
+  }
+  return out;
+}
+
+async function codeFiles(dir, out = []) {
+  for (const e of await fs.readdir(dir, { withFileTypes: true })) {
+    if (SKIP_CODE.has(e.name)) continue;
+    const full = path.join(dir, e.name);
+    if (e.isDirectory()) await codeFiles(full, out);
+    else if (!e.name.endsWith(".md")) out.push(full);
+  }
+  return out;
+}
+
+async function trace({ checks, kind, from }, root, solutions) {
+  const errors = [];
+  const notes = [];
+  if (!ITEM_SPECS.has(kind) || !from || checks.length === 0) return { errors, notes };
+  const solution = from.split("/")[0];
+  const item = path.basename(from).replace(/\.(md|json)$/, "");
+  const local = solutions.get(solution);
+  if (!local) return { errors, notes: [`cannot trace checks: the digest has no solution line for ${solution}`] };
+  const dir = path.resolve(root, local);
+  if (!existsSync(dir)) return { errors, notes: [`cannot trace checks: ${local} is not here`] };
+
+  const escaped = item.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const tag = new RegExp(`(?<![\\w-])${escaped}#(C\\d+)\\b`, "g");
+  const found = new Set();
+  for (const file of await codeFiles(dir)) {
+    for (const [, id] of (await read(file)).matchAll(tag)) {
+      if (checks.includes(id)) found.add(id);
+      else errors.push(`  ${path.relative(dir, file).split(path.sep).join("/")} names ${item}#${id}, which the spec does not have`);
+    }
+  }
+  const brief = await read(path.join(root, from));
+  const status = from.endsWith(".json") ? JSON.parse(brief).status : frontMatter(brief)?.fields.status;
+  for (const id of checks.filter((c) => !found.has(c))) {
+    if (status === "built") errors.push(`  built, and ${id} has no test naming it (${item}#${id})`);
+  }
+  notes.push(`${found.size} of ${checks.length} check(s) have a test naming them (${item}#C<n>)`);
+  return { errors, notes };
 }
 
 /** Every folder holding a Project_brief.md. */
@@ -283,14 +356,18 @@ for (const { root, files } of targets) {
     failed = true;
     continue;
   }
+  const solutions = await solutionPaths(root);
   for (const file of files.sort()) {
     const result = await lintSpec(file, root, keys);
     if (!result) continue;
     checked++;
     const rel = path.relative(process.cwd(), file).split(path.sep).join("/");
-    const { errors, unknowns } = result;
+    const traced = await trace(result, root, solutions);
+    const errors = [...result.errors, ...traced.errors];
+    const { unknowns } = result;
     console.log(`\n${rel}`);
     for (const e of errors) console.log(`  ERROR  ${rel}${e}`);
+    for (const n of traced.notes) console.log(`  note   ${n}`);
     for (const u of unknowns) console.log(`  open   ${rel}${u}`);
     if (errors.length === 0 && unknowns.length === 0) console.log("  every line sourced");
     if (errors.length > 0) failed = true;

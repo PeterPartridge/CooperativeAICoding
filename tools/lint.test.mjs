@@ -846,3 +846,79 @@ test("brief-lint --ready needs only Dev's sign-off and QA for an endpoint", asyn
   const no = await signProject({ "Shop/api.json": endpoint(""), "qa/Shop/api.md": qa });
   assert.equal(ready(no, "Shop/api.json").code, 1);
 });
+
+// ---------------------------------------------------------------------------
+// Tracing: every acceptance check has a test, and every test names a real one.
+//
+// A spec's `check:` lines carry IDs (C1, C2, …); a test proves one by naming it
+// as `<item>#C<n>`. spec-lint searches the solution's code for those names.
+// The faults: a built item with a check no test names (the claim "done" with
+// nothing behind it), and a test naming a check that is not there (a test of
+// something nobody asked for, or of a check since removed).
+
+const traceProject = async ({ status = "built", checks, code, eol = "\n", local = "code" }) =>
+  project(
+    {
+      "Project_brief.md": brief("filled", THREE),
+      "Shop/cart.md": item(status, "MVP"),
+      "ai-only/Project_digest.md": `---\nspec: digest\nfrom: Project_brief.md\n---\nsolution: Shop — website — this repo — ${local} [deliverables]\n`,
+      "ai-only/Shop/cart.md": `---\nspec: page\nfrom: Shop/cart.md\ndeliverable: MVP\ndepends-on: []\n---\n${checks}\n`,
+      ...Object.fromEntries(Object.entries(code).map(([p, t]) => [`code/${p}`, t])),
+    },
+    eol,
+  );
+
+const TWO_CHECKS = "check: C1 removing an item empties the basket [Project_brief.md#deliverables]\ncheck: C2 the total updates [Project_brief.md#deliverables]";
+
+for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
+  test(`spec-lint passes a built item whose every check has a test (${name})`, async () => {
+    const root = await traceProject({
+      eol,
+      checks: TWO_CHECKS,
+      code: { "src/cart.test.js": 'test("cart#C1 empties", () => {});\ntest("cart#C2 total", () => {});\n' },
+    });
+    const { code, out } = lintSpecs(root);
+    assert.equal(code, 0, out);
+    assert.match(out, /2 of 2 check\(s\) have a test/);
+  });
+}
+
+test("spec-lint fails a built item with a check no test names", async () => {
+  const root = await traceProject({ checks: TWO_CHECKS, code: { "src/cart.test.js": 'test("cart#C1 empties", () => {});\n' } });
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 1);
+  assert.match(out, /built, and C2 has no test naming it \(cart#C2\)/);
+});
+
+test("spec-lint only notes untested checks on an item not built yet", async () => {
+  const root = await traceProject({ status: "filled", checks: TWO_CHECKS, code: { "src/cart.test.js": "" } });
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 0, out);
+  assert.match(out, /0 of 2 check\(s\) have a test/);
+});
+
+test("spec-lint fails a test naming a check the spec does not have", async () => {
+  const root = await traceProject({
+    checks: TWO_CHECKS,
+    code: { "src/cart.test.js": 'test("cart#C1", () => {});\ntest("cart#C2", () => {});\ntest("cart#C9 old", () => {});\n' },
+  });
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 1);
+  assert.match(out, /src\/cart\.test\.js names cart#C9, which the spec does not have/);
+});
+
+test("spec-lint says so, without failing, when the solution's code is not checked out", async () => {
+  const root = await traceProject({ checks: TWO_CHECKS, code: {}, local: "../not-here" });
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 0, out);
+  assert.match(out, /cannot trace checks: \.\.\/not-here is not here/);
+});
+
+test("spec-lint catches a check with no ID, and two checks with one", async () => {
+  const noId = await traceProject({ status: "filled", checks: "check: removing an item empties the basket [Project_brief.md#deliverables]", code: {} });
+  assert.equal(lintSpecs(noId).code, 1);
+  assert.match(lintSpecs(noId).out, /check needs an ID: check: C<n> /);
+  const dup = await traceProject({ status: "filled", checks: "check: C1 a [Project_brief.md#deliverables]\ncheck: C1 b [Project_brief.md#deliverables]", code: {} });
+  assert.equal(lintSpecs(dup).code, 1);
+  assert.match(lintSpecs(dup).out, /C1 is used twice/);
+});

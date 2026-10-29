@@ -11,6 +11,7 @@ follow it.**
 | plan an idea with Product | [`product.md`](product.md) |
 | add a new page, endpoint or database model | [`new-item.md`](new-item.md) |
 | build the next iteration of an approved spec | [`build.md`](build.md) |
+| verify a build against its spec | [`verify.md`](verify.md) |
 | help QA: automate tests, write scripts, run the regression suite | [`qa.md`](qa.md) |
 | set up a solution's pipeline and infrastructure | [`pipeline.md`](pipeline.md) |
 | write the rules out for another AI tool | [`emit-guardrails.md`](emit-guardrails.md) |
@@ -83,6 +84,9 @@ token budget per procedure; it may only come down.
 
 ### build
 
+- **Tests name the check they prove** (`<item>#C<n>`), so the claim that an item is
+  done is traceable to a test, and a test is traceable to something somebody
+  asked for. `spec-lint` checks both directions.
 - **The approval card.** People approve from ten plain-English lines, not from
   the AI's plan. "Unknowns: 0" is on it because a plan with an open unknown is
   built on a guess.
@@ -126,6 +130,19 @@ token budget per procedure; it may only come down.
   the test hides it, and changing the app is a development round nobody planned.
 - **Never sign off.** A sign-off is a person saying the work is done. The AI
   stops at a built deliverable; QA's sign-off is what finishes it.
+
+### verify
+
+- **A check marked by its own author is the weakest kind.** The agent that
+  built an item wrote its tests and believes its code; `/verify` is a second
+  reader, ideally a fresh session or another model, before people review.
+- **Two questions, two tools.** `spec-lint` proves a test *names* each check
+  (`<item>#C<n>`), and fails a built item where one does not. `/verify` asks
+  whether that test would actually fail if the check broke. The first is
+  mechanical and always true; the second is judgement, so every verdict cites
+  a file and line.
+- **Report, never fix.** A verifier that edits code is a second builder nobody
+  approved.
 
 ### pipeline
 

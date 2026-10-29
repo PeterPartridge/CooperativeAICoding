@@ -39,7 +39,9 @@ key: value [source]
 - `floor`: the testing floor.
 - `tier`: when to use which model and effort.
 - `cmd`: a command, e.g. `cmd: test = npm test`.
-- `check`: an acceptance check.
+- `check`: `check: C<n> <what must be true>`. IDs are never reused; a test proves
+  one by naming `<item>#C<n>`.
+- `solution`: `<name> — <type> — <repo> — <local path>`.
 - `skill`: `skill: name — why`.
 
 ## Example
@@ -53,6 +55,6 @@ depends-on: [ClothingAPI/Login.json]
 ---
 objective: so a customer can log in to their account [why-exists]
 must: the typed password is never saved [in-memory]
-check: wrong password shows an error and does not log in [tests]
+check: C2 wrong password shows an error and does not log in [tests]
 UNKNOWN: how does a logged-out customer reset? ResetPassword needs a login [actions, ClothingAPI/Login.json#operations]
 ```
