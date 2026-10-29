@@ -312,7 +312,7 @@ function landing() {
   <div class="cards">
     <div class="card">
       <p><code>npm install -g coperativeai</code><br><code>coperativeai init</code></p>
-      <p>Drops the project brief, the blank forms and the nine commands into
+      <p>Drops the project brief, the blank forms and the ten commands into
       any project. You answer in plain English; the AI translates it into the
       spec it builds from, makes the smallest change, and declares the debt it
       left. It is Markdown, JSON and prompts &mdash; there is nothing to run.</p>

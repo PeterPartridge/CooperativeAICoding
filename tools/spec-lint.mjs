@@ -236,7 +236,88 @@ async function lintSpec(file, root, keys) {
       }
     }
   }
-  return { errors, unknowns, checks, kind: fm.fields.spec, from };
+  return { errors, unknowns, checks, kind: fm.fields.spec, from, text };
+}
+
+// ---------------------------------------------------------------------------
+// **Debt flows back.** A build declares each debt as `D<n>: …` under "Debt I
+// left behind". People decide in the brief: a change round naming it schedules
+// it; the accepted-debt part accepts it as it is. A later round that pays it
+// says `Paid D<n>`. Whatever nobody has decided on is open — and `--debt`
+// lists it, so a person can be walked through it.
+
+const DEBT_LINE = /^\s*(?:[-*]\s+)?\**(D\d+)\**\s*[:—–-]\s*(.*)$/;
+const SHRUG = /^\s*(?:[-*]\s+)?(none|nothing|n\/a)\.?\s*$/i;
+
+/** The debt a spec's build reports declare, and the debt they say was paid. */
+function reportedDebt(text) {
+  const declared = [];
+  const paid = new Set();
+  const errors = [];
+  const at = text.search(/^##\s+Round\b/m);
+  if (at === -1) return { declared, paid, errors };
+  let section = null;
+  let unlabelled = false;
+  for (const line of text.slice(at).split("\n")) {
+    const heading = line.match(/^#{2,3}\s+(.*)$/);
+    if (heading) {
+      section = /^debt i left behind/i.test(heading[1]) ? "debt" : /^what i did/i.test(heading[1]) ? "did" : null;
+      continue;
+    }
+    if (section === "did") for (const [, id] of line.matchAll(/\bpaid\s+(D\d+)\b/gi)) paid.add(id);
+    if (section !== "debt" || line.trim() === "" || SHRUG.test(line) || /^\s{2,}\S/.test(line)) continue;
+    const m = line.match(DEBT_LINE);
+    if (!m) unlabelled = true;
+    else if (declared.some((d) => d.id === m[1])) errors.push(`  ${m[1]} is declared twice — a round naming it would not say which`);
+    else declared.push({ id: m[1], text: m[2].trim() });
+  }
+  if (unlabelled) errors.push(`  debt needs an ID: write each as "- D<n>: …", so a person can schedule it`);
+  return { declared, paid, errors };
+}
+
+/** What the brief has decided: the debt its change rounds schedule, and the
+ *  debt it accepts as it is. */
+function decidedDebt(briefText, isJson) {
+  const ids = (s) => [...String(s).matchAll(/\bD\d+\b/g)].map((m) => m[0]);
+  if (isJson) {
+    const b = JSON.parse(briefText);
+    return {
+      scheduled: new Set((b.changesOverTime?.rounds ?? []).flatMap((r) => ids(r?.change ?? r))),
+      accepted: new Set((b.acceptedDebt?.entries ?? []).flatMap((e) => ids(e?.debt ?? e))),
+    };
+  }
+  const part = (name) =>
+    (briefText.match(new RegExp(`^##[^\\n]*${name}[^\\n]*\\n([\\s\\S]*?)(?=^## |(?![\\s\\S]))`, "im"))?.[1] ?? "")
+      .split("\n")
+      .filter((l) => !l.trimStart().startsWith(">"))
+      .join("\n");
+  return { scheduled: new Set(ids(part("changes-over-time"))), accepted: new Set(ids(part("accepted-debt"))) };
+}
+
+async function debt({ kind, from, text }, root) {
+  const errors = [];
+  const notes = [];
+  const open = [];
+  if (!ITEM_SPECS.has(kind) || !from || !existsSync(path.join(root, from))) return { errors, notes, open };
+  const { declared, paid, errors: reportErrors } = reportedDebt(text);
+  errors.push(...reportErrors);
+  const { scheduled, accepted } = decidedDebt(await read(path.join(root, from)), from.endsWith(".json"));
+  const known = new Set(declared.map((d) => d.id));
+  for (const id of new Set([...scheduled, ...accepted, ...paid])) {
+    if (!known.has(id)) errors.push(`  ${from} names ${id}, which no build declared`);
+  }
+  if (declared.length === 0) return { errors, notes, open };
+  const of = (pick) => declared.filter(pick).map((d) => d.id);
+  const isPaid = (d) => paid.has(d.id);
+  const isAccepted = (d) => !isPaid(d) && accepted.has(d.id);
+  const isScheduled = (d) => !isPaid(d) && !isAccepted(d) && scheduled.has(d.id);
+  for (const d of declared) if (!isPaid(d) && !isAccepted(d) && !isScheduled(d)) open.push(`${from} ${d.id}: ${d.text}`);
+  const count = (label, ids) => `${ids.length} ${label}${ids.length ? ` (${ids.join(", ")})` : ""}`;
+  notes.push(
+    `debt: ${count("open", open.map((o) => o.split(" ")[1].replace(":", "")))}, ${count("scheduled", of(isScheduled))}, ` +
+      `${count("accepted", of(isAccepted))}, ${count("paid", of(isPaid))}`,
+  );
+  return { errors, notes, open };
 }
 
 // ---------------------------------------------------------------------------
@@ -331,7 +412,8 @@ function rootOf(file) {
   return null;
 }
 
-const args = process.argv.slice(2);
+const debtMode = process.argv.includes("--debt");
+const args = process.argv.slice(2).filter((a) => a !== "--debt");
 const readyAt = args.indexOf("--ready");
 let targets; // [{ root, files }]
 if (readyAt !== -1) {
@@ -349,6 +431,9 @@ if (readyAt !== -1) {
 
 let failed = false;
 let checked = 0;
+const openDebt = [];
+// In --debt mode the per-spec report is not wanted: just the open debt.
+const say = debtMode ? () => {} : (...a) => console.log(...a);
 for (const { root, files } of targets) {
   const keys = await allowedKeys(root);
   if (!keys || keys.size === 0) {
@@ -363,19 +448,27 @@ for (const { root, files } of targets) {
     checked++;
     const rel = path.relative(process.cwd(), file).split(path.sep).join("/");
     const traced = await trace(result, root, solutions);
-    const errors = [...result.errors, ...traced.errors];
+    const owed = await debt(result, root);
+    openDebt.push(...owed.open);
+    traced.notes.push(...owed.notes);
+    const errors = [...result.errors, ...traced.errors, ...owed.errors];
     const { unknowns } = result;
-    console.log(`\n${rel}`);
-    for (const e of errors) console.log(`  ERROR  ${rel}${e}`);
-    for (const n of traced.notes) console.log(`  note   ${n}`);
-    for (const u of unknowns) console.log(`  open   ${rel}${u}`);
-    if (errors.length === 0 && unknowns.length === 0) console.log("  every line sourced");
+    say(`\n${rel}`);
+    for (const e of errors) say(`  ERROR  ${rel}${e}`);
+    for (const n of traced.notes) say(`  note   ${n}`);
+    for (const u of unknowns) say(`  open   ${rel}${u}`);
+    if (errors.length === 0 && unknowns.length === 0) say("  every line sourced");
     if (errors.length > 0) failed = true;
     if (readyAt !== -1 && unknowns.length > 0) {
       console.log(`  not ready: ${unknowns.length} unknown(s) open — a person answers them, or marks them DEFERRED with an owner`);
       failed = true;
     }
   }
+}
+if (debtMode) {
+  console.log(openDebt.length === 0 ? "no open debt" : `${openDebt.length} open debt item(s), nobody has decided on yet:`);
+  for (const d of openDebt) console.log(`  ${d}`);
+  process.exit(0);
 }
 if (checked === 0) console.log("no specs in ai-only/ yet — nothing to check");
 process.exit(failed ? 1 : 0);

@@ -21,19 +21,9 @@ this order:
    building anything new. Never read `qa/` while building: it is QA's.
 8. **The working agreement:** smallest change; existing code is production;
    never invent scope; **when you cannot understand something, stop and say so.**
-9. **The procedures table, verbatim.** Point at the files; never inline them.
-
-   | When the request is | Follow |
-   |---|---|
-   | fill a brief in from an existing codebase | `ai-only/procedures/draft.md` |
-   | turn a filled-in brief into a spec | `ai-only/procedures/translate.md` |
-   | plan an idea with Product | `ai-only/procedures/product.md` |
-   | add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
-   | build the next iteration of an approved spec | `ai-only/procedures/build.md` |
-   | verify a build against its spec | `ai-only/procedures/verify.md` |
-   | help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |
-   | set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
-   | write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |
+9. **The procedures table** from `ai-only/procedures/README.md`, with each file
+   written as its path from the project root (`ai-only/procedures/<name>.md`).
+   Point at the files; never inline them.
 
 ## Formats
 

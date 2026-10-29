@@ -19,6 +19,7 @@ marked *not yet filled in* wait on the brief.
 | add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
 | build the next iteration of an approved spec | `ai-only/procedures/build.md` |
 | verify a build against its spec | `ai-only/procedures/verify.md` |
+| decide on the debt builds declared | `ai-only/procedures/debt.md` |
 | help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |
 | set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
 | write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |

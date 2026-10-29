@@ -922,3 +922,87 @@ test("spec-lint catches a check with no ID, and two checks with one", async () =
   assert.equal(lintSpecs(dup).code, 1);
   assert.match(lintSpecs(dup).out, /C1 is used twice/);
 });
+
+// ---------------------------------------------------------------------------
+// Debt flows back: declared by a build, decided by people, paid by a build.
+//
+// /build writes each debt as `D<n>:` under "Debt I left behind". People decide
+// in the brief: a change round naming it schedules it; Part 5 accepts it as it
+// is. A later round that pays it says `Paid D<n>`. spec-lint keeps the books.
+// The faults: a brief naming debt no build declared (a typo, or a decision
+// about nothing), two debts sharing an ID, and debt written with no ID at all,
+// which nobody can schedule.
+
+const debtSpec = (debt, did = "- Added the basket.") =>
+  `---\nspec: page\nfrom: Shop/cart.md\ndeliverable: MVP\ndepends-on: []\n---\n` +
+  `objective: a basket [Project_brief.md#deliverables]\n\n## Round 1\n### What I did\n${did}\n` +
+  `### What I could not do  (and what you would need to tell me)\n- Nothing.\n### Debt I left behind\n${debt}\n`;
+
+const debtBrief = (rounds = "- Round 2: …", accepted = "") =>
+  `---\nform: page-brief\npage: cart\nsolution: Shop\ndeliverable: MVP\nstatus: built\n---\n\n` +
+  `## Part 4 — changes-over-time\n\n${rounds}\n\n## Part 5 — accepted-debt\n\n${accepted}\n`;
+
+const debtProject = (spec, briefText = debtBrief(), eol = "\n") =>
+  project({ "Project_brief.md": brief("filled", THREE), "Shop/cart.md": briefText, "ai-only/Shop/cart.md": spec }, eol);
+
+const TWO_DEBTS = "- D1: totals round in two places.\n- D2: no retry when the API is down.";
+
+for (const [name, eol] of [["LF", "\n"], ["CRLF", CRLF]]) {
+  test(`spec-lint keeps the books on debt: open, scheduled, accepted, paid (${name})`, async () => {
+    const root = await debtProject(
+      debtSpec("- D1: totals round in two places.\n- D2: no retry.\n- D3: slow on big baskets.\n- D4: old icons.") +
+        "\n## Round 2\n### What I did\n- Paid D4.\n### What I could not do\n- Nothing.\n### Debt I left behind\n- None.\n",
+      debtBrief("- Round 2: pay down D2, add a retry.", "- D3: baskets stay small for now."),
+      eol,
+    );
+    const { code, out } = lintSpecs(root);
+    assert.equal(code, 0, out);
+    assert.match(out, /debt: 1 open \(D1\), 1 scheduled \(D2\), 1 accepted \(D3\), 1 paid \(D4\)/);
+  });
+}
+
+test("spec-lint fails a brief that names debt no build declared", async () => {
+  const root = await debtProject(debtSpec(TWO_DEBTS), debtBrief("- Round 2: pay down D7."));
+  const { code, out } = lintSpecs(root);
+  assert.equal(code, 1);
+  assert.match(out, /Shop\/cart\.md names D7, which no build declared/);
+});
+
+test("spec-lint fails two debts with one ID", async () => {
+  const { code, out } = lintSpecs(await debtProject(debtSpec("- D1: one thing.\n- D1: another.")));
+  assert.equal(code, 1);
+  assert.match(out, /D1 is declared twice/);
+});
+
+test("spec-lint fails debt written with no ID", async () => {
+  const { code, out } = lintSpecs(await debtProject(debtSpec("Totals round in two places, and one should go.")));
+  assert.equal(code, 1);
+  assert.match(out, /debt needs an ID/);
+});
+
+test("spec-lint lets a round say there is no debt", async () => {
+  const { code, out } = lintSpecs(await debtProject(debtSpec("- None.")));
+  assert.equal(code, 0, out);
+});
+
+test("spec-lint --debt lists the open debt, across the project", async () => {
+  const root = await debtProject(debtSpec(TWO_DEBTS), debtBrief("- Round 2: pay down D2."));
+  const { code, out } = run("spec-lint.mjs", ["--debt", root]);
+  assert.equal(code, 0, out);
+  assert.match(out, /Shop\/cart\.md D1: totals round in two places/);
+  assert.doesNotMatch(out, /D2/);
+});
+
+test("brief-lint does not count accepted debt as a change round", async () => {
+  const root = await project({
+    "Project_brief.md": brief("filled", THREE),
+    "qa/regression.md": "",
+    "qa/Shop/cart.md": "---\nform: qa-review\nitem: Shop/cart.md\nstatus: happy\n---\n",
+    "Shop/cart.md":
+      `---\nform: page-brief\npage: cart\nsolution: Shop\ndeliverable: MVP\nstatus: filled\n` +
+      `product-signoff: Sam 2026-10-30 round 1\nbuild-signoff: Alex and Sam 2026-10-31 round 1\n---\n\n` +
+      `## Part 4 — changes-over-time\n\n- Round 2: …\n\n## Part 5 — accepted-debt\n\n- D3: fine for now.\n`,
+  });
+  const { code, out } = run("brief-lint.mjs", ["--ready", path.join(root, "Shop/cart.md")]);
+  assert.equal(code, 0, out);
+});

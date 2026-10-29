@@ -674,3 +674,56 @@
 
 - **Kiro CLI gets prompts; Kiro the IDE still gets steering** (through
   `/emit-guardrails`), not commands. The two Kiros read different things.
+
+## 2026-10-29 — Gap 9: debt flows back
+
+### What I did
+- **Every debt a build declares has an ID.** `/build` writes them as
+  `- D<n>: …` under "Debt I left behind", numbering on from earlier rounds, and
+  writes `Paid D<n>` when a round pays one.
+- **People decide in the brief, in their words:**
+  - a change round that names a debt schedules it, and needs the two sign-offs
+    like any other round;
+  - a new Part 5, accepted debt (`acceptedDebt` in JSON), says why a debt is
+    fine for now. It is not a change round, so it needs no new sign-offs.
+- **`spec-lint` keeps the books.** It notes each item's debt as open (nobody has
+  decided), scheduled, accepted or paid. It fails on:
+  - a brief naming a debt no build declared;
+  - two debts with one ID;
+  - debt written with no ID.
+
+  "None" is still a fine answer. `spec-lint --debt` lists only the open debt,
+  across the project. There are 9 tests, written first, two of them shapes that
+  must keep passing.
+- **`/debt` walks a person through it.** For each open debt it explains what it
+  costs to leave, then offers: pay it down next, accept it, leave it, or
+  something else. It drafts the round or the accepted line into the brief,
+  marked as drafted, and never decides or signs. It opens a GitHub issue only
+  when asked, with their yes to the title and text. Its agent command files
+  were regenerated for all six agents.
+- **One copy fewer.** `emit-guardrails.md` carried a verbatim copy of the
+  procedures table, the third, so every new command meant three edits. It now
+  points at the table in `procedures/README.md`. A test checks that the
+  starter `AGENTS.md` and that README each list every procedure. This also
+  freed about 150 tokens, and the budget is lowered to keep them.
+- **Docs:** the README and `HOW-TO-USE.md` (declaring debt, the command
+  lists), ten commands where it said nine, the reasons in
+  `procedures/README.md`, and QA scenario 12.
+
+### What I could not do  (and what you would need to tell me)
+- **The framework's own `ROUND-RECORD.md` debt stays prose.** It is project-level
+  debt, not an item's, so nothing schedules it yet. Turning those paragraphs into
+  work items is still a person's job (or Swarm's).
+- **No person has run QA scenarios 1–12** against a real agent.
+
+### Debt I left behind
+- **Debt IDs are per item.** `D2` means "D2 of this item". `spec-lint --debt`
+  shows the item beside each, but a brief cannot schedule another item's debt.
+  A cross-cutting debt would need declaring on each item it touches.
+
+- **"Paid" is the build's own word.** `spec-lint` takes `Paid D<n>` on trust, as
+  it takes a check's test on trust. `/verify` is where someone could ask whether
+  the debt is really gone.
+
+- **Opening a GitHub issue is the only tracker.** Jira, Linear and the rest would
+  each need their own route. Swarm already maps to Jira.

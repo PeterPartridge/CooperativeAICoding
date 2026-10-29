@@ -283,3 +283,30 @@ Open the project in each agent and run `/new-item page Shop cart`.
 - The agent can't find the command.
 - It improvises instead of reading the procedure.
 - Files arrive for an agent you didn't choose.
+
+---
+
+## 12. `/debt`: what a build leaves behind reaches a person
+
+Build an item whose report declares two debts, `D1` and `D2`. Then:
+
+```bash
+node tools/spec-lint.mjs --debt
+```
+
+**Pass:** both are listed as open.
+
+Now run `/debt`. Choose "pay it down next" for D1 and "accept it" for D2.
+
+**Pass:**
+- The brief gains `- Round <n>: pay down D1 — …` in Part 4 and a D2 line in
+  Part 5, each marked `> drafted`.
+- Neither is signed.
+- `brief-lint --ready` now wants sign-offs for the new round.
+- `spec-lint --debt` lists nothing open.
+
+**Fail:**
+- It decides for you.
+- It signs.
+- It opens an issue you didn't ask for.
+- An accepted debt counts as a change round.
