@@ -267,7 +267,7 @@ against the list its Project Brief names, QA's **regression suite and sign-off**
 of every **AI spec** against the brief answer it cites.
 
 None of that proves a *command* behaves — a command is a prompt, and the thing
-running it is a model. That pass is [`tools/QA.md`](tools/QA.md): thirteen scenarios a
+running it is a model. That pass is [`tools/QA.md`](tools/QA.md): fourteen scenarios a
 person runs against a real agent, each one naming the failure that would count as
 a fail rather than asking whether the output looked plausible.
 
@@ -278,5 +278,6 @@ a fail rather than asking whether the output looked plausible.
 - If the AI can't finish something, it **says so and writes it down** — no endless retrying.
 - **A person reviews and approves** every plan before anything is built, from a short plain-English card.
 - **You can read anything the AI writes, and you don't have to.** Every line of a spec names where it came from, and a check reads them for you.
-- **Secret values never go into code** — settings are referenced by name; values live in secret stores you control.
+- **Secret values never go into code** — settings are referenced by name; values live in secret stores you control. In Claude Code, a hook refuses a write that adds one.
+- **Only a person signs.** In Claude Code, a hook refuses a sign-off, a QA verdict or a QA sign-off written by the AI.
 - **Infrastructure and pipelines are their own approved plans** — never a side effect of building a feature.

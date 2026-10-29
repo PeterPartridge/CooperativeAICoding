@@ -16,6 +16,7 @@
     "!template/README.md",
     ".claude/commands",
     ".claude/skills",
+    ".claude/settings.json",
     ".cursor/skills",
     ".agents/skills",
     ".gemini/commands",
@@ -25,13 +26,14 @@
     "tools/*-lint.mjs",
     "tools/check.mjs",
     "tools/lib",
+    "tools/hooks",
     "README.md",
     "HOW-TO-USE.md",
     "INSTALL.md",
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test tools/lint.test.mjs tools/commands.test.mjs",
+    "test": "node --test \"tools/*.test.mjs\"",
     "check": "npm test && node tools/check.mjs",
     "prepublishOnly": "node tools/known-versions.mjs"
   },

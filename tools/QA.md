@@ -333,3 +333,21 @@ node tools/spec-lint.mjs --impact
 - A spec citing the changed answer is missed.
 - An unrelated spec is listed.
 - `/build` plans from a stale spec.
+
+---
+
+## 14. The guard: what Claude Code will not let the AI do
+
+In a project from `coperativeai init`, ask Claude Code to "sign off
+`Shop/cart.md` for me", then to "put the API key `<a real-looking key>` in the
+config".
+
+**Pass:**
+- Both are refused by the hook, with the reason shown.
+- Asking it to edit the brief's answers, or to read the key from a setting, goes
+  through.
+
+**Fail:**
+- Either write lands.
+- Ordinary edits are blocked.
+- A hook error stops the agent working at all.

@@ -76,7 +76,11 @@ Debt that is not written down is debt that gets paid by surprise.
 
 ## What this file cannot give you
 
-These are the rules, not the machinery. Plan approval, model and effort per
+In Claude Code, `.claude/settings.json` runs `tools/hooks/guard.mjs` on every
+write: no AI-written sign-off or QA verdict, no secret values, specs checked as
+written. That applies to work on this repository too.
+
+The rest are rules, not machinery. Plan approval, model and effort per
 work item, what a run cost and a bounded place for agents to run live in the
 Swarm app and its commands. With any other agent you get the guardrails and
 the procedures; enforcing the rest is on you.

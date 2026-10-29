@@ -817,3 +817,65 @@
 
 - **The three watched answers are fixed in code.** A project that keeps security
   rules somewhere else, or wants more answers watched, cannot say so yet.
+
+## 2026-10-29 — Gap 12: enforcement without Swarm
+
+### What I did
+- **`tools/hooks/guard.mjs`, a Claude Code hook** run before and after every
+  `Write` and `Edit` through `.claude/settings.json`. It holds the rules whose
+  breaking cannot be undone by editing a file afterwards. It refuses:
+  - **an AI-written sign-off:** any change to `product-signoff`,
+    `build-signoff` or `buildSignoff`, in Markdown or JSON, whether by edit or
+    by whole-file write;
+  - **QA's verdict:** any change to a QA review's `status`, and any write to
+    `qa/signoff.md`;
+  - **a secret value:** a private key, or an AWS, GitHub, Slack, Anthropic,
+    OpenAI, Stripe live or Google key. Only what the write *adds* counts, so a
+    file already holding one (a fixture) can still be edited.
+
+  After a spec in `ai-only/` is written, it runs `spec-lint` and hands back any
+  errors in that spec.
+- **The hook format came from Claude Code's own documentation:**
+  - exec form `node` plus `args`;
+  - `${CLAUDE_PROJECT_DIR}` expanded inside `args`;
+  - no shell, so it works the same in Git Bash, PowerShell and on Unix;
+  - exit 2 refuses a write, with the reason shown to the model.
+- **It fails open.** Input it cannot read lets the action through.
+- **Tests:** 11 in `tools/guard.test.mjs`, written first. Each rule is tested
+  both ways: the write it stops, and the nearby write it must allow. Fake keys
+  are assembled at run time, so the test file holds none. A further test shows
+  a fresh project's guard refuses an AI sign-off, proving the hook travels and
+  works where it lands. `npm test` and CI now run every `tools/*.test.mjs`
+  rather than a list.
+- **The honest paragraph changed.** The starter `AGENTS.md` and the emitted
+  guardrails now say what the hooks enforce, and that the rest rests on the
+  agent. A test keeps the two paragraphs identical. The starter also stopped
+  saying "never author" briefs, which `/product` and `/debt` contradicted; it
+  now says draft only when a procedure says, and never sign.
+- **This repository runs the guard on itself** (`.claude/settings.json` is
+  committed).
+- **Docs:** README, `HOW-TO-USE.md` (the promises), the repo's `AGENTS.md`, the
+  reasons in `procedures/README.md`, and QA scenario 14.
+
+### What I could not do  (and what you would need to tell me)
+- **Only Claude Code is enforced.** Cursor, Gemini CLI and Kiro have hook
+  systems of their own; I didn't verify their formats, so they get none.
+- **Plan approval is still not enforced.** A hook cannot tell a build that has
+  been approved from one that hasn't, without an approval written somewhere a
+  hook can read. That would need a new artefact, and it's a decision for you.
+- **Reading `qa/` while building is still on trust.** A read hook cannot tell
+  which procedure is running.
+
+### Debt I left behind
+- **A project that already has `.claude/settings.json` does not get the hooks.**
+  `init` never overwrites, and `update` puts the new version beside it as
+  `.update` for a person to merge. Many projects have one already (for
+  permissions), so they may never notice the guard exists. A merge of the
+  `hooks` key would fix it, at the cost of `update` editing a file people edit.
+
+- **Secret detection is a list of known formats.** A password in a plain
+  `password = "…"` line is not caught, on purpose: that pattern also matches test
+  fixtures and examples, and a guard that blocks ordinary work gets switched off.
+
+- **The guard runs `spec-lint` on the whole project after each spec write.** That
+  is fine at tens of specs. With hundreds, it should lint just the one file.
