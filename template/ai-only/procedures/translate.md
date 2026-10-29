@@ -35,7 +35,9 @@ repository, `template/`).
 - **Solution:** its answers, plus the preset's layout, tests and commands and the
   baseline's rules. Its own answers override the preset; its security rules only
   add to the baseline.
-- **Item:** only what the digest does not already say.
+- **Item:** only what the digest does not already say. Its `check` lines come
+  from `tests` and `ai-tests`, numbered `C1`, `C2`, … Re-translating keeps each
+  check's ID.
 
 Translate the person's answers only. `>` lines and `question`, `guidance` and
 `example` fields are part of the form. Write no plan; `/build` plans. Never read `qa/`.

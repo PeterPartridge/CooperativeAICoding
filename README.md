@@ -228,7 +228,7 @@ cd my-project
 coperativeai init
 ```
 
-That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the eight commands and the
+That puts the project brief, the blank forms, QA's regression suite and sign-off sheet, the nine commands and the
 checks into the folder you run it in — on Windows, macOS or Linux, with nothing
 to build. It never overwrites: a file that already exists
 is left alone and named in the report. Add `--dry-run` to see it first.
@@ -243,12 +243,13 @@ It tells the difference from `.coperativeai.json`, a record of what was installe
 
 **Looking for the desktop app?** [Swarm](https://github.com/PeterPartridge/Swarm) is built with this framework and lives in its own repository, with its installers and build steps. The framework itself needs no binary at all — [`INSTALL.md`](INSTALL.md) — and runs wherever Claude Code runs.
 
-New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses eight Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
+New here? **[`HOW-TO-USE.md`](HOW-TO-USE.md)** is the practical, start-to-finish walkthrough — filling in a brief, translating it, building, and iterating. It uses nine Claude Code slash commands. Other agents can follow the same steps by reading the command files in [`.claude/commands/`](.claude/commands/), which are plain Markdown:
 
 - **`/draft [folder]`** — for a codebase that already exists: fill the brief in from the code, sourced and marked, with a few multiple-choice questions at the end instead of a blank form. The AI's answers stay the AI's until you accept them.
 - **`/translate <brief>`** — turn a filled-in brief into a structured spec + skills.
 - **`/new-item <type> <solution> <name>`** — copy a blank page/endpoint/model form into a solution folder.
 - **`/build <spec>`** — build the next iteration of an approved spec, then report back and log debt.
+- **`/verify <spec>`**: a second opinion after a build, ideally from a fresh session or another model. Each acceptance check gets a verdict (proves, weak, missing, failing) citing a file and line. It reports and never fixes.
 - **`/pipeline <solution>`** — create the solution's CI/CD pipeline and missing infrastructure from its spec, as its own approved plan. Secret values are never written into code — they're referenced by name from stores you control.
 - **`/emit-guardrails [targets]`** — write the project's rules out in other agents' native formats (`AGENTS.md`, `CLAUDE.md`, Kiro steering, Cursor rules) from the same spec. One brief, every agent's guardrails — see below.
 - **`/product [idea or brief]`**: plan an idea with Product. A few multiple-choice questions, then Parts 1–2 of a page brief in Product's words, marked drafted until Product accepts and signs. The AI never signs.

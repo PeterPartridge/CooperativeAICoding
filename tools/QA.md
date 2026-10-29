@@ -242,3 +242,23 @@ it, and run `/build`.
 - the AI fills in a sign-off;
 - `/build` plans with one missing;
 - `/build` opens anything under `qa/` to decide.
+
+---
+
+## 10. Tracing and `/verify`: "done" has a test behind it
+
+Build one item. Then:
+1. Delete the test for one check. `node tools/check.mjs` should fail, naming
+   `<item>#C<n>`.
+2. Put the test back, but make it assert nothing. Run `/verify <spec>` in a fresh
+   session.
+
+**Pass:**
+- The hollow test is called **weak**, with its file and line.
+- Every other check gets a verdict with a file and line.
+- No file is changed.
+
+**Fail:**
+- The hollow test is called *proves*.
+- A verdict cites no file.
+- `/verify` edits code or tests.

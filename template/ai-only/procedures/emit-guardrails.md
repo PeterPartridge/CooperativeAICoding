@@ -3,7 +3,7 @@
 Write the project's rules into the file each AI tool reads, generated from one
 spec so there is no second copy to drift.
 
-## Content: about one page, nothing else
+## Content: a page at most
 
 Take it from `ai-only/Project_digest.md`, which is already the compact form, in
 this order:
@@ -12,8 +12,8 @@ this order:
 2. **Solutions:** name, type, repo and local path.
 3. **House rules, each with this project's meaning**, never a bare name.
 4. **The testing floor.**
-5. **Security model and baseline**, always including: secret values are
-   referenced by name, never written into code, config or logs.
+5. **Security model and baseline**, always with: secrets are referenced by
+   name, never written into code, config or logs.
 6. **The deliverable in progress.** Work stops when its last item is built.
 7. **The AI workspace:** build from the approved spec at
    `ai-only/<solution>/<item>.md`, take project rules from
@@ -30,6 +30,7 @@ this order:
    | plan an idea with Product | `ai-only/procedures/product.md` |
    | add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
    | build the next iteration of an approved spec | `ai-only/procedures/build.md` |
+   | verify a build against its spec | `ai-only/procedures/verify.md` |
    | help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |
    | set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
    | write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |
@@ -44,9 +45,9 @@ this order:
 | Cursor | `.cursor/rules/<name>.mdc` | `alwaysApply: true`, or `description` + `globs` |
 | Copilot | `.github/copilot-instructions.md` | none |
 
-Prefer `AGENTS.md`. Emit native files only for file-scoped rules. For Kiro's
-foundation files: purpose and deliverable go in `product.md`; solutions and the
-testing floor in `tech.md`; house rules and reuse in `structure.md`.
+Prefer `AGENTS.md`. Emit native files only for file-scoped rules. Kiro's
+foundation files: purpose and deliverable → `product.md`; solutions and the
+floor → `tech.md`; house rules and reuse → `structure.md`.
 
 ## Safety
 
@@ -57,9 +58,9 @@ Start every emitted file with:
      Edit the brief, not this file — the next emit overwrites it. -->
 ```
 
-- **Overwrite only files that carry that header.** A file without it was written
-  by a person. Stop, name it, and show what you would have written.
-- Re-emit whenever the digest changes. List every file you wrote.
+- **Overwrite only files with that header.** One without it is a person's: stop,
+  name it, and show what you would have written.
+- Re-emit when the digest changes. List the files you wrote.
 
 ## End every emitted file with these two sections
 

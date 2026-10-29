@@ -557,3 +557,56 @@
 - **"Dev and Product" is not checked to be two people.** `build-signoff` needs
   only a name, a date and a round. That two names are there, and that one of
   them is Product, is trusted.
+
+## 2026-10-29 — Gaps 5 and 6: trace and verify
+
+### What I did
+- **Every acceptance check has an ID**, `check: C1 …`, and **every test names the
+  check it proves**, `userLogin#C2`. `/translate` numbers the checks from the
+  brief's `tests` and the Developers' `ai-tests`, and keeps the IDs when it
+  re-translates. `/build` names each test after its check.
+- **`spec-lint` traces both directions** (gap 6). It searches the solution's
+  code, found through the digest's `solution:` line, for `<item>#C<n>`:
+  - a **built** item with a check no test names fails;
+  - an item not built yet is noted;
+  - a test naming a check the spec doesn't have fails, as a test of something
+    nobody asked for, or of a check since removed;
+  - a check with no ID, or an ID used twice, fails;
+  - code that isn't checked out is said, not failed.
+
+  It skips `ai-only/`, `qa/` and Markdown, so a round report quoting a tag
+  doesn't count as a test. There are 7 tests, written first. The new check
+  caught the example's three un-numbered checks, now `C1`–`C3`.
+- **`/verify`, a second opinion** (gap 5). Ideally run in a fresh session or
+  with another model. It runs the tests and gives each check a verdict
+  (*proves*, *weak*, *missing* or *failing*), each citing a file and line. It
+  looks for spec lines no check covers, reports under `## Verify <date>`, and
+  never fixes anything.
+- **Docs:** the README and `HOW-TO-USE.md` (command lists and the build steps),
+  the reasons in `procedures/README.md`, nine commands where it said eight, and
+  QA scenario 10.
+- **The token budgets held**, by trimming `build.md`, `emit-guardrails.md` and
+  the format document. I briefly raised `translate.md`'s budget, against my own
+  rule, then put it back: the file fitted all along.
+
+### What I could not do  (and what you would need to tell me)
+- **The example's code isn't here** (`../clothing-website`), so its trace is
+  "cannot trace", not a real result. Nothing in this repository exercises
+  tracing against real code except the tests' fixtures.
+- **Whether a test really proves its check is judgement.** `spec-lint` proves a
+  test *names* a check. `/verify` and a person decide whether it would catch a
+  break.
+- **No person has run QA scenarios 1–10** against a real agent.
+
+### Debt I left behind
+- **The `solution:` line is parsed by its ` — ` separators.** The format document
+  now fixes its shape, but a digest written another way gives "cannot trace",
+  not an error. A dedicated `path:` key would be sturdier.
+
+- **Tags are matched by item name alone.** Two solutions with an item of the same
+  name are searched only within their own code, so they don't collide. A tag
+  inside a string that happens to look like one would still count.
+
+- **QA's regression tests are not traced to checks.** They link to an item, not a
+  `C<n>`. That keeps QA independent of the AI's spec, which may be right; it
+  means a suite can't yet show which checks QA covers.

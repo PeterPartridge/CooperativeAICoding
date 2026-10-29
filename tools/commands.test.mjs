@@ -175,6 +175,7 @@ const TOKEN_BUDGET = {
   "template/ai-only/procedures/product.md": 525,
   "template/ai-only/procedures/qa.md": 500,
   "template/ai-only/procedures/translate.md": 600,
+  "template/ai-only/procedures/verify.md": 525,
 };
 
 test("what the AI reads to follow a procedure stays within its token budget", async () => {
