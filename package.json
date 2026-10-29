@@ -1,6 +1,6 @@
 {
   "name": "coperativeai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A way of working that Product, Developers, QA and AI share: plain-English briefs, specs the AI translates rather than authors, and debt it has to declare.",
   "type": "module",
   "bin": {

@@ -468,3 +468,27 @@
 - **The version list is generated from this repository's history.** Copies of
   the framework that never went through it (a fork, or a hand-copied
   `template/`) are treated as edited. That is safe, but noisy for them.
+
+## 2026-10-29 — Release 0.2.0, prepared
+
+### What I did
+- **Bumped `package.json` to 0.2.0.** The published 0.1.0 went out at 20:04 UTC
+  on 27 October, before #19 merged at 20:52, so npm does not yet have #19–#23:
+  - the procedure path fixes;
+  - the Lean AI layer;
+  - QA sign-off;
+  - one copy list;
+  - `coperativeai update`.
+- **Regenerated `bin/known-versions.json`**: unchanged, already current.
+- `npm test`: 112 pass. `node tools/check.mjs`: 4 checks pass.
+
+### What I could not do  (and what you would need to tell me)
+- **I did not publish.** `npm publish` runs under the owner's npm account. After
+  this merges: `git pull`, then `npm publish` (which regenerates the version list
+  first, through `prepublishOnly`).
+
+### Debt I left behind
+- **Nothing tells anyone when `main` and npm drift apart again.** This release
+  exists because they did, unnoticed, for two days. A CI step comparing
+  `package.json`'s version with `npm view coperativeai version` after a merge
+  would say so.
