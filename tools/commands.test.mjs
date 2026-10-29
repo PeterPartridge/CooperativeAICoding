@@ -642,3 +642,36 @@ test("the starter AGENTS.md and procedures/README.md each list every procedure",
   }
   assert.deepEqual(missing, []);
 });
+
+// **The guard travels, and works where it lands.** A hook that is configured
+// in a project but cannot find its script, or its spec-lint, refuses nothing
+// — and nobody notices, because a missing guard looks exactly like a quiet one.
+test("a fresh project's guard refuses a sign-off the AI writes", async () => {
+  const t = await freshProject();
+  const settings = JSON.parse(await readIn(t, ".claude/settings.json"));
+  assert.ok(settings.hooks.PreToolUse, "no hooks in a fresh project");
+  await fs.mkdir(inProject(t, "Shop"), { recursive: true });
+  await fs.writeFile(inProject(t, "Shop/cart.md"), "---\nform: page-brief\nproduct-signoff: \"\"\n---\n");
+  const { spawnSync } = await import("node:child_process");
+  const r = spawnSync(process.execPath, [inProject(t, "tools/hooks/guard.mjs"), "pre"], {
+    input: JSON.stringify({
+      tool_name: "Edit",
+      tool_input: { file_path: inProject(t, "Shop/cart.md"), old_string: 'product-signoff: ""', new_string: "product-signoff: AI 2026-10-29 round 1" },
+    }),
+    env: { ...process.env, CLAUDE_PROJECT_DIR: t },
+    encoding: "utf8",
+  });
+  assert.equal(r.status, 2, r.stderr);
+});
+
+// **The honest paragraph, said the same way twice.** The starter AGENTS.md and
+// the block /emit-guardrails writes both end by saying what is enforced and
+// what is not. They drifted once; an overstated version is the one that costs
+// trust, because it is discovered while somebody is relying on it.
+test("the starter AGENTS.md and emitted guardrails say the same about enforcement", async () => {
+  const section = (text) => text.match(/## What this file cannot give you\n\n([\s\S]*?)(?:\n```|$)/)?.[1]?.trim();
+  const starter = section(await read("template/AGENTS.template.md"));
+  const emitted = section(await read("template/ai-only/procedures/emit-guardrails.md"));
+  assert.ok(starter && starter.includes("hooks"), "the starter's paragraph is missing or says nothing of the hooks");
+  assert.equal(emitted, starter);
+});

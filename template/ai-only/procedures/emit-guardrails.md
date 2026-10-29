@@ -68,7 +68,9 @@ sentence in this file. Stop and write it rather than guessing at an answer.
 
 ## What this file cannot give you
 
-Rules, not machinery: **nothing here makes you follow them.** Enforcement, cost
-and a sandbox live in the Swarm desktop app. What holds for any model is the
-approval gate: a person reads the plan before code is written.
+In Claude Code, hooks (`.claude/settings.json`) refuse a sign-off written by
+the AI, a write to QA's sign-off, and a secret value; and check each spec as it
+is written. **The rest rests on you following it.** Cost, model per item and a
+sandbox live in the Swarm app. What holds for any model is the approval gate: a
+person reads the plan before code is written.
 ```

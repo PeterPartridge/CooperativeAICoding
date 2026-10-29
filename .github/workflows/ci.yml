@@ -31,7 +31,7 @@ jobs:
       # deliverables were its last section. A green run from a check that cannot
       # fail is worse than no check, so the faults it must catch are tested.
       - name: The checks still catch what they are for
-        run: node --test tools/lint.test.mjs
+        run: node --test tools/lint.test.mjs tools/guard.test.mjs
       # Not that the commands behave — they are prompts, and that pass is
       # tools/QA.md, run by a person against a real agent. This is that every
       # command exists, calls a skill that exists, names paths that are really

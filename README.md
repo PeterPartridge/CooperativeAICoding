@@ -175,6 +175,14 @@ Every one is a pointer to the same procedure in `ai-only/procedures/`, generated
 
 Generated files carry a header saying so, and a file without that header is never overwritten — it was written by a person.
 
+**What is enforced, in Claude Code.** Hooks in `.claude/settings.json` run `tools/hooks/guard.mjs` before and after every write. They refuse:
+- a sign-off written by the AI;
+- a QA review marked `happy` by the AI;
+- any write in QA's sign-off sheet;
+- a write that adds a secret value (a private key, or an AWS, GitHub, Slack, Anthropic, OpenAI, Stripe or Google token).
+
+After a spec is written, they hand `spec-lint`'s findings straight back to the AI. These are the rules whose breaking cannot be undone by editing a file afterwards. Other agents get none of this yet.
+
 **What travels and what does not**, stated plainly because it is discovered otherwise: the guardrails travel — house rules with their definitions, the testing floor, the security baseline, the deliverable in progress, and the working agreement including *stop and say so rather than guess*. The machinery does not — plan approval, model and effort per item, run cost, deny-by-default policy and the sandbox live in the app and its commands. This repository's own [`AGENTS.md`](AGENTS.md) is the worked example, honest gaps included.
 
 ## How this differs from OpenSpec, Kiro, and friends

@@ -5,28 +5,28 @@
 
 # How work is done here
 
-People answer plain-English briefs. You translate them into specs, and a person
-approves every plan before code is written. **This is the starter:** sections
-marked *not yet filled in* wait on the brief.
+People answer plain-English briefs; you translate them into specs; a person
+approves every plan before code is written. **This is the starter:** *not yet
+filled in* sections wait on the brief.
 
 ## The procedures: read the file and follow it exactly
 
 | When the request is | Follow |
 |---|---|
-| fill a brief in from an existing codebase | `ai-only/procedures/draft.md` |
-| turn a filled-in brief into a spec | `ai-only/procedures/translate.md` |
+| draft a brief from existing code | `ai-only/procedures/draft.md` |
+| translate a brief into a spec | `ai-only/procedures/translate.md` |
 | plan an idea with Product | `ai-only/procedures/product.md` |
-| add a new page, endpoint or database model | `ai-only/procedures/new-item.md` |
-| build the next iteration of an approved spec | `ai-only/procedures/build.md` |
+| add a page, endpoint or model | `ai-only/procedures/new-item.md` |
+| build an approved spec | `ai-only/procedures/build.md` |
 | verify a build against its spec | `ai-only/procedures/verify.md` |
 | decide on the debt builds declared | `ai-only/procedures/debt.md` |
-| help QA: automate tests, write scripts, run the regression suite | `ai-only/procedures/qa.md` |
-| set up a solution's pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
-| write these rules out for another AI tool | `ai-only/procedures/emit-guardrails.md` |
+| help QA with tests and the regression suite | `ai-only/procedures/qa.md` |
+| set up a pipeline and infrastructure | `ai-only/procedures/pipeline.md` |
+| write these rules for another AI tool | `ai-only/procedures/emit-guardrails.md` |
 
 ## Where things are
 
-- `Project_brief.md` and `<solution>/<item>.md|.json`: the people's briefs. Never author them.
+- `Project_brief.md` and `<solution>/<item>.md|.json`: people's briefs. Draft in them only when a procedure says; never sign.
 - `ai-only/`: your workspace, in the format of `ai-only/2-ai-system.template.md`.
 - `ai-only/Project_digest.md`: the rules every build obeys. *Does not exist yet: created by `translate.md`.*
 - `qa/`: QA's. Read it only when following `qa.md`.
@@ -44,10 +44,9 @@ marked *not yet filled in* wait on the brief.
 - Build the **smallest thing** that answers the request.
 - Existing code is **production**, even if it looks broken.
 - **Never invent scope.** What the brief doesn't say is an `UNKNOWN`, not a decision.
-- **Reuse before building:** check the code map first, and add a row for what you build.
+- **Reuse before building:** check the code map; add a row for what you build.
 - **When you cannot understand something, stop and say so.** "I don't know how
   you want this done" is the most useful sentence you can write.
-- A person approves the plan before code is written.
 
 ## When you finish, write this down
 
@@ -64,6 +63,8 @@ the round record.
 
 ## What this file cannot give you
 
-Rules, not machinery: **nothing here makes you follow them.** Enforcement, cost
-and a sandbox live in the Swarm desktop app. What holds for any model is the
-approval gate: a person reads the plan before code is written.
+In Claude Code, hooks (`.claude/settings.json`) refuse a sign-off written by
+the AI, a write to QA's sign-off, and a secret value; and check each spec as it
+is written. **The rest rests on you following it.** Cost, model per item and a
+sandbox live in the Swarm app. What holds for any model is the approval gate: a
+person reads the plan before code is written.

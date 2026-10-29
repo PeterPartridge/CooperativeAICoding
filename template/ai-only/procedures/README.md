@@ -62,6 +62,18 @@ token budget per procedure; it may only come down.
 
 ## Why the rules are the way they are
 
+### the guard (Claude Code hooks)
+
+- **Enforced, not asked.** A procedure is a document an agent is pointed at.
+  `tools/hooks/guard.mjs` runs before and after every write in Claude Code, and a
+  refusal from it is a refusal. It holds the rules whose breaking cannot be
+  undone afterwards: a sign-off is a person saying so, so the AI never writes
+  one; and a committed secret is a rotated secret.
+- **Only what a write adds.** A secret pattern already in a file (a fixture, a
+  scanner's own tests) does not block editing that file.
+- **It fails open.** A guard that locks an agent up over its own bug gets
+  switched off, and then guards nothing.
+
 ### translate
 
 - **A drafted brief is refused.** `/draft` writes answers from the code and marks
