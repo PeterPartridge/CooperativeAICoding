@@ -8,6 +8,7 @@ follow it.**
 |---|---|
 | fill a brief in from an existing codebase | [`draft.md`](draft.md) |
 | turn a filled-in brief into a spec | [`translate.md`](translate.md) |
+| plan an idea with Product | [`product.md`](product.md) |
 | add a new page, endpoint or database model | [`new-item.md`](new-item.md) |
 | build the next iteration of an approved spec | [`build.md`](build.md) |
 | help QA: automate tests, write scripts, run the regression suite | [`qa.md`](qa.md) |
@@ -95,6 +96,23 @@ token budget per procedure; it may only come down.
   direction, which is worth nothing if the AI builds straight past it.
 - **Debt, not retries.** Thrashing on something it cannot do burns tokens and
   produces worse code than a clear "I could not do this, here is why".
+
+### product
+
+- **Two sign-offs, because two kinds of person decide.** Product knows the
+  customers and the commercial reason; Developers know how it can be built.
+  Product signs the idea and its use case first; then Developers ask how, what
+  can go wrong and whether there is a better way, and when both are happy they
+  sign together, with QA's review done. A build nobody agreed to is the thing
+  both sign-offs exist to stop.
+- **Sign-offs name a round.** A brief changes by gaining change rounds, so a
+  sign-off says which round it covers. A new round shows its missing sign-offs
+  instead of carrying an old approval forward silently.
+- **The AI plans with Product, but never signs.** Its words stay `drafted`
+  until Product accepts them. A sign-off is a person saying so, the same as
+  QA's.
+- **No architecture from Product.** How it is built is the Developers' part.
+  An idea brief that prescribes a mechanism makes a design nobody chose.
 
 ### qa
 

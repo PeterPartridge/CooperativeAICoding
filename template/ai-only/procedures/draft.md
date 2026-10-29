@@ -31,8 +31,8 @@ After each answer, write one line:
   thing this procedure can produce.
 
 **Never draft** `deliverables`, `apps-to-avoid`, who the users are unless a
-source says it, or anything about cost, models or effort. Those are the team's
-decisions, not facts in the code.
+source says it, anything about cost, models or effort, or any sign-off. Those
+are the team's decisions, not facts in the code.
 
 ## 3. End with at most five questions
 

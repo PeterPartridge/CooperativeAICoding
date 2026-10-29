@@ -1,12 +1,11 @@
 # Build the next iteration of an approved spec
 
-Build from `ai-only/<solution>/<item>.md`. If no spec was named, list the specs
-and ask. `<projectRoot>` is the nearest folder above it that holds `Project_brief.md`.
+Build from `ai-only/<solution>/<item>.md`; with none named, list them and ask. `<projectRoot>` is the nearest folder above it that holds `Project_brief.md`.
 
 ## Read only
 
 - `ai-only/Project_digest.md`
-- `ai-only/<solution>/_solution.md` (if missing, translate the solution's `application-spec.json` first)
+- `ai-only/<solution>/_solution.md` (translate its `application-spec.json` first if missing)
 - the item spec
 - the first sentence of each row of `ai-only/Code_map.md`, if it exists
 
@@ -15,6 +14,7 @@ Never read `qa/`. QA's tests check this build from outside.
 ## Stop before planning if
 
 - `node tools/spec-lint.mjs --ready <spec>` fails. Name the open unknowns.
+- `node tools/brief-lint.mjs --ready <its brief>` fails. Name what's missing; never sign for anyone.
 - `node tools/brief-lint.mjs --status <each depends-on brief>` shows one not `built`.
 - `node tools/brief-lint.mjs <projectRoot>` reports this item's deliverable.
 - The repo in `_solution.md` is missing or not checked out.
@@ -38,9 +38,8 @@ Unknowns:    0
 Under it, for the AI: one line per action and check in the spec, and how each
 is done. **Wait for approval.**
 
-In a solution with no code yet, plan only the scaffold, from `_solution.md`.
-Use the pinned versions; anything unpinned gets the latest stable, and its exact
-version goes in the report.
+No code in the solution yet? Plan only the scaffold, from `_solution.md`, with
+pinned versions; record the exact version of anything unpinned.
 
 ## 2. Build
 
@@ -62,10 +61,8 @@ Run `cmd: test` and `cmd: build`. Append to the spec:
 ### Debt I left behind
 ```
 
-The report includes:
-- the command results;
-- each check, with the test that proves it;
-- a token estimate for the round.
+Include the command results, each check with the test that proves it, and a
+token estimate.
 
 Then:
 - **Code map:** add or fix one row in `ai-only/Code_map.md` per method you

@@ -25,5 +25,5 @@ Steps:
    English: under the question headings in a Markdown form, or in the `answer`
    fields of a JSON form (and sets the name/status fields at the top).
 4. Do NOT overwrite an existing file; if it exists, stop and tell me.
-5. Tell me the path you created and that the next step is to fill it in, then run
-   `/translate` on it.
+5. Tell me the path, and what's next: Product fills Parts 1–2 (or uses
+   `/product`) and signs; Developers answer Part 3 and sign with Product.
