@@ -145,7 +145,8 @@ endpoints and models, and every step below is identical for them.
 5. **Answer its `UNKNOWN`s**, as above. A build won't start while any is open,
    nor until both sign-offs cover the item's current round and QA's review says
    `happy`. `node tools/brief-lint.mjs --ready <brief>` says what is missing. A
-   new change round needs new sign-offs.
+   new change round needs new sign-offs. So does sign-off 2 if the project's
+   roles or testing floor, or the solution's security, change after it.
 
 ---
 

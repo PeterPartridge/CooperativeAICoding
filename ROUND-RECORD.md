@@ -779,3 +779,41 @@
   add a line to a spec (a new role, say) is invisible to a check that starts
   from what the spec cites. `--impact` flags the digest when `roles` changes,
   but cannot say which item should now mention the new role.
+
+## 2026-10-29 — Which changes reopen a sign-off (option c)
+
+### What I did
+- **Option c, as chosen.** A change after an item's build sign-off to any of
+  these reopens that sign-off (sign-off 2, Dev and Product together):
+  - the Project Brief's `roles`;
+  - the Project Brief's `testing`;
+  - the item's solution's `security`.
+
+  `brief-lint --ready`, the gate `/build` asks, then waits on "Dev and
+  Product's sign-off again — Project_brief.md#roles changed after <date>".
+  Any other change means re-translating, not re-signing. Product's sign-off
+  (the idea) is not reopened.
+- **Told apart with git.** Each watched answer as of the end of the sign-off's
+  day, against now. No git means no reopening.
+- **One reading of a brief.** Reading an answer, now or at a commit, moved out of
+  `spec-lint` into `tools/lib/answers.mjs`, which both checks import, rather than
+  a second copy in `brief-lint`. `package.json` publishes `tools/lib`, so it
+  travels into projects with the checks; the fresh-project test proves it.
+- **Tests:** 5, written first. Two are shapes that must keep passing: an
+  unrelated change reopens nothing, and a sign-off made after the change
+  stands. Commit dates are set in the fixture, so "after" is a day, not a race.
+- **Docs:** `page.md`'s sign-off guidance, the README, `HOW-TO-USE.md` and the
+  reasons in `procedures/README.md`.
+
+### What I could not do  (and what you would need to tell me)
+- **A change made on the sign-off's own day, after the signing, is not caught.**
+  A sign-off records a day, not a time, so the whole day counts as before it.
+
+### Debt I left behind
+- **A heredoc swallowed the shared module's regex backslashes**, and every
+  spec-lint test failed until I fixed it by hand. The tests caught it at once.
+  It is the same shell-escaping trap as before, now hit five times this
+  session; writing code through the file tools instead of heredocs avoids it.
+
+- **The three watched answers are fixed in code.** A project that keeps security
+  rules somewhere else, or wants more answers watched, cannot say so yet.

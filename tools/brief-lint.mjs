@@ -27,6 +27,7 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { changedSince, commitBy } from "./lib/answers.mjs";
 
 const repo = path.resolve(
   path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")),
@@ -192,6 +193,31 @@ async function qaVerdicts(root) {
 
 /** What an item still waits on before it may be built, and what is wrong
  *  with the sign-offs it has. */
+/** **What reopens a build sign-off.** Dev and Product agreed how to build an
+ *  item against the project's roles, its testing floor and its solution's
+ *  security; if one of those changed after they signed, the agreement was made
+ *  about something that is no longer true. Anything else is a re-translation,
+ *  not a new agreement. Told apart with git: each answer as of the end of the
+ *  sign-off's day, against now. No git, no reopening. */
+async function reopened(root, item, itemPath) {
+  const [field, who] = signoffsFor(item).at(-1);
+  const m = String(item.fields[field] ?? "").trim().match(SIGNOFF);
+  if (!m) return [];
+  const commit = commitBy(root, m[2]);
+  if (!commit) return [];
+  const solution = itemPath.split("/")[0];
+  const watched = [
+    ["Project_brief.md", "roles"],
+    ["Project_brief.md", "testing"],
+    [`${solution}/application-spec.json`, "security"],
+  ];
+  const out = [];
+  for (const [rel, id] of watched) {
+    if ((await changedSince(root, commit, rel, id)) === true) out.push(`${who} again — ${rel}#${id} changed after ${m[2]}`);
+  }
+  return out;
+}
+
 function readiness(item, itemPath, verdicts) {
   const round = roundOf(item);
   const waiting = [];
@@ -350,6 +376,7 @@ async function lint(root) {
     if (item.broken) continue;
     const itemPath = path.relative(root, item.file).split(path.sep).join("/");
     const { waiting, wrong } = readiness(item, itemPath, verdicts);
+    if (wrong.length === 0) waiting.push(...(await reopened(root, item, itemPath)));
     for (const w of wrong) errors.push(`${rel(item.file)}  ${w}`);
     if (wrong.length > 0) continue;
     if (waiting.length > 0) notes.push(`${itemPath} waiting on ${waiting.join("; ")}`);
@@ -435,6 +462,7 @@ if (named[0] === "--ready") {
     process.exit(1);
   }
   const { round, waiting, wrong } = readiness(item, itemPath, await qaVerdicts(root));
+  if (wrong.length === 0) waiting.push(...(await reopened(root, item, itemPath)));
   for (const w of wrong) console.log(`  ERROR  ${w}`);
   if (waiting.length === 0 && wrong.length === 0) {
     console.log(`${itemPath}: ready to build (round ${round})`);

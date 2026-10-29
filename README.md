@@ -79,7 +79,7 @@ Product plans these, with the AI if they like (`/product`), and signs them: **si
 - How will we know it works? What must be true for this to be accepted?
 - What endpoints should be used?
 
-Developers talk their answers through with Product, which refines the idea. When both are happy, and QA has reviewed the item and planned how to test it, they sign together: **sign-off 2**. `/build` checks both (and QA's verdict, never QA's tests) before it plans. A sign-off names the change round it covers, so a new round needs new sign-offs.
+Developers talk their answers through with Product, which refines the idea. When both are happy, and QA has reviewed the item and planned how to test it, they sign together: **sign-off 2**. `/build` checks both (and QA's verdict, never QA's tests) before it plans. A sign-off names the change round it covers, so a new round needs new sign-offs. A change after sign-off 2 to the project's roles or testing floor, or to the solution's security, reopens it, because that is what Dev and Product agreed against. Other changes mean re-translating, not re-signing.
 
 ## The AI Workflow
 
